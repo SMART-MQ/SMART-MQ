@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SMART - Memory Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Fredoka', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+
+    h1, h2, p {
+      margin: 10px;
+    }
+
+    .rainbow {
+      background: linear-gradient(90deg, #f06292, #ba68c8, #64b5f6, #4db6ac, #aed581, #ffd54f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+    }
+
+    .active {
+      display: flex;
+    }
+
+    .play-button {
+      background: #b2fab4;
+      border: none;
+      padding: 20px 40px;
+      font-size: 1.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      transition: background 0.3s ease;
+    }
+
+    .play-button:hover {
+      background: #a5d6a7;
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(6, 100px);
+      gap: 15px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+      background: #b3e5fc;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      user-select: none;
+      transition: transform 0.3s ease;
+    }
+
+    .card.flipped {
+      background: #4dd0e1;
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card.shake {
+      animation: shake 0.4s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+    }
+
+    .message {
+      color: #2e7d32;
+      font-size: 2.5rem;
+      display: none;
+      margin-bottom: 10px;
+      transition: opacity 0.5s ease;
+    }
+
+    .message.show {
+      display: block;
+      opacity: 1;
+    }
+
+    .countdown {
+      font-size: 6rem;
+      font-weight: bold;
+      color: #f06292;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .fade-in {
+      opacity: 1 !important;
+    }
+
+    .good-job-message {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #2e7d32;
+      position: absolute;
+      z-index: 10;
+      display: none;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    #startScreen {
+      background-color: #fff9c4;
+    }
+
+    #countdownScreen {
+      background-color: #b3e5fc;
+    }
+
+    #gameScreen {
+      background-color: #c8e6c9;
+    }
+
+    #congratsScreen {
+      background-color: #c8e6c9;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SCREEN 1: Start -->
+  <div class="screen active" id="startScreen">
+    <h1 class="rainbow">Welcome to the SMART Memory Game!</h1>
+    <p class="rainbow">To play, match each food to its pair.</p>
+    <button class="play-button" onclick="startCountdown()">▶ Play</button>
+  </div>
+
+  <!-- SCREEN 1.5: Countdown -->
+  <div class="screen" id="countdownScreen">
+    <div class="countdown" id="countdownText">3</div>
+  </div>
+
+  <!-- SCREEN 2: Game -->
+  <div class="screen" id="gameScreen">
+    <h2 class="rainbow">SMART - Memory Game</h2>
+    <div class="game-board" id="gameBoard"></div>
+    <div class="good-job-message" id="goodJobMessage">Good Job!</div>
+  </div>
+
+  <!-- SCREEN 3: Congrats -->
+  <div class="screen" id="congratsScreen">
+    <h2 class="rainbow">CONGRATULATIONS!</h2>
+    <p id="resultText"></p>
+    <p class="rainbow">Now, time to finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
+  </div>
+
+  <script>
+    const emojis = ['☕', '🍕', '🍭', '🍔', '🍟', '🥗', '🍎', '🍌', '🥛'];
+    let cards = [];
+
+    let firstCard = null;
+    let lockBoard = false;
+    let matches = 0;
+    let fastestMatch = Infinity;
+    let firstClickTime = null;
+    const totalPairs = emojis.length;
+
+    const startScreen = document.getElementById('startScreen');
+    const countdownScreen = document.getElementById('countdownScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const congratsScreen = document.getElementById('congratsScreen');
+    const board = document.getElementById('gameBoard');
+    const goodJobMessage = document.getElementById('goodJobMessage');
+    const resultText = document.getElementById('resultText');
+    const countdownText = document.getElementById('countdownText');
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function switchScreen(from, to) {
+      from.classList.remove('active');
+      to.classList.add('active');
+    }
+
+    function startCountdown() {
+      switchScreen(startScreen, countdownScreen);
+      let count = 3;
+      countdownText.textContent = count;
+      countdownText.classList.add('fade-in');
+
+      const interval = setInterval(() => {
+        countdownText.classList.remove('fade-in');
+        setTimeout(() => {
+          count--;
+          if (count === 0) {
+            countdownText.textContent = "GO!";
+            countdownText.classList.add('fade-in');
+            clearInterval(interval);
+            setTimeout(() => {
+              switchScreen(countdownScreen, gameScreen);
+              initGame();
+            }, 1000);
+          } else {
+            countdownText.textContent = count;
+            countdownText.classList.add('fade-in');
+          }
+        }, 500);
+      }, 1000);
+    }
+
+    function initGame() {
+      cards = shuffle([...emojis, ...emojis]);
+      board.innerHTML = '';
+      matches = 0;
+      fastestMatch = Infinity;
+      firstCard = null;
+      lockBoard = false;
+
+      cards.forEach((emoji, index) => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.dataset.emoji = emoji;
+        card.dataset.index = index;
+        card.textContent = '';
+        card.addEventListener('click', flipCard);
+        board.appendChild(card);
+      });
+    }
+
+    function flipCard() {
+      if (lockBoard || this.classList.contains('flipped')) return;
+
+      this.classList.add('flipped');
+      this.textContent = this.dataset.emoji;
+
+      if (!firstCard) {
+        firstCard = this;
+        firstClickTime = performance.now();
+        return;
+      }
+
+      const secondCard = this;
+
+      if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
+        const matchTime = (performance.now() - firstClickTime) / 1000;
+        if (matchTime < fastestMatch) fastestMatch = matchTime;
+
+        showMessage("Good Job!");
+        firstCard.removeEventListener('click', flipCard);
+        secondCard.removeEventListener('click', flipCard);
+        firstCard = null;
+        matches++;
+
+        if (matches === totalPairs) {
+          setTimeout(showCongrats, 800);
+        }
+        lockBoard = false;
+      } else {
+        lockBoard = true;
+        firstCard.classList.add('shake');
+        secondCard.classList.add('shake');
+        setTimeout(() => {
+          firstCard.classList.remove('flipped', 'shake');
+          secondCard.classList.remove('flipped', 'shake');
+          firstCard.textContent = '';
+          secondCard.textContent = '';
+          firstCard = null;
+          lockBoard = false;
+        }, 800);
+      }
+    }
+
+    function showMessage(text) {
+      goodJobMessage.textContent = text;
+      goodJobMessage.style.display = 'block';
+      lockBoard = true;
+
+      setTimeout(() => {
+        goodJobMessage.style.display = 'none';
+        lockBoard = false;
+      }, 3000);
+    }
+
+    function showCongrats() {
+      switchScreen(gameScreen, congratsScreen);
+      resultText.innerHTML = `✅ Fastest matched pair time: ${fastestMatch.toFixed(2)} seconds`;
+    }
+  </script>
+</body>
+</html>
