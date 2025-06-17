@@ -25,7 +25,7 @@
       line-height: 1.1;
     }
     #game h1 {
-      font-size: 3.2rem; /* smaller "Spot the difference" title */
+      font-size: 2.6rem; /* even smaller "Spot the difference" */
       margin-bottom: 18px;
     }
     .grid {
@@ -34,6 +34,11 @@
       justify-content: center;
       margin: 0 auto 35px;
       user-select: none;
+    }
+    .grid.guessing .cell:hover {
+      transform: scale(1.1);
+      border-color: #f48fb1;
+      box-shadow: 2px 6px 14px rgba(244, 143, 177, 0.5);
     }
     .cell {
       cursor: pointer;
@@ -48,11 +53,6 @@
       user-select: none;
       transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
       -webkit-tap-highlight-color: transparent;
-    }
-    .grid.guessing .cell:hover {
-      transform: scale(1.1);
-      border-color: #f48fb1;
-      box-shadow: 2px 6px 14px rgba(244, 143, 177, 0.5);
     }
     .marker {
       position: absolute;
@@ -152,7 +152,7 @@
         font-size: 2.4rem;
       }
       #game h1 {
-        font-size: 2.6rem;
+        font-size: 2.2rem;
       }
       .instruction-box, #end p {
         font-size: 1.6rem;
@@ -216,14 +216,14 @@
     const rounds = [
       { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 }, // rounds 1 & 2: 2 columns
       { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 },
-      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 110 }, // rounds 3 & 4 smaller emoji size to fit better
-      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 110 },
-      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 90 },  // rounds 5-6 smaller emoji size
-      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 90 },
-      { gridSize: 10, time: 60, differences: 2, columns: 5, cellSize: 80 },
-      { gridSize: 10, time: 60, differences: 2, columns: 5, cellSize: 80 },
-      { gridSize: 12, time: 60, differences: 3, columns: 6, cellSize: 70 },
-      { gridSize: 12, time: 60, differences: 3, columns: 6, cellSize: 70 }
+      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 90 }, // rounds 3 & 4 smaller emoji size
+      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 90 },
+      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 70 },  // rounds 5 & 6 smaller emoji size
+      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 70 },
+      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 60 }, // rounds 7 & 8: 3 columns + special layout, smaller size
+      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 60 },
+      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 55 }, // rounds 9 & 10: 4 columns, smaller size
+      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 55 }
     ];
 
     let currentRound = 0;
@@ -245,30 +245,60 @@
       );
     }
 
+    // For rounds 7 & 8, create a custom grid layout with 3 emojis in first 3 rows and 1 emoji centered in last row
     function renderGrid(grid, columns, cellSize, clickable = false) {
       gridElement.innerHTML = '';
-      gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-      gridElement.style.justifyContent = 'center'; // center grid horizontally
       gridElement.className = 'grid';
+      gridElement.style.justifyContent = 'center';
+      gridElement.style.maxWidth = ''; // reset max-width
+
+      if (currentRound === 6 || currentRound === 7) {
+        // rounds 7 & 8 special layout for 10 emojis: 3 cols, 4 rows with last row center one emoji
+        gridElement.style.display = 'grid';
+        gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+        gridElement.style.gridAutoRows = `${cellSize + 30}px`;
+        gridElement.style.gap = '25px 25px';
+        grid.forEach((emoji, i) => {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.textContent = emoji;
+          cell.style.width = `${cellSize}px`;
+          cell.style.height = `${cellSize}px`;
+          cell.style.fontSize = `${cellSize * 0.6}px`;
+          if (clickable) {
+            cell.addEventListener('click', () => handleSelect(i, cell));
+          }
+          // for the 10th emoji, place in last row, second column (center)
+          if (i === 9) {
+            cell.style.gridColumnStart = 2;
+          }
+          gridElement.appendChild(cell);
+        });
+      } else {
+        // normal grid layout for other rounds
+        gridElement.style.display = 'grid';
+        gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+        gridElement.style.gap = '25px 25px';
+        gridElement.style.maxWidth = `${columns * (cellSize + 30)}px`;
+        grid.forEach((emoji, i) => {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.textContent = emoji;
+          cell.style.width = `${cellSize}px`;
+          cell.style.height = `${cellSize}px`;
+          cell.style.fontSize = `${cellSize * 0.6}px`;
+          if (clickable) {
+            cell.addEventListener('click', () => handleSelect(i, cell));
+          }
+          gridElement.appendChild(cell);
+        });
+      }
+
       if (clickable) {
         gridElement.classList.add('guessing');
       } else {
         gridElement.classList.remove('guessing');
       }
-      gridElement.style.maxWidth = `${columns * (cellSize + 30)}px`; // approximate max width with gaps
-
-      grid.forEach((emoji, i) => {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        cell.textContent = emoji;
-        cell.style.width = `${cellSize}px`;
-        cell.style.height = `${cellSize}px`;
-        cell.style.fontSize = `${cellSize * 0.6}px`;
-        if (clickable) {
-          cell.addEventListener('click', () => handleSelect(i, cell));
-        }
-        gridElement.appendChild(cell);
-      });
     }
 
     function modifyGrid(grid, count) {
@@ -398,4 +428,3 @@
   </script>
 </body>
 </html>
-
