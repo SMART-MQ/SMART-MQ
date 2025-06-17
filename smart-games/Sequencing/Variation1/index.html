@@ -140,15 +140,31 @@
       font-weight: bold;
       display: none;
     }
-    #surveyButton {
+
+    #finalPopup {
       display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(255, 255, 255, 0.95);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px;
+    }
+
+    #finalPopup h2 {
+      font-size: 2em;
+      color: #444;
+    }
+
+    #finalPopup p {
+      font-size: 1.3em;
+      color: #333;
       margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #bae1ff;
-      font-size: 1.2em;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
     }
   </style>
 </head>
@@ -189,8 +205,15 @@
       <button class="color-button" id="btn4" style="background-color: #bae1ff;"></button>
     </div>
     <p id="message"></p>
-    <button id="surveyButton" onclick="window.location.href='https://example.com/survey'">Complete Survey</button>
     <div id="timerBox">10:00</div>
+  </div>
+
+  <div id="finalPopup">
+    <div>
+      <h2>Congratulations!</h2>
+      <p id="finalMessage"></p>
+      <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
+    </div>
   </div>
 
   <audio id="flashSound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
@@ -311,10 +334,16 @@
         if (timeLeft <= 0) {
           clearInterval(timer);
           document.getElementById("message").textContent = "Time's up!";
-          document.getElementById("surveyButton").style.display = "block";
+          showFinalPopup();
         }
       }, 1000);
+    }
+
+    function showFinalPopup() {
+      document.getElementById("finalMessage").textContent = `Your personal best was: ${best}`;
+      document.getElementById("finalPopup").style.display = "flex";
     }
   </script>
 </body>
 </html>
+
