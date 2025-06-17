@@ -28,9 +28,12 @@
       font-size: 2.6rem;
       margin-bottom: 10px;
     }
+    /* Updated style for round number */
     #roundNumber {
       font-size: 2.2rem;
       margin-bottom: 20px;
+      font-weight: bold;
+      color: #e91e63; /* pink */
     }
     .grid {
       display: grid;
@@ -322,7 +325,12 @@
           const result = modifyGrid(originalGrid, round.differences);
           modifiedGrid = result.newGrid;
           changedIndices = result.changedIndices;
-          messageElement.textContent = 'Now, spot the difference!';
+          // Updated spot difference message based on singular/plural
+          if (round.differences === 1) {
+            messageElement.textContent = 'Now, spot the difference!';
+          } else {
+            messageElement.textContent = `Now, spot the ${round.differences} differences!`;
+          }
           setTimeout(() => {
             messageElement.textContent = '';
             renderGrid(modifiedGrid, round.columns, round.cellSize, true);
@@ -384,4 +392,3 @@
   </script>
 </body>
 </html>
-
