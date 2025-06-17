@@ -2,49 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>SMART Memory Game</title>
   <style>
+    /* Base styles */
     body {
       font-family: "Calibri", sans-serif;
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       text-align: center;
       background-color: #fff9c4;
-      padding: 20px;
+      padding: 20px 10px;
+      margin: 0;
+      -webkit-tap-highlight-color: transparent;
     }
-    /* Increase font size for the game section only */
     #game {
-      font-size: 1.8rem;
+      font-size: 2rem;
+      max-width: 100%;
     }
-    #game h1 {
+    h1 {
       font-size: 3.5rem;
       margin-bottom: 10px;
+      line-height: 1.1;
     }
     .grid {
       display: grid;
-      gap: 35px;               /* Increased gap */
+      gap: 25px;
       justify-content: center;
-      max-width: 900px;        /* Slightly wider max-width */
-      margin: 0 auto 20px;
-      font-size: 5.5rem;       /* Larger emojis */
+      margin: 0 auto 25px;
       width: max-content;
+      max-width: 100vw;
+      touch-action: manipulation; /* improve touch */
+      user-select: none;
+      /* We'll dynamically set columns from JS */
     }
     .cell {
-      font-size: inherit;      /* inherit from .grid */
       cursor: pointer;
       position: relative;
-      width: 140px;            /* Bigger width */
-      height: 140px;           /* Bigger height */
-      display: flex;
-      align-items: center;
-      justify-content: center;
       background-color: #fff;
       border: 2px solid #ccc;
       border-radius: 12px;
-      user-select: none;
       box-shadow: 1px 1px 6px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      /* We'll set size in media queries */
+      width: 120px;
+      height: 120px;
+      font-size: 5rem;
+      -webkit-tap-highlight-color: transparent;
     }
-    .cell:hover {
+    .grid.guessing .cell:hover {
       transform: scale(1.1);
       border-color: #f48fb1;
       box-shadow: 2px 4px 12px rgba(244, 143, 177, 0.4);
@@ -55,10 +64,12 @@
       right: 6px;
       font-size: 2.5rem;
       user-select: none;
+      pointer-events: none;
     }
     #message, #timer, #roundInfo {
       font-size: 1.8rem;
       margin: 10px 0;
+      min-height: 2.5rem;
     }
     #cover, #end {
       display: flex;
@@ -66,48 +77,62 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: center;
     }
     #cover h1 {
       font-size: 3rem;
       color: #c2185b;
       font-weight: bold;
-      margin-top: 20px;
+      margin-bottom: 20px;
     }
     #cover .instruction-box {
       background: linear-gradient(to right, #f8bbd0, #f48fb1);
       padding: 20px;
       border-radius: 12px;
       max-width: 600px;
+      width: 90vw;
+      margin: 0 auto 20px;
       text-align: left;
+      font-size: 1.4rem;
+      line-height: 1.4;
     }
     #cover p {
-      font-size: 1.5rem;
       margin: 10px 0;
     }
     #cover button {
-      font-size: 1.5rem;
-      padding: 10px 20px;
+      font-size: 1.8rem;
+      padding: 15px 30px;
       border: none;
       background-color: #ffd54f;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
-      margin-top: 20px;
+      transition: background-color 0.3s ease;
+      box-shadow: 1px 1px 6px rgba(0,0,0,0.1);
+      -webkit-tap-highlight-color: transparent;
+    }
+    #cover button:hover,
+    #cover button:focus {
+      background-color: #ffca28;
+      outline: none;
     }
     #end h1 {
       font-size: 3rem;
+      margin-bottom: 15px;
     }
     #end p {
       font-size: 1.8rem;
       margin: 20px 0;
+      max-width: 90vw;
     }
     #countdownOverlay {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: rgba(255, 255, 255, 0.95);
       z-index: 9999;
       justify-content: center;
       align-items: center;
@@ -115,6 +140,62 @@
       font-weight: bold;
       color: #c2185b;
       font-family: 'Calibri', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      body {
+        font-size: 1.5rem;
+        padding: 15px 8px;
+      }
+      h1 {
+        font-size: 2.8rem;
+      }
+      .grid {
+        gap: 20px;
+      }
+      .cell {
+        width: 90px;
+        height: 90px;
+        font-size: 4rem;
+      }
+      #message, #timer, #roundInfo {
+        font-size: 1.5rem;
+        min-height: 2rem;
+      }
+      #cover h1 {
+        font-size: 2.6rem;
+      }
+      #cover .instruction-box {
+        font-size: 1.2rem;
+      }
+      #cover button {
+        font-size: 1.6rem;
+        padding: 12px 24px;
+        border-radius: 10px;
+      }
+      #end h1 {
+        font-size: 2.6rem;
+      }
+      #end p {
+        font-size: 1.6rem;
+      }
+      #countdownOverlay {
+        font-size: 6rem;
+      }
+    }
+    @media (max-width: 400px) {
+      .cell {
+        width: 70px;
+        height: 70px;
+        font-size: 3rem;
+      }
+      .grid {
+        gap: 15px;
+      }
     }
   </style>
 </head>
@@ -124,10 +205,10 @@
     <div class="instruction-box">
       <p><strong>How to play:</strong></p>
       <p>You will be presented with a grid of animal emojis for a set amount of time.</p>
-      <p>Memorise the grid as best as you can</p>
-      <p>Next, you will be presented with another grid of animal emojis</p>
+      <p>Memorise the grid as best as you can.</p>
+      <p>Next, you will be presented with another grid of animal emojis.</p>
       <p>To succeed, spot the difference between the two grids!</p>
-      <p>The game will get harder as you go on</p>
+      <p>The game will get harder as you go on.</p>
     </div>
     <button onclick="startGame()">Play</button>
   </div>
@@ -187,9 +268,17 @@
       );
     }
 
+    // Render the grid with clickable = true for guessing rounds (hover scale enabled)
     function renderGrid(grid, columns, clickable = false) {
       gridElement.innerHTML = '';
       gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+      if (clickable) {
+        gridElement.classList.add('guessing');
+      } else {
+        gridElement.classList.remove('guessing');
+      }
+
       grid.forEach((emoji, i) => {
         const cell = document.createElement('div');
         cell.className = 'cell';
@@ -250,7 +339,7 @@
       displayRoundIntro(round, () => {
         messageElement.textContent = '';
         originalGrid = getRandomGrid(round.gridSize);
-        renderGrid(originalGrid, round.columns);
+        renderGrid(originalGrid, round.columns, false);
         startCountdown(round.time, () => {
           gridElement.innerHTML = '';
           timerElement.textContent = '';
