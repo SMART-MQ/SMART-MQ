@@ -24,6 +24,10 @@
       margin-bottom: 25px;
       line-height: 1.1;
     }
+    #game h1 {
+      font-size: 3.2rem; /* smaller "Spot the difference" title */
+      margin-bottom: 18px;
+    }
     .grid {
       display: grid;
       gap: 25px 25px;
@@ -91,7 +95,7 @@
       margin-bottom: 30px;
       font-size: 1.8rem;
       line-height: 1.5;
-      text-align: center; /* center text per your request */
+      text-align: center; /* center text */
     }
     #cover button {
       font-size: 2.4rem;
@@ -138,8 +142,6 @@
       touch-action: manipulation;
     }
 
-    /* Cell sizes and grid columns dynamically assigned via JS but these are base styles */
-
     /* Responsive smaller text on tiny devices */
     @media (max-width: 480px) {
       body {
@@ -148,6 +150,9 @@
       #game {
         max-width: 360px;
         font-size: 2.4rem;
+      }
+      #game h1 {
+        font-size: 2.6rem;
       }
       .instruction-box, #end p {
         font-size: 1.6rem;
@@ -211,14 +216,14 @@
     const rounds = [
       { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 }, // rounds 1 & 2: 2 columns
       { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 },
-      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 130 },
-      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 130 },
-      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 100 }, // smaller cells for bigger rounds
-      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 100 },
-      { gridSize: 10, time: 60, differences: 2, columns: 5, cellSize: 90 },
-      { gridSize: 10, time: 60, differences: 2, columns: 5, cellSize: 90 },
-      { gridSize: 12, time: 60, differences: 3, columns: 6, cellSize: 80 },
-      { gridSize: 12, time: 60, differences: 3, columns: 6, cellSize: 80 }
+      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 110 }, // rounds 3 & 4 smaller emoji size to fit better
+      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 110 },
+      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 90 },  // rounds 5-6 smaller emoji size
+      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 90 },
+      { gridSize: 10, time: 60, differences: 2, columns: 5, cellSize: 80 },
+      { gridSize: 10, time: 60, differences: 2, columns: 5, cellSize: 80 },
+      { gridSize: 12, time: 60, differences: 3, columns: 6, cellSize: 70 },
+      { gridSize: 12, time: 60, differences: 3, columns: 6, cellSize: 70 }
     ];
 
     let currentRound = 0;
