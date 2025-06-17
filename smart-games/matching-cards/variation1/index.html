@@ -319,7 +319,7 @@
 
       // ✅ Send message to parent iframe (Qualtrics) to record completion
       if (window.parent !== window) {
-        window.parent.postMessage({ gameCompleted: true }, "*");
+        window.parent.postMessage({ gamecompleted: true }, "*");
       }
     }
   </script>
