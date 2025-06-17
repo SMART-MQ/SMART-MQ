@@ -15,7 +15,7 @@
       -webkit-tap-highlight-color: transparent;
     }
     #game {
-      max-width: 400px;
+      max-width: 420px;
       margin: 0 auto;
       font-size: 2.8rem;
     }
@@ -30,7 +30,6 @@
       justify-content: center;
       margin: 0 auto 35px;
       user-select: none;
-      /* columns set dynamically */
     }
     .cell {
       cursor: pointer;
@@ -44,9 +43,6 @@
       justify-content: center;
       user-select: none;
       transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-      width: 150px;
-      height: 150px;
-      font-size: 7rem;
       -webkit-tap-highlight-color: transparent;
     }
     .grid.guessing .cell:hover {
@@ -66,7 +62,7 @@
       font-size: 2.2rem;
       margin: 18px 0 18px 0;
       min-height: 3rem;
-      max-width: 360px;
+      max-width: 400px;
       margin-left: auto;
       margin-right: auto;
     }
@@ -76,7 +72,6 @@
       align-items: center;
       justify-content: center;
       padding: 25px 15px;
-      height: auto;
       min-height: 100vh;
       box-sizing: border-box;
       text-align: center;
@@ -91,12 +86,12 @@
       background: linear-gradient(to right, #f8bbd0, #f48fb1);
       padding: 30px;
       border-radius: 12px;
-      max-width: 360px;
+      max-width: 400px;
       width: 100%;
       margin-bottom: 30px;
       font-size: 1.8rem;
       line-height: 1.5;
-      text-align: left;
+      text-align: center; /* center text per your request */
     }
     #cover button {
       font-size: 2.4rem;
@@ -121,7 +116,7 @@
     #end p {
       font-size: 2.2rem;
       margin: 25px 0;
-      max-width: 360px;
+      max-width: 400px;
       line-height: 1.4;
     }
     #countdownOverlay {
@@ -143,87 +138,27 @@
       touch-action: manipulation;
     }
 
-    /* Responsive for mobile */
-    @media (max-width: 800px) {
-      #game {
-        max-width: 360px;
-      }
-      .cell {
-        width: 140px;
-        height: 140px;
-        font-size: 6.2rem;
-      }
-      #message, #timer, #roundInfo {
-        max-width: 320px;
-      }
-      .instruction-box, #end p {
-        max-width: 320px;
-      }
-      #cover h1 {
-        font-size: 3.8rem;
-      }
-      #cover button {
-        font-size: 2.2rem;
-        padding: 18px 36px;
-      }
-      #end h1 {
-        font-size: 3.8rem;
-      }
-    }
+    /* Cell sizes and grid columns dynamically assigned via JS but these are base styles */
+
+    /* Responsive smaller text on tiny devices */
     @media (max-width: 480px) {
-      #game {
-        max-width: 280px;
-      }
-      .cell {
-        width: 120px;
-        height: 120px;
-        font-size: 5.2rem;
-      }
-      #message, #timer, #roundInfo {
-        max-width: 260px;
+      body {
         font-size: 2rem;
       }
-      .instruction-box, #end p {
-        max-width: 260px;
-        font-size: 1.6rem;
-      }
-      #cover h1 {
-        font-size: 3.2rem;
-      }
-      #cover button {
-        font-size: 1.8rem;
-        padding: 16px 32px;
-      }
-      #end h1 {
-        font-size: 3.2rem;
-      }
-    }
-    @media (max-width: 320px) {
       #game {
-        max-width: 240px;
-      }
-      .cell {
-        width: 100px;
-        height: 100px;
-        font-size: 4.4rem;
-      }
-      #message, #timer, #roundInfo {
-        max-width: 220px;
-        font-size: 1.8rem;
+        max-width: 360px;
+        font-size: 2.4rem;
       }
       .instruction-box, #end p {
-        max-width: 220px;
-        font-size: 1.4rem;
+        font-size: 1.6rem;
+        max-width: 320px;
       }
-      #cover h1 {
-        font-size: 2.8rem;
+      #cover h1, #end h1 {
+        font-size: 3.2rem;
       }
       #cover button {
-        font-size: 1.6rem;
-        padding: 14px 28px;
-      }
-      #end h1 {
-        font-size: 2.8rem;
+        font-size: 2rem;
+        padding: 18px 36px;
       }
     }
   </style>
@@ -265,17 +200,25 @@
       '🦋','🐌','🐞','🐜','🦂','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈'
     ];
 
+    /*
+     * Rounds configuration:
+     * gridSize: total emojis in grid
+     * time: seconds to memorize
+     * differences: number of changes
+     * columns: columns in grid (used for layout)
+     * cellSize: emoji cell size in px (for bigger rounds smaller size)
+     */
     const rounds = [
-      { gridSize: 4, time: 20, differences: 1, columns: 2 },  // use fewer columns
-      { gridSize: 4, time: 20, differences: 1, columns: 2 },
-      { gridSize: 6, time: 30, differences: 1, columns: 2 },
-      { gridSize: 6, time: 30, differences: 1, columns: 2 },
-      { gridSize: 8, time: 45, differences: 2, columns: 2 },
-      { gridSize: 8, time: 45, differences: 2, columns: 2 },
-      { gridSize: 10, time: 60, differences: 2, columns: 2 },
-      { gridSize: 10, time: 60, differences: 2, columns: 2 },
-      { gridSize: 12, time: 60, differences: 3, columns: 2 },
-      { gridSize: 12, time: 60, differences: 3, columns: 2 }
+      { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 }, // rounds 1 & 2: 2 columns
+      { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 },
+      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 130 },
+      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 130 },
+      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 100 }, // smaller cells for bigger rounds
+      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 100 },
+      { gridSize: 10, time: 60, differences: 2, columns: 5, cellSize: 90 },
+      { gridSize: 10, time: 60, differences: 2, columns: 5, cellSize: 90 },
+      { gridSize: 12, time: 60, differences: 3, columns: 6, cellSize: 80 },
+      { gridSize: 12, time: 60, differences: 3, columns: 6, cellSize: 80 }
     ];
 
     let currentRound = 0;
@@ -297,20 +240,25 @@
       );
     }
 
-    function renderGrid(grid, columns, clickable = false) {
+    function renderGrid(grid, columns, cellSize, clickable = false) {
       gridElement.innerHTML = '';
       gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-
+      gridElement.style.justifyContent = 'center'; // center grid horizontally
+      gridElement.className = 'grid';
       if (clickable) {
         gridElement.classList.add('guessing');
       } else {
         gridElement.classList.remove('guessing');
       }
+      gridElement.style.maxWidth = `${columns * (cellSize + 30)}px`; // approximate max width with gaps
 
       grid.forEach((emoji, i) => {
         const cell = document.createElement('div');
         cell.className = 'cell';
         cell.textContent = emoji;
+        cell.style.width = `${cellSize}px`;
+        cell.style.height = `${cellSize}px`;
+        cell.style.fontSize = `${cellSize * 0.6}px`;
         if (clickable) {
           cell.addEventListener('click', () => handleSelect(i, cell));
         }
@@ -367,7 +315,7 @@
       displayRoundIntro(round, () => {
         messageElement.textContent = '';
         originalGrid = getRandomGrid(round.gridSize);
-        renderGrid(originalGrid, round.columns, false);
+        renderGrid(originalGrid, round.columns, round.cellSize, false);
         startCountdown(round.time, () => {
           gridElement.innerHTML = '';
           timerElement.textContent = '';
@@ -379,7 +327,7 @@
 
           setTimeout(() => {
             messageElement.textContent = '';
-            renderGrid(modifiedGrid, round.columns, true);
+            renderGrid(modifiedGrid, round.columns, round.cellSize, true);
             timerElement.textContent = `Find the difference${round.differences > 1 ? 's' : ''}!`;
           }, 2000);
         });
