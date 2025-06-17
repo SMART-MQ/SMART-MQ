@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SMART Memory Game - Reverse Order</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial Rounded MT Bold', sans-serif;
+      background: linear-gradient(to bottom right, #fce4ec, #e1f5fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+      color: #333;
+      flex-direction: column;
+      padding: 2vw;
+      box-sizing: border-box;
+    }
+    .content {
+      padding: 5vw;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      max-width: 100%;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    h1 {
+      font-size: 6vw;
+      background: linear-gradient(90deg, #ffb3ba, #ffdfba, #ffffba, #baffc9, #bae1ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: bold;
+    }
+    h2, .score {
+      font-size: 5vw;
+      color: #444;
+      margin: 10px 0;
+    }
+    .play-button {
+      font-size: 5vw;
+      padding: 3vw 6vw;
+      background-color: #ffd6e8;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .scoreboard {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .score {
+      font-size: 4.5vw;
+    }
+    #timerBox {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      background: #ffffffcc;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 5vw;
+      font-weight: bold;
+      color: #222;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6vw;
+      margin-top: 30px;
+    }
+    .color-button {
+      width: 22vw;
+      height: 22vw;
+      border-radius: 50%;
+      border: none;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .color-button.flash {
+      opacity: 0.5;
+      transform: scale(1.1);
+      border: 3px solid #333;
+    }
+    #instructionModal, #finalPopup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(to bottom right, #fce4ec, #e1f5fe);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      padding: 5vw;
+      box-sizing: border-box;
+    }
+    #instructionBox, #finalPopup > div {
+      background: white;
+      padding: 5vw;
+      border-radius: 15px;
+      max-width: 90vw;
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    #instructionBox h2, #finalPopup h2 {
+      font-size: 5vw;
+      background: linear-gradient(90deg, #ffb3ba, #ffdfba);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    #instructionBox ul {
+      list-style-type: disc;
+      padding-left: 5vw;
+      line-height: 1.8;
+      text-align: left;
+      font-size: 4vw;
+    }
+    #message {
+      font-size: 4vw;
+      margin-top: 10px;
+    }
+    #finalPopup p {
+      font-size: 4vw;
+      color: #333;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="content" id="startScreen">
+    <h1>Welcome to the SMART Memory Game!</h1>
+    <p><strong>Repeat the pattern in REVERSE order!</strong></p>
+    <button class="play-button" onclick="showInstructions()">Play</button>
+  </div>
+
+  <div id="instructionModal">
+    <div id="instructionBox">
+      <h2>Instructions</h2>
+      <ul>
+        <li>Watch the sequence of colours flash on the screen.</li>
+        <li>Repeat the pattern in REVERSE order by clicking the buttons.</li>
+        <li>Try to beat your personal best in 10 minutes!</li>
+      </ul>
+      <div style="text-align:center; margin-top: 20px;">
+        <button class="play-button" onclick="startGame()">Start</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="gameArea" style="display:none; position: relative;">
+    <h2>Repeat the sequence in reverse!</h2>
+    <div class="scoreboard">
+      <p class="score" id="currentScore">Current Score: 0</p>
+      <p class="score" id="bestScore">Personal Best: 0</p>
+    </div>
+    <p id="message"></p>
+    <div class="button-container" id="buttonContainer"></div>
+  </div>
+
+  <div id="timerBox">10:00</div>
+
+  <div id="finalPopup">
+    <div>
+      <h2>Congratulations!</h2>
+      <p id="finalMessage"></p>
+      <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
+    </div>
+  </div>
+
+  <audio id="flashSound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
+  <audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.mp3"></audio>
+
+  <script>
+    const colors = ["#ffb3ba", "#bae1ff", "#ffffba", "#baffc9"];
+    let sequence = [];
+    let userSequence = [];
+    let buttons = [];
+    let score = 0;
+    let best = 0;
+    let timeLeft = 600;
+    let timer;
+
+    function showInstructions() {
+      document.getElementById("startScreen").style.display = "none";
+      document.getElementById("instructionModal").style.display = "flex";
+    }
+
+    function startGame() {
+      document.getElementById("instructionModal").style.display = "none";
+      document.getElementById("gameArea").style.display = "block";
+      score = 0;
+      sequence = [];
+      userSequence = [];
+      timeLeft = 600;
+      document.getElementById("currentScore").textContent = "Current Score: 0";
+      document.getElementById("bestScore").textContent = "Personal Best: " + best;
+      document.getElementById("message").textContent = "";
+      createButtons();
+      startTimer();
+      nextRound();
+    }
+
+    function createButtons() {
+      const container = document.getElementById("buttonContainer");
+      container.innerHTML = "";
+      buttons = [];
+
+      for (let i = 0; i < 4; i++) {
+        const btn = document.createElement("button");
+        btn.className = "color-button";
+        btn.style.backgroundColor = colors[i];
+        btn.dataset.index = i;
+        btn.addEventListener("click", () => {
+          flash(btn);
+          userSequence.push(parseInt(btn.dataset.index));
+          check();
+        });
+        container.appendChild(btn);
+        buttons.push(btn);
+      }
+    }
+
+    function flash(button) {
+      document.getElementById("flashSound").play();
+      button.classList.add("flash");
+      setTimeout(() => button.classList.remove("flash"), 400);
+    }
+
+    function playSequence() {
+      let i = 0;
+      const interval = setInterval(() => {
+        flash(buttons[sequence[i]]);
+        i++;
+        if (i >= sequence.length) clearInterval(interval);
+      }, 800);
+    }
+
+    function check() {
+      const i = userSequence.length - 1;
+      const reversed = [...sequence].reverse();
+      if (userSequence[i] !== reversed[i]) {
+        document.getElementById("wrongSound").play();
+        document.getElementById("message").textContent = "Try again!";
+        sequence = [];
+        userSequence = [];
+        setTimeout(nextRound, 1000);
+      } else if (userSequence.length === reversed.length) {
+        score++;
+        if (score > best) best = score;
+        document.getElementById("currentScore").textContent = "Current Score: " + score;
+        document.getElementById("bestScore").textContent = "Personal Best: " + best;
+        document.getElementById("message").textContent = "Well done!";
+        userSequence = [];
+        setTimeout(nextRound, 1000);
+      }
+    }
+
+    function nextRound() {
+      const next = Math.floor(Math.random() * 4);
+      sequence.push(next);
+      userSequence = [];
+      playSequence();
+    }
+
+    function startTimer() {
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        const sec = String(timeLeft % 60).padStart(2, '0');
+        document.getElementById("timerBox").textContent = min + ":" + sec;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          document.getElementById("message").textContent = "Time's up!";
+          buttons.forEach(btn => btn.disabled = true);
+          showFinalPopup();
+        }
+      }, 1000);
+    }
+
+    function showFinalPopup() {
+      document.getElementById("finalMessage").textContent = `Your personal best was: ${best}`;
+      document.getElementById("finalPopup").style.display = "flex";
+    }
+  </script>
+</body>
+</html>
