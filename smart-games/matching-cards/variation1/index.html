@@ -5,6 +5,7 @@
   <title>SMART - Memory Game</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet" />
   <style>
+    /* (Style section unchanged – kept as-is for design consistency) */
     body {
       font-family: 'Fredoka', sans-serif;
       display: flex;
@@ -130,7 +131,7 @@
 </head>
 <body>
 
-  <!-- START SCREEN -->
+  <!-- SCREENS -->
   <div class="screen active" id="startScreen">
     <h1 class="rainbow">Welcome to the SMART Memory Game!</h1>
     <p class="rainbow">To play, match each face to its pair.</p>
@@ -138,26 +139,22 @@
     <button class="play-button" onclick="startCountdown()">▶ Play</button>
   </div>
 
-  <!-- COUNTDOWN -->
   <div class="screen" id="countdownScreen">
     <div class="countdown" id="countdownText">3</div>
   </div>
 
-  <!-- GAME -->
   <div class="screen" id="gameScreen">
     <h2 class="rainbow" id="gameTitle">SMART - Memory Game (Round 1)</h2>
     <div class="game-board" id="gameBoard"></div>
     <div class="good-job-message" id="goodJobMessage">Good Job!</div>
   </div>
 
-  <!-- ROUND COMPLETE -->
   <div class="screen" id="roundEndScreen">
     <h2 class="rainbow">Round Complete!</h2>
     <p id="roundResultText"></p>
     <button class="play-button" id="nextRoundBtn" onclick="startNextRound()">Start Round</button>
   </div>
 
-  <!-- FINAL SCREEN -->
   <div class="screen" id="finalScreen">
     <h2 class="rainbow">CONGRATULATIONS!</h2>
     <p id="finalResults"></p>
@@ -165,10 +162,6 @@
   </div>
 
   <script>
-    // Get the 'return' URL parameter (the Qualtrics survey URL to return to)
-    const urlParams = new URLSearchParams(window.location.search);
-    const returnUrl = urlParams.get("return");
-
     const emojis = ['😀', '😢', '😇', '😍', '😎', '🥳', '🥸', '😐', '🫣'];
     const totalPairs = emojis.length;
 
@@ -324,11 +317,9 @@
         .join('<br>');
       switchScreen(gameScreen, finalScreen);
 
-      // Redirect back to Qualtrics survey after 10 seconds if returnUrl is provided
-      if (returnUrl) {
-        setTimeout(() => {
-          window.location.href = returnUrl;
-        }, 3000);
+      // ✅ Send message to parent iframe (Qualtrics) to record completion
+      if (window.parent !== window) {
+        window.parent.postMessage({ gameCompleted: true }, "*");
       }
     }
   </script>
