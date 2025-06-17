@@ -5,44 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SMART Memory Game</title>
   <style>
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
       font-family: 'Arial Rounded MT Bold', sans-serif;
       background: linear-gradient(to bottom right, #fce4ec, #e1f5fe);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
+      height: 100%;
       color: #333;
     }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
     .content {
-      padding: 30px;
+      width: 90vw;
+      max-width: 600px;
+      padding: 5vw;
+      margin-top: 5vh;
       background: white;
       border-radius: 20px;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      max-width: 90%;
+      text-align: center;
       position: relative;
     }
+
     h1 {
-      font-size: 2.5em;
+      font-size: 6vw;
       background: linear-gradient(90deg, #ffb3ba, #ffdfba, #ffffba, #baffc9, #bae1ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       font-weight: bold;
     }
+
     h2, .score {
-      font-size: 1.5em;
+      font-size: 4.5vw;
       color: #444;
       margin: 10px 0;
     }
+
     p, #message {
-      font-size: 1.2em;
+      font-size: 4vw;
       color: #555;
       margin: 10px 0;
     }
+
     .play-button {
-      font-size: 1.5em;
+      font-size: 4.5vw;
       padding: 10px 20px;
       background-color: #ffd6e8;
       border: none;
@@ -50,52 +64,53 @@
       cursor: pointer;
       margin-top: 20px;
     }
+
     .button-container {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 15px;
+      gap: 5vw;
       margin-top: 20px;
     }
+
     .color-button {
-      width: 100px;
-      height: 100px;
+      width: 22vw;
+      height: 22vw;
       border: 4px solid transparent;
       border-radius: 20px;
       box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
       cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s, border 0.2s, background-color 0.3s;
-      opacity: 1;
+      transition: transform 0.2s, opacity 0.2s, border 0.2s;
     }
+
     .color-button.flash {
       opacity: 0.4 !important;
       transform: scale(1.1);
       border: 4px solid #555;
     }
-    .color-button.active {
-      opacity: 0.6;
-      transform: scale(1.05);
-      border: 4px solid #999;
-    }
+
     .scoreboard {
       display: flex;
-      justify-content: center;
-      gap: 40px;
+      justify-content: space-between;
+      gap: 5vw;
+      flex-wrap: wrap;
       margin-bottom: 10px;
     }
+
     #timerBox {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
       background: #ffffffcc;
       padding: 10px 20px;
       border-radius: 10px;
-      font-size: 1.8em;
+      font-size: 5vw;
       font-weight: bold;
       color: #222;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    #instructionModal {
+
+    #instructionModal, #finalPopup {
       position: fixed;
       top: 0;
       left: 0;
@@ -106,65 +121,39 @@
       justify-content: center;
       align-items: center;
       z-index: 999;
+      padding: 5vw;
+      box-sizing: border-box;
     }
-    #instructionBox {
+
+    #instructionBox, #finalPopup > div {
       background: white;
-      padding: 30px;
+      padding: 5vw;
       border-radius: 15px;
-      max-width: 500px;
-      text-align: left;
-    }
-    #instructionBox h2 {
+      max-width: 90vw;
+      width: 100%;
       text-align: center;
+      box-sizing: border-box;
+    }
+
+    #instructionBox h2, #finalPopup h2 {
+      font-size: 5vw;
       background: linear-gradient(90deg, #ffb3ba, #ffdfba);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      font-size: 1.8em;
-      font-weight: bold;
     }
+
     #instructionBox ul {
       list-style-type: disc;
-      padding-left: 20px;
-      line-height: 2;
+      padding-left: 5vw;
+      line-height: 1.8;
+      text-align: left;
+      font-size: 4vw;
     }
-    #instructionBox li {
-      color: black;
-    }
-    #instructionBox li:nth-child(1)::marker { color: #ffb3ba; }
-    #instructionBox li:nth-child(2)::marker { color: #ffdfba; }
-    #instructionBox li:nth-child(3)::marker { color: #baffc9; }
-    #instructionBox li:nth-child(4)::marker { color: #bae1ff; }
 
     #countdownBox {
-      font-size: 3em;
+      font-size: 6vw;
       font-weight: bold;
       display: none;
-    }
-
-    #finalPopup {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(255, 255, 255, 0.95);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 30px;
-    }
-
-    #finalPopup h2 {
-      font-size: 2em;
-      color: #444;
-    }
-
-    #finalPopup p {
-      font-size: 1.3em;
-      color: #333;
-      margin-top: 20px;
     }
   </style>
 </head>
@@ -182,17 +171,14 @@
         <li>Watch the sequence of colours flash on the screen.</li>
         <li>Repeat the pattern by clicking the buttons in the same order.</li>
         <li>Each round adds a new colour to the sequence.</li>
-        <li>Try to get the highest score in 10 minutes by beating your personal best!</li>
+        <li>Try to get the highest score in 10 minutes!</li>
       </ul>
-      <div style="text-align:center; margin-top: 20px;">
-        <button class="play-button" onclick="startCountdown()">Start</button>
-        <button class="play-button" onclick="goBack()">Back</button>
-      </div>
+      <button class="play-button" onclick="startCountdown()">Start</button>
     </div>
   </div>
 
   <div class="content" id="gameArea" style="display:none">
-    <h2 id="roundTitle">Try and beat your personal best to get the highest score in 10 minutes!</h2>
+    <h2 id="roundTitle">Try and beat your personal best to get the highest score!</h2>
     <div class="scoreboard">
       <p class="score" id="currentScore">Current Score: 0</p>
       <p class="score" id="bestScore">Personal Best: 0</p>
@@ -220,27 +206,15 @@
   <audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.mp3"></audio>
 
   <script>
-    let sequence = [];
-    let userSequence = [];
-    let score = 0;
-    let best = 0;
-    let timer;
-    let timeLeft = 600;
-
-    const buttons = [
-      document.getElementById("btn1"),
-      document.getElementById("btn2"),
-      document.getElementById("btn3"),
-      document.getElementById("btn4")
-    ];
-
+    let sequence = [], userSequence = [], score = 0, best = 0, timer, timeLeft = 600;
+    const buttons = ["btn1", "btn2", "btn3", "btn4"].map(id => document.getElementById(id));
     const flashSound = document.getElementById("flashSound");
     const wrongSound = document.getElementById("wrongSound");
 
-    buttons.forEach((btn, index) => {
+    buttons.forEach((btn, i) => {
       btn.addEventListener("click", () => {
         flashButton(btn);
-        userSequence.push(index);
+        userSequence.push(i);
         checkUserInput();
       });
     });
@@ -250,37 +224,30 @@
       document.getElementById("instructionModal").style.display = "flex";
     }
 
-    function goBack() {
-      document.getElementById("instructionModal").style.display = "none";
-      document.getElementById("startScreen").style.display = "block";
-    }
-
     function startCountdown() {
       document.getElementById("instructionModal").style.display = "none";
       document.getElementById("gameArea").style.display = "block";
-
       let countdown = 3;
-      const countdownBox = document.getElementById("countdownBox");
-      countdownBox.style.display = "block";
-      countdownBox.textContent = countdown;
-
+      const box = document.getElementById("countdownBox");
+      box.style.display = "block";
+      box.textContent = countdown;
       const countdownInterval = setInterval(() => {
         countdown--;
         if (countdown > 0) {
-          countdownBox.textContent = countdown;
+          box.textContent = countdown;
         } else {
           clearInterval(countdownInterval);
-          countdownBox.style.display = "none";
+          box.style.display = "none";
           startTimer();
           nextRound();
         }
       }, 1000);
     }
 
-    function flashButton(button) {
+    function flashButton(btn) {
       flashSound.play();
-      button.classList.add("flash");
-      setTimeout(() => button.classList.remove("flash"), 500);
+      btn.classList.add("flash");
+      setTimeout(() => btn.classList.remove("flash"), 500);
     }
 
     function playSequence() {
@@ -297,21 +264,15 @@
       if (userSequence[index] !== sequence[index]) {
         wrongSound.play();
         document.getElementById("message").textContent = "Try again!";
-        sequence = [];
-        userSequence = [];
-        score = 0;
+        sequence = [], userSequence = [], score = 0;
         document.getElementById("currentScore").textContent = `Current Score: ${score}`;
         setTimeout(nextRound, 1000);
         return;
       }
       if (userSequence.length === sequence.length) {
         score++;
-        if (score > best) {
-          best = score;
-          document.getElementById("message").textContent = "New personal best!";
-        } else {
-          document.getElementById("message").textContent = "Well done!";
-        }
+        best = Math.max(best, score);
+        document.getElementById("message").textContent = score === best ? "New personal best!" : "Well done!";
         document.getElementById("currentScore").textContent = `Current Score: ${score}`;
         document.getElementById("bestScore").textContent = `Personal Best: ${best}`;
         userSequence = [];
@@ -320,17 +281,16 @@
     }
 
     function nextRound() {
-      const next = Math.floor(Math.random() * 4);
-      sequence.push(next);
+      sequence.push(Math.floor(Math.random() * 4));
       playSequence();
     }
 
     function startTimer() {
       timer = setInterval(() => {
         timeLeft--;
-        const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-        const seconds = (timeLeft % 60).toString().padStart(2, '0');
-        document.getElementById("timerBox").textContent = `${minutes}:${seconds}`;
+        const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        const s = String(timeLeft % 60).padStart(2, '0');
+        document.getElementById("timerBox").textContent = `${m}:${s}`;
         if (timeLeft <= 0) {
           clearInterval(timer);
           document.getElementById("message").textContent = "Time's up!";
@@ -346,4 +306,5 @@
   </script>
 </body>
 </html>
+
 
