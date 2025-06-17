@@ -6,258 +6,154 @@
   <title>SMART Memory Game</title>
   <style>
     body {
-      font-family: "Calibri", sans-serif;
-      font-size: 2.4rem;
-      background-color: #fff9c4;
-      margin: 0;
-      padding: 25px 15px;
-      text-align: center;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #game {
-      max-width: 420px;
-      margin: 0 auto;
-      font-size: 2.8rem;
-    }
-    h1 {
-      font-size: 4.5rem;
-      margin-bottom: 25px;
-      line-height: 1.1;
-    }
-    #game h1 {
-      font-size: 2.6rem; /* even smaller "Spot the difference" */
-      margin-bottom: 18px;
-    }
-    .grid {
-      display: grid;
-      gap: 25px 25px;
-      justify-content: center;
-      margin: 0 auto 35px;
-      user-select: none;
-    }
-    .grid.guessing .cell:hover {
-      transform: scale(1.1);
-      border-color: #f48fb1;
-      box-shadow: 2px 6px 14px rgba(244, 143, 177, 0.5);
-    }
-    .cell {
-      cursor: pointer;
-      position: relative;
-      background-color: #fff;
-      border: 2px solid #ccc;
-      border-radius: 12px;
-      box-shadow: 1px 1px 8px rgba(0,0,0,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .marker {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      font-size: 3.2rem;
-      user-select: none;
-      pointer-events: none;
-    }
-    #message, #timer, #roundInfo {
-      font-size: 2.2rem;
-      margin: 18px 0 18px 0;
-      min-height: 3rem;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #cover, #end {
+      font-family: 'Arial', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 25px 15px;
-      min-height: 100vh;
-      box-sizing: border-box;
-      text-align: center;
-    }
-    #cover h1 {
-      font-size: 4rem;
-      color: #c2185b;
-      font-weight: bold;
-      margin-bottom: 30px;
-    }
-    .instruction-box {
-      background: linear-gradient(to right, #f8bbd0, #f48fb1);
-      padding: 30px;
-      border-radius: 12px;
-      max-width: 400px;
-      width: 100%;
-      margin-bottom: 30px;
-      font-size: 1.8rem;
-      line-height: 1.5;
-      text-align: center; /* center text */
-    }
-    #cover button {
-      font-size: 2.4rem;
-      padding: 20px 40px;
-      border: none;
-      background-color: #ffd54f;
-      border-radius: 14px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      box-shadow: 1px 1px 8px rgba(0,0,0,0.1);
-      -webkit-tap-highlight-color: transparent;
-    }
-    #cover button:hover,
-    #cover button:focus {
-      background-color: #ffca28;
-      outline: none;
-    }
-    #end h1 {
-      font-size: 4rem;
-      margin-bottom: 20px;
-    }
-    #end p {
-      font-size: 2.2rem;
-      margin: 25px 0;
-      max-width: 400px;
-      line-height: 1.4;
-    }
-    #countdownOverlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(255, 255, 255, 0.95);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      font-size: 10rem;
-      font-weight: bold;
-      color: #c2185b;
-      font-family: 'Calibri', sans-serif;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
+      margin: 0;
+      padding: 10px;
+      background-color: #f9f9f9;
+      color: #333;
     }
 
-    /* Responsive smaller text on tiny devices */
-    @media (max-width: 480px) {
-      body {
-        font-size: 2rem;
-      }
-      #game {
-        max-width: 360px;
-        font-size: 2.4rem;
-      }
-      #game h1 {
-        font-size: 2.2rem;
-      }
-      .instruction-box, #end p {
-        font-size: 1.6rem;
-        max-width: 320px;
-      }
-      #cover h1, #end h1 {
-        font-size: 3.2rem;
-      }
-      #cover button {
-        font-size: 2rem;
-        padding: 18px 36px;
-      }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+
+    #round-info {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    #message {
+      font-size: 20px;
+      margin: 15px 0;
+    }
+
+    #grid {
+      display: grid;
+      justify-content: center;
+      gap: 25px 25px;
+      margin-bottom: 15px;
+    }
+
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #fff;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .cell:hover {
+      transform: scale(1.05);
+      background-color: #e0f7fa;
+    }
+
+    .selected {
+      background-color: #b2dfdb !important;
+      border-color: #00796b;
+    }
+
+    #timer {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    #start-button {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin-top: 20px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div id="cover">
-    <h1>Welcome to the SMART Memory Game!</h1>
-    <div class="instruction-box">
-      <p><strong>How to play:</strong></p>
-      <p>You will be presented with a grid of animal emojis for a set amount of time.</p>
-      <p>Memorise the grid as best as you can.</p>
-      <p>Next, you will be presented with another grid of animal emojis.</p>
-      <p>To succeed, spot the difference between the two grids!</p>
-      <p>The game will get harder as you go on.</p>
-    </div>
-    <button onclick="startGame()">Play</button>
-  </div>
-
-  <div id="game" style="display: none;">
-    <h1>Spot the Difference</h1>
-    <div id="roundInfo"></div>
-    <div class="grid" id="emojiGrid"></div>
-    <div id="timer"></div>
-    <div id="message"></div>
-  </div>
-
-  <div id="end" style="display: none;">
-    <h1>Well done!</h1>
-    <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
-  </div>
-
-  <div id="countdownOverlay">
-    <div id="countdownText"></div>
-  </div>
+  <h1>Spot the Difference</h1>
+  <div id="round-info"></div>
+  <div id="timer"></div>
+  <div id="message"></div>
+  <div id="grid"></div>
+  <button id="start-button">Start Game</button>
 
   <script>
-    const animalEmojis = [
-      '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🦆','🦉','🐴','🦄','🐝','🐛',
-      '🦋','🐌','🐞','🐜','🦂','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈'
-    ];
+    const gridElement = document.getElementById('grid');
+    const messageElement = document.getElementById('message');
+    const timerElement = document.getElementById('timer');
+    const roundInfoElement = document.getElementById('round-info');
+    const startButton = document.getElementById('start-button');
 
-    /*
-     * Rounds configuration:
-     * gridSize: total emojis in grid
-     * time: seconds to memorize
-     * differences: number of changes
-     * columns: columns in grid (used for layout)
-     * cellSize: emoji cell size in px (for bigger rounds smaller size)
-     */
+    const emojiList = ['🍎', '🍌', '🍇', '🍓', '🍉', '🍒', '🍍', '🥝', '🍑', '🍋', '🍔', '🍕', '🍟', '🌮', '🍿', '🍪', '🍩', '🎂', '🍫', '🍬'];
+
     const rounds = [
-      { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 }, // rounds 1 & 2: 2 columns
       { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 },
-      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 90 }, // rounds 3 & 4 smaller emoji size
+      { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 },
       { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 90 },
-      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 70 },  // rounds 5 & 6 smaller emoji size
+      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 90 },
       { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 70 },
-      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 60 }, // rounds 7 & 8: 3 columns + special layout, smaller size
-      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 60 },
-      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 55 }, // rounds 9 & 10: 4 columns, smaller size
-      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 55 }
+      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 70 },
+      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 90 },
+      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 90 },
+      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 70 },
+      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 70 }
     ];
 
     let currentRound = 0;
     let originalGrid = [];
     let modifiedGrid = [];
-    let selectedIndices = [];
     let changedIndices = [];
-    let countdownInterval;
-    let lastDifferences = 0;
-
-    const gridElement = document.getElementById('emojiGrid');
-    const timerElement = document.getElementById('timer');
-    const messageElement = document.getElementById('message');
-    const roundInfoElement = document.getElementById('roundInfo');
+    let selectedIndices = [];
 
     function getRandomGrid(size) {
-      return Array.from({ length: size }, () =>
-        animalEmojis[Math.floor(Math.random() * animalEmojis.length)]
-      );
+      const grid = [];
+      for (let i = 0; i < size; i++) {
+        const emoji = emojiList[Math.floor(Math.random() * emojiList.length)];
+        grid.push(emoji);
+      }
+      return grid;
     }
 
-    // For rounds 7 & 8, create a custom grid layout with 3 emojis in first 3 rows and 1 emoji centered in last row
+    function modifyGrid(grid, numDifferences) {
+      const newGrid = [...grid];
+      const indices = [];
+
+      while (indices.length < numDifferences) {
+        const index = Math.floor(Math.random() * newGrid.length);
+        if (!indices.includes(index)) {
+          let newEmoji;
+          do {
+            newEmoji = emojiList[Math.floor(Math.random() * emojiList.length)];
+          } while (newEmoji === newGrid[index]);
+          newGrid[index] = newEmoji;
+          indices.push(index);
+        }
+      }
+
+      return { newGrid, changedIndices: indices };
+    }
+
     function renderGrid(grid, columns, cellSize, clickable = false) {
       gridElement.innerHTML = '';
       gridElement.className = 'grid';
       gridElement.style.justifyContent = 'center';
-      gridElement.style.maxWidth = ''; // reset max-width
+      gridElement.style.maxWidth = '';
+
+      let gap = '25px 25px';
+      if (currentRound >= 6) {
+        gap = '12px 12px';
+      }
 
       if (currentRound === 6 || currentRound === 7) {
-        // rounds 7 & 8 special layout for 10 emojis: 3 cols, 4 rows with last row center one emoji
         gridElement.style.display = 'grid';
         gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-        gridElement.style.gridAutoRows = `${cellSize + 30}px`;
-        gridElement.style.gap = '25px 25px';
+        gridElement.style.gridAutoRows = `${cellSize + 20}px`;
+        gridElement.style.gap = gap;
+
         grid.forEach((emoji, i) => {
           const cell = document.createElement('div');
           cell.className = 'cell';
@@ -268,18 +164,17 @@
           if (clickable) {
             cell.addEventListener('click', () => handleSelect(i, cell));
           }
-          // for the 10th emoji, place in last row, second column (center)
           if (i === 9) {
             cell.style.gridColumnStart = 2;
           }
           gridElement.appendChild(cell);
         });
       } else {
-        // normal grid layout for other rounds
         gridElement.style.display = 'grid';
         gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-        gridElement.style.gap = '25px 25px';
-        gridElement.style.maxWidth = `${columns * (cellSize + 30)}px`;
+        gridElement.style.gap = gap;
+        gridElement.style.maxWidth = `${columns * (cellSize + 20)}px`;
+
         grid.forEach((emoji, i) => {
           const cell = document.createElement('div');
           cell.className = 'cell';
@@ -301,52 +196,65 @@
       }
     }
 
-    function modifyGrid(grid, count) {
-      let newGrid = [...grid];
-      let indices = [];
-      while (indices.length < count) {
-        let i = Math.floor(Math.random() * grid.length);
-        if (!indices.includes(i)) {
-          let newEmoji;
-          do {
-            newEmoji = animalEmojis[Math.floor(Math.random() * animalEmojis.length)];
-          } while (newEmoji === newGrid[i]);
-          newGrid[i] = newEmoji;
-          indices.push(i);
-        }
+    function handleSelect(index, cell) {
+      if (selectedIndices.includes(index)) return;
+
+      cell.classList.add('selected');
+      selectedIndices.push(index);
+
+      if (selectedIndices.length === rounds[currentRound].differences) {
+        checkAnswer();
       }
-      return { newGrid, changedIndices: indices };
     }
 
-    function startCountdown(seconds, onComplete) {
-      let remaining = seconds;
-      timerElement.textContent = `Memorize this! ${remaining} seconds remaining`;
-      countdownInterval = setInterval(() => {
-        remaining--;
-        timerElement.textContent = `Memorize this! ${remaining} seconds remaining`;
-        if (remaining <= 0) {
-          clearInterval(countdownInterval);
-          onComplete();
+    function checkAnswer() {
+      const isCorrect = changedIndices.every(i => selectedIndices.includes(i));
+
+      if (isCorrect) {
+        messageElement.textContent = 'Correct!';
+      } else {
+        messageElement.textContent = 'Incorrect!';
+      }
+
+      setTimeout(() => {
+        currentRound++;
+        if (currentRound < rounds.length) {
+          startRound();
+        } else {
+          messageElement.textContent = '🎉 You completed all rounds!';
+          gridElement.innerHTML = '';
+          timerElement.textContent = '';
+          roundInfoElement.textContent = '';
+          startButton.style.display = 'inline-block';
+        }
+      }, 1500);
+    }
+
+    function startCountdown(seconds, callback) {
+      timerElement.textContent = `Memorize: ${seconds}s`;
+      const interval = setInterval(() => {
+        seconds--;
+        timerElement.textContent = `Memorize: ${seconds}s`;
+        if (seconds <= 0) {
+          clearInterval(interval);
+          callback();
         }
       }, 1000);
     }
 
     function displayRoundIntro(round, callback) {
-      gridElement.innerHTML = '';
-      messageElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`;
-      if (round.differences !== lastDifferences) {
-        roundInfoElement.textContent = `This time there will be ${round.differences} difference${round.differences > 1 ? 's' : ''} to spot.`;
-        lastDifferences = round.differences;
-      } else {
-        roundInfoElement.textContent = '';
-      }
-      timerElement.textContent = '';
-      setTimeout(callback, 2000);
+      messageElement.textContent = `Round ${currentRound + 1}: Memorize the emojis!`;
+      setTimeout(() => {
+        callback();
+      }, 1000);
     }
 
     function startRound() {
       const round = rounds[currentRound];
       selectedIndices = [];
+
+      roundInfoElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`;
+
       displayRoundIntro(round, () => {
         messageElement.textContent = '';
         originalGrid = getRandomGrid(round.gridSize);
@@ -369,62 +277,11 @@
       });
     }
 
-    function handleSelect(index, cell) {
-      if (selectedIndices.includes(index)) return;
-
-      selectedIndices.push(index);
-
-      const marker = document.createElement('div');
-      marker.className = 'marker';
-      marker.textContent = changedIndices.includes(index) ? '✅' : '❌';
-      cell.appendChild(marker);
-
-      const round = rounds[currentRound];
-      if (selectedIndices.length === round.differences) {
-        const correct = selectedIndices.filter(i => changedIndices.includes(i)).length;
-        if (correct === round.differences) {
-          messageElement.textContent = '🎉 Good job!';
-        }
-        setTimeout(() => {
-          currentRound++;
-          if (currentRound < rounds.length) {
-            startRound();
-          } else {
-            document.getElementById('game').style.display = 'none';
-            document.getElementById('end').style.display = 'flex';
-          }
-        }, 2000);
-      }
-    }
-
-    function showCountdown(callback) {
-      const overlay = document.getElementById('countdownOverlay');
-      const text = document.getElementById('countdownText');
-      const sequence = ['3', '2', '1', 'GO!'];
-      let index = 0;
-
-      overlay.style.display = 'flex';
-      text.textContent = sequence[index];
-
-      const interval = setInterval(() => {
-        index++;
-        if (index < sequence.length) {
-          text.textContent = sequence[index];
-        } else {
-          clearInterval(interval);
-          overlay.style.display = 'none';
-          callback();
-        }
-      }, 1000);
-    }
-
-    function startGame() {
-      document.getElementById('cover').style.display = 'none';
-      showCountdown(() => {
-        document.getElementById('game').style.display = 'block';
-        startRound();
-      });
-    }
+    startButton.addEventListener('click', () => {
+      currentRound = 0;
+      startButton.style.display = 'none';
+      startRound();
+    });
   </script>
 </body>
 </html>
