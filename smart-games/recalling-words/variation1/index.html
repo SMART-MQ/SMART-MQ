@@ -134,22 +134,20 @@
             box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
         }
 
-        /* MODIFIED: Styles for the recall question container */
         #recall-word {
             width: 90%;
-            max-width: 500px; /* Constrains the width on larger screens */
-            margin: 0 auto 30px auto; /* Centers the container and adds bottom margin */
+            max-width: 500px;
+            margin: 0 auto 30px auto;
             font-size: 23px;
         }
 
-        /* NEW: Helper class to style the layout inside the question */
         .recall-question-layout {
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-wrap: wrap; /* Allows wrapping on small screens */
+            flex-wrap: wrap;
             gap: 12px;
-            line-height: 1.5; /* Improves readability when wrapped */
+            line-height: 1.5;
         }
 
         .hidden {
@@ -166,14 +164,6 @@
             text-align: center;
             font-size: 18px;
             line-height: 1.6;
-        }
-        .info-page-container h2 {
-            text-align: center;
-        }
-        .info-page-container ul {
-            padding-left: 20px;
-            margin-top: 20px;
-            text-align: left;
         }
         
         .rainbow-title {
@@ -203,14 +193,7 @@
             gap: 20px;
             margin-top: 20px;
         }
-        .info-button-group .recall-button {
-             width: 150px;
-        }
-         .info-button-group .main-action-button {
-            width: 200px !important;
-            margin: 0;
-        }
-
+        
         #session-timer {
             position: fixed;
             top: 15px;
@@ -229,10 +212,6 @@
             text-align: left;
             max-height: 200px;
             overflow-y: auto;
-        }
-        #score-list li {
-            margin-bottom: 8px;
-            font-weight: normal;
         }
         #score-list li.best-score {
             font-weight: bold;
@@ -269,6 +248,15 @@
         @media (max-width: 650px) {
             body {
                 font-size: 1.2rem;
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+                padding: 1rem 0;
+            }
+            body.no-scroll {
+                 height: 100vh;
+                 overflow: hidden;
+                 padding: 0;
             }
             #words-list {
                 grid-template-columns: repeat(3, 1fr);
@@ -295,15 +283,13 @@
             .info-button-group .main-action-button {
                 width: 100% !important;
             }
-            /* NEW: Adjust recall question font size on mobile */
             #recall-word {
                 font-size: 1.25rem;
             }
         }
-
     </style>
 </head>
-<body>
+<body class="no-scroll">
     <div id="feedback-popup"></div>
     <div id="session-timer" class="hidden">Time: 10:00</div>
     
@@ -332,7 +318,6 @@
         </div>
     </div>
 
-
     <div id="game-container" class="hidden">
         <h2>Memorize these words!</h2>
         <div id="words-list"></div>
@@ -351,14 +336,9 @@
     </div>
 
     <script>
-        const wordsPool = [
-            "lion", "tiger", "bear", "monkey", "zebra", "giraffe", "hippo", "rhino", "snake", "lizard",
-            "frog", "eagle", "parrot", "owl", "wolf", "fox", "deer", "rabbit", "squirrel", "turtle",
-            "whale", "dolphin", "shark", "octopus", "penguin", "koala", "panda", "camel", "bat", "bee",
-            "jungle", "forest", "ocean", "river", "desert", "savanna", "nest", "den", "hive", "burrow",
-            "paw", "claw", "wing", "fin", "tail", "fur", "feather", "scale", "fang", "web"
-        ];
-        
+        document.body.classList.add('no-scroll');
+
+        const wordsPool = [ "lion", "tiger", "bear", "monkey", "zebra", "giraffe", "hippo", "rhino", "snake", "lizard", "frog", "eagle", "parrot", "owl", "wolf", "fox", "deer", "rabbit", "squirrel", "turtle", "whale", "dolphin", "shark", "octopus", "penguin", "koala", "panda", "camel", "bat", "bee", "jungle", "forest", "ocean", "river", "desert", "savanna", "nest", "den", "hive", "burrow", "paw", "claw", "wing", "fin", "tail", "fur", "feather", "scale", "fang", "web", "cow", "pig", "sheep", "horse", "goat", "dog", "cat", "mouse", "hamster", "leopard", "cheetah", "elephant", "raccoon", "skunk", "beaver", "chipmunk", "moose", "bison", "fish", "crab", "lobster", "shrimp", "starfish", "seahorse", "jellyfish", "seal", "walrus", "otter", "chicken", "duck", "goose", "robin", "cardinal", "sparrow", "hawk", "swan", "flamingo", "peacock", "alligator", "crocodile", "chameleon", "ant", "butterfly", "moth", "ladybug", "spider", "caterpillar", "beak", "horn", "tusk", "hoof", "shell", "pouch", "whisker", "mane", "farm", "barn", "zoo", "herd", "flock" ];
         const incorrectFeedback = ['Almost!', 'Nearly there!', 'Not Quite'];
         const SESSION_DURATION = 600000;
 
@@ -375,6 +355,9 @@
         
         let bestScore = 0;
         let allSessionScores = [];
+        
+        let wordsUsedLastRound = [];
+        let wordsUsedTwoRoundsAgo = [];
 
         function showInstructionsPage() {
             document.getElementById('info-page-1').classList.add('hidden');
@@ -392,6 +375,9 @@
 		        sessionStartTime = Date.now(); 
                 startSessionTimer(); 
 	        } 
+            
+            document.body.classList.remove('no-scroll');
+
             document.getElementById('info-page-1').classList.add('hidden');
             document.getElementById('info-page-2').classList.add('hidden');
             document.getElementById('recall-container').classList.add('hidden');
@@ -399,13 +385,35 @@
             document.getElementById('game-container').classList.remove('hidden');
             document.getElementById('game-container').style.display = 'block';
             
-            initialWords = getRandomWords(15);
-            recallWords = getRandomWords(5);
+            updateWordHistory();
+            
+            const forbiddenWords = [...wordsUsedLastRound, ...wordsUsedTwoRoundsAgo];
+            let availablePool = wordsPool.filter(word => !forbiddenWords.includes(word));
+            
+            if (availablePool.length < 20) {
+                console.warn("Word pool is small; reusing words from 2 rounds ago.");
+                availablePool = wordsPool.filter(word => !wordsUsedLastRound.includes(word));
+            }
+
+            initialWords = getRandomWordsFromPool(15, availablePool);
+            let distractorPool = availablePool.filter(word => !initialWords.includes(word));
+            recallWords = getRandomWordsFromPool(5, distractorPool);
+            
             allWordsToRecall = [...initialWords, ...recallWords];
             shuffleArray(allWordsToRecall);
             
             displayWords(initialWords);
             startTimer();
+        }
+
+        function updateWordHistory() {
+            wordsUsedTwoRoundsAgo = [...wordsUsedLastRound];
+            wordsUsedLastRound = [...allWordsToRecall];
+        }
+
+        function getRandomWordsFromPool(count, pool) {
+            const shuffled = [...pool].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
         }
         
         function startSessionTimer() {
@@ -425,18 +433,6 @@
                     timerDisplay.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
                 }
             }, 1000);
-        }
-
-        function getRandomWords(count) {
-            const randomWords = [];
-            const pool = wordsPool.filter(word => !initialWords.includes(word));
-            while (randomWords.length < count) {
-                const randomWord = pool[Math.floor(Math.random() * pool.length)];
-                if (!randomWords.includes(randomWord)) {
-                    randomWords.push(randomWord);
-                }
-            }
-            return randomWords;
         }
 
 	    function displayWords(words) {
@@ -472,7 +468,6 @@
         function displayRecallWord() {
             if (currentWordIndex < allWordsToRecall.length) {
                 const word = allWordsToRecall[currentWordIndex];
-                // MODIFIED: Simplified the innerHTML to use a CSS class instead of many inline styles
                 document.getElementById('recall-word').innerHTML = `
                     <div class="recall-question-layout">
                         <span>Have you seen the word</span>
@@ -547,13 +542,15 @@
                     return `<li>Round ${index + 1}: ${s} / ${allWordsToRecall.length}</li>`;
                 }).join('');
 
+                document.body.classList.add('no-scroll');
+                
+                // MODIFIED: Removed the "Play Again" button from the final result
                 document.getElementById('result').innerHTML = `
                     <p>Session Ended!</p>
                     <p>Best Score: ${bestScore} / ${allWordsToRecall.length}</p>
                     <hr>
                     <h3>All Scores:</h3>
                     <ul id="score-list">${scoreListHTML}</ul>
-                    <button class="main-action-button" onclick="returnToStart()">Play Again</button>
                 `;
             } else {
                 document.getElementById('result').innerHTML = `<p id="score-text">${scoreText}</p>`;
@@ -572,18 +569,8 @@
             document.getElementById('result').classList.add('hidden');
         }
 
-        function returnToStart() {
-            resetGame(); 
-            sessionActive = false;
-            sessionStartTime = null;
-            totalGamesPlayed = 0;
-            clearInterval(sessionTimerInterval);
-            bestScore = 0;
-            allSessionScores = [];
-            document.getElementById('result').classList.add('hidden');
-            document.getElementById('session-timer').classList.add('hidden');
-            showWelcomePage();
-        }
+        // MODIFIED: This function is no longer used, so it has been removed.
+        // function returnToStart() { ... }
 
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
