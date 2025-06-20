@@ -5,164 +5,154 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SMART - Memory Game</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Fredoka', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      text-align: center;
-      font-size: 1.5rem;
-    }
+<style>
+  body {
+    font-family: 'Fredoka', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    text-align: center;
+    font-size: 1.5rem;
+  }
 
+  h1, h2, p {
+    margin: 10px;
+  }
+
+  .rainbow {
+    background: linear-gradient(90deg, #f06292, #ba68c8, #64b5f6, #4db6ac, #aed581, #ffd54f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+  }
+
+  .screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+  }
+
+  .active {
+    display: flex;
+  }
+
+  .play-button {
+    background: #b2fab4;
+    border: none;
+    padding: 20px 40px;
+    font-size: 1.5rem;
+    border-radius: 50px;
+    cursor: pointer;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: background 0.3s ease;
+  }
+
+  .play-button:hover {
+    background: #a5d6a7;
+  }
+
+  .game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    justify-content: center;
+    margin: 20px 0;
+    max-width: 90vw;
+  }
+
+  .card {
+    aspect-ratio: 1 / 1;
+    width: calc((90vw - 45px) / 4); /* 4 cards per row, 3 gaps of 15px */
+    font-size: 2.5rem;
+    background: #b3e5fc;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    user-select: none;
+    transition: transform 0.3s ease;
+  }
+
+  .card.flipped {
+    background: #4dd0e1;
+    color: white;
+    transform: rotateY(180deg);
+  }
+
+  .countdown {
+    font-size: 6rem;
+    font-weight: bold;
+    color: #f06292;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .fade-in {
+    opacity: 1 !important;
+  }
+
+  .good-job-message {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #2e7d32;
+    position: absolute;
+    z-index: 10;
+    display: none;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  .game-timer {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #f06292;
+  }
+
+  #startScreen { background-color: #fff9c4; }
+  #countdownScreen { background-color: #b3e5fc; }
+  #gameScreen { background-color: #c8e6c9; }
+  #roundEndScreen { background-color: #dcedc8; }
+  #finalScreen { background-color: #c8e6c9; }
+
+  /* 📱 Responsive Design */
+  @media (max-width: 600px) {
     h1, h2, p {
-      margin: 10px;
-    }
-
-    .rainbow {
-      background: linear-gradient(90deg, #f06292, #ba68c8, #64b5f6, #4db6ac, #aed581, #ffd54f);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-weight: 700;
-    }
-
-    .screen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      width: 100%;
-    }
-
-    .active {
-      display: flex;
-    }
-
-    .play-button {
-      background: #b2fab4;
-      border: none;
-      padding: 20px 40px;
-      font-size: 1.5rem;
-      border-radius: 50px;
-      cursor: pointer;
-      margin-top: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-      transition: background 0.3s ease;
-    }
-
-    .play-button:hover {
-      background: #a5d6a7;
-    }
-
-    .game-board {
-      display: grid;
-      grid-template-columns: repeat(4, 100px);
-      gap: 15px;
-      justify-content: center;
-      margin: 20px 0;
-    }
-
-    .card {
-      width: 100px;
-      height: 100px;
-      font-size: 2.5rem;
-      background: #b3e5fc;
-      border-radius: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      user-select: none;
-      transition: transform 0.3s ease;
-    }
-
-    .card.flipped {
-      background: #4dd0e1;
-      color: white;
-      transform: rotateY(180deg);
-    }
-
-    .countdown {
-      font-size: 6rem;
-      font-weight: bold;
-      color: #f06292;
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-
-    .fade-in {
-      opacity: 1 !important;
-    }
-
-    .good-job-message {
-      font-size: 3rem;
-      font-weight: bold;
-      color: #2e7d32;
-      position: absolute;
-      z-index: 10;
-      display: none;
-      background: rgba(255, 255, 255, 0.8);
-      padding: 20px;
-      border-radius: 10px;
+      font-size: 1.2rem;
     }
 
     .game-timer {
-      position: absolute;
-      top: 20px;
-      right: 20px;
+      font-size: 1.5rem;
+      top: 10px;
+      right: 10px;
+    }
+
+    .play-button {
+      padding: 15px 30px;
+      font-size: 1.2rem;
+    }
+
+    .good-job-message {
       font-size: 2rem;
-      font-weight: bold;
-      color: #f06292;
     }
 
-    #startScreen { background-color: #fff9c4; }
-    #countdownScreen { background-color: #b3e5fc; }
-    #gameScreen { background-color: #c8e6c9; }
-    #roundEndScreen { background-color: #dcedc8; }
-    #finalScreen { background-color: #c8e6c9; }
-
-    /* 📱 Responsive Design */
-    @media (max-width: 600px) {
-      .game-board {
-        grid-template-columns: repeat(3, 80px);
-        gap: 10px;
-      }
-
-      .card {
-        width: 80px;
-        height: 80px;
-        font-size: 2rem;
-      }
-
-      h1, h2, p {
-        font-size: 1.2rem;
-      }
-
-      .game-timer {
-        font-size: 1.5rem;
-        top: 10px;
-        right: 10px;
-      }
-
-      .play-button {
-        padding: 15px 30px;
-        font-size: 1.2rem;
-      }
-
-      .good-job-message {
-        font-size: 2rem;
-      }
-
-      .countdown {
-        font-size: 4rem;
-      }
+    .countdown {
+      font-size: 4rem;
     }
-  </style>
+  }
+</style>
 </head>
 <body>
 
