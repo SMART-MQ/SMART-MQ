@@ -132,16 +132,17 @@
       grid-column: 2 / 3;
     }
     
-    /* --- START: FINAL SUBMIT BUTTON FIX --- */
-    /* Removed font-size and font-weight to ensure it matches other buttons */
+    /* --- START: FINAL, DEFINITIVE SUBMIT BUTTON FIX --- */
     .option-buttons button#submit-btn { 
       background-color: #27ae60; 
       border-color: #2ecc71; 
       border-radius: 12px;
       grid-row: 4;
       grid-column: 3 / 4;
+      /* The fix: A smaller font-size ONLY for this icon to guarantee it fits. */
+      font-size: 28px; 
     }
-    /* --- END: FINAL SUBMIT BUTTON FIX --- */
+    /* --- END: FINAL, DEFINITIVE SUBMIT BUTTON FIX --- */
     .option-buttons button#submit-btn:hover { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
     
     .hidden { display: none; }
