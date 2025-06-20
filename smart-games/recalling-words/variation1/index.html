@@ -25,29 +25,31 @@
             background-attachment: fixed;
             padding: 2rem 0;
             box-sizing: border-box;
-            transition: justify-content 0.3s; /* Smooth transition */
         }
-        
-        /* NEW: Class to force vertical centering and no scrolling */
-        body.is-centered {
-            height: 100vh;
-            padding: 0;
+
+        /* MODIFIED: Wrapper is now a full-screen, centering overlay */
+        #welcome-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            overflow: hidden;
+            z-index: 200;
+            background: inherit; /* Inherit the body's gradient */
+            background-attachment: fixed;
         }
-       
-	    #game-container, #result {
-            display: none;
-	    }
-        
-        /* MODIFIED: Recall container is now a full-screen overlay */
+
+        /* MODIFIED: Recall container is ALSO a full-screen overlay */
         #recall-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: none; /* Toggled by .hidden class */
+            display: flex; /* This is now permanent */
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -55,6 +57,11 @@
             backdrop-filter: blur(4px);
             z-index: 150;
         }
+
+        /* Main game containers start hidden */
+	    #game-container, #result, #recall-container {
+            display: none;
+	    }
 
         #result {
             font-size: 20px;
@@ -267,7 +274,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             font-size: 2.5rem;
             font-weight: 700;
-            z-index: 100;
+            z-index: 250; /* Needs to be on top of other overlays */
             opacity: 0;
             transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
             pointer-events: none;
@@ -316,36 +323,36 @@
                 font-size: 1.25rem;
             }
         }
-
     </style>
 </head>
-<!-- MODIFIED: Start the body with the is-centered class -->
-<body class="is-centered">
+<body>
     <div id="feedback-popup"></div>
     <div id="session-timer" class="hidden">Time: 10:00</div>
     
-    <div id="info-page-1" class="info-page-container">
-        <p>
-            <span class="rainbow-title">Welcome to the SMART Memory Game!</span>
-            <br>
-            <span class="welcome-subtitle">This is a challenge just for you. Try to beat your best score each round!</span>
-        </p>
-        <button class="main-action-button" onclick="showInstructionsPage()">How to Play</button>
-    </div>
+    <div id="welcome-wrapper">
+        <div id="info-page-1" class="info-page-container">
+            <p>
+                <span class="rainbow-title">Welcome to the SMART Memory Game!</span>
+                <br>
+                <span class="welcome-subtitle">This is a challenge just for you. Try to beat your best score each round!</span>
+            </p>
+            <button class="main-action-button" onclick="showInstructionsPage()">How to Play</button>
+        </div>
 
-    <div id="info-page-2" class="info-page-container hidden">
-        <h2>How to Play</h2>
-        <ul>
-            <li>You will be shown <strong>15 words</strong> for <strong>15 seconds</strong>. Try to memorize them!</li>
-            <li>After the timer runs out, the words will disappear.</li>
-            <li>You will then be shown a series of words, one by one.</li>
-            <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
-            <li>Your score is based on your correct answers.</li>
-            <li>The session lasts for 10 minutes.</li>
-        </ul>
-        <div class="info-button-group">
-            <button class="recall-button" onclick="showWelcomePage()">Back</button>
-            <button class="main-action-button" onclick="startGame()">Play!</button>
+        <div id="info-page-2" class="info-page-container hidden">
+            <h2>How to Play</h2>
+            <ul>
+                <li>You will be shown <strong>15 words</strong> for <strong>15 seconds</strong>. Try to memorize them!</li>
+                <li>After the timer runs out, the words will disappear.</li>
+                <li>You will then be shown a series of words, one by one.</li>
+                <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
+                <li>Your score is based on your correct answers.</li>
+                <li>The session lasts for 10 minutes.</li>
+            </ul>
+            <div class="info-button-group">
+                <button class="recall-button" onclick="showWelcomePage()">Back</button>
+                <button class="main-action-button" onclick="startGame()">Play!</button>
+            </div>
         </div>
     </div>
 
@@ -409,14 +416,12 @@
 		        sessionStartTime = Date.now(); 
                 startSessionTimer(); 
 	        } 
-            // MODIFIED: Remove the centering class to allow scrolling
-            document.body.classList.remove('is-centered');
+            // MODIFIED: Hide the welcome overlay and show the game container
+            document.getElementById('welcome-wrapper').classList.add('hidden');
+            document.getElementById('game-container').style.display = 'block';
             
-            document.getElementById('info-page-1').classList.add('hidden');
-            document.getElementById('info-page-2').classList.add('hidden');
-            document.getElementById('recall-container').classList.add('hidden');
-            document.getElementById('result').classList.add('hidden');
-            document.getElementById('game-container').classList.remove('hidden');
+            document.getElementById('recall-container').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
             
             initialWords = getRandomWords(15);
             recallWords = getRandomWords(5);
@@ -477,16 +482,14 @@
                 document.getElementById('time-left').textContent = timeLeft;
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    document.getElementById('game-container').classList.add('hidden');
+                    document.getElementById('game-container').style.display = 'none';
                     startRecallPhase();
                 }
             }, 1000);
         }
 
         function startRecallPhase() {
-            // MODIFIED: No need to hide game-container, the recall screen is a fixed overlay
-            document.getElementById('recall-container').classList.remove('hidden');
-            document.getElementById('recall-container').style.display = 'flex'; // Ensure it's flex
+            document.getElementById('recall-container').style.display = 'flex';
             displayRecallWord();
         }
 
@@ -542,8 +545,8 @@
         }
 
         function endGame() {
-            document.getElementById('recall-container').classList.add('hidden');
-            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('recall-container').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
 
             totalGamesPlayed++;
             
@@ -588,8 +591,8 @@
             score = 0;
             currentWordIndex = 0;
             initialWords = []; 
-            document.getElementById('game-container').classList.add('hidden');
-            document.getElementById('result').classList.add('hidden');
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
         }
 
         function returnToStart() {
@@ -601,10 +604,10 @@
             bestScore = 0;
             allSessionScores = [];
             
-            // MODIFIED: Add centering class back to the body
-            document.body.classList.add('is-centered');
+            // MODIFIED: Show the welcome overlay again
+            document.getElementById('welcome-wrapper').classList.remove('hidden');
             
-            document.getElementById('result').classList.add('hidden');
+            document.getElementById('result').style.display = 'none';
             document.getElementById('session-timer').classList.add('hidden');
             showWelcomePage();
         }
