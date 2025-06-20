@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Game</title>
+    <title>Memory Game - Progressive</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,8 +50,8 @@
 
         #words-list {
             display: grid;
-            grid-template-columns: repeat(5, 1fr); 
-            gap: 45px;
+            /* Grid columns will be set by JS based on difficulty */
+            gap: 25px;
             justify-items: center;
             margin-top: 20px;
             padding: 10px;
@@ -164,11 +164,10 @@
             text-align: center;
             font-size: 18px;
             line-height: 1.6;
-		
         }
-         .info-page-container h2 {
+            
+        .info-page-container h2 {
             text-align: center;
-		 
         }
         .info-page-container ul {
             padding-left: 20px;
@@ -176,7 +175,7 @@
             /* MODIFIED: Add this line to align the list to the left */
             text-align: left;
         }
-	    
+
         .rainbow-title {
             font-size: 2.2rem;
             font-weight: 700;
@@ -221,12 +220,17 @@
             list-style-type: none;
             padding: 0;
             text-align: left;
-            max-height: 200px;
+            max-height: 250px; /* Increased height for more scores */
             overflow-y: auto;
         }
         #score-list li.best-score {
             font-weight: bold;
             color: #2a9d8f;
+        }
+        /* NEW: Style for the difficulty headers in the final score list */
+        #score-list h3 {
+            margin: 15px 0 5px 0;
+            color: #555;
         }
 
         #feedback-popup {
@@ -271,7 +275,7 @@
             }
             #words-list {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 25px;
+                gap: 20px;
             }
             .info-page-container, #result {
                 padding: 20px;
@@ -279,20 +283,12 @@
             .rainbow-title {
                 font-size: 1.8rem;
             }
-            .welcome-subtitle {
-                font-size: 1rem;
-            }
             #feedback-popup {
                 font-size: 2rem;
-                padding: 20px 30px;
             }
             .info-button-group {
                 flex-direction: column;
                 gap: 15px;
-            }
-            .info-button-group .recall-button,
-            .info-button-group .main-action-button {
-                width: 100% !important;
             }
             #recall-word {
                 font-size: 1.25rem;
@@ -308,7 +304,7 @@
         <p>
             <span class="rainbow-title">Welcome to the SMART Memory Game!</span>
             <br>
-            <span class="welcome-subtitle">This is a challenge just for you. Try to beat your best score each round!</span>
+            <span class="welcome-subtitle"> This is a challenge just for you. Try to beat your best score each round!</span>
         </p>
         <button class="main-action-button" onclick="showInstructionsPage()">How to Play</button>
     </div>
@@ -316,12 +312,12 @@
     <div id="info-page-2" class="info-page-container hidden">
         <h2>How to Play</h2>
         <ul>
-            <li>You will be shown <strong>15 words</strong> for <strong>15 seconds</strong>. Try to memorize them!</li>
-            <li>After the timer runs out, the words will disappear.</li>
+            <!-- MODIFIED: Updated instructions -->
+            <li>The game has three difficulties: Easy, Medium, and Hard. You will play 3 rounds of each before moving to the next.</li>
+            <li>In each round, memorize the words you see.</li>
             <li>You will then be shown a series of words, one by one.</li>
-            <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
-            <li>Your score is based on your correct answers.</li>
-            <li>The session lasts for 10 minutes.</li>
+	    <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
+            <li>The session lasts for 10 minutes. Try to get the best score in each difficulty!</li>
         </ul>
         <div class="info-button-group">
             <button class="recall-button" onclick="showWelcomePage()">Back</button>
@@ -330,7 +326,7 @@
     </div>
 
     <div id="game-container" class="hidden">
-        <h2>Memorize these words!</h2>
+        <h2 id="game-heading">Memorize these words!</h2>
         <div id="words-list"></div>
         <p id="timer">Time left: <span id="time-left">15</span> seconds</p>
     </div>
@@ -353,6 +349,13 @@
         const incorrectFeedback = ['Almost!', 'Nearly there!', 'Not Quite'];
         const SESSION_DURATION = 600000;
 
+        // NEW: Define the parameters for each difficulty level
+        const difficultyLevels = [
+            { name: 'Easy', memorizeCount: 6, distractorCount: 6, gridCols: 3 },
+            { name: 'Medium', memorizeCount: 9, distractorCount: 7, gridCols: 4 },
+            { name: 'Hard', memorizeCount: 15, distractorCount: 5, gridCols: 5 }
+        ];
+
         let sessionStartTime = null;
         let sessionTimerInterval = null; 
         let totalGamesPlayed = 0;
@@ -364,7 +367,8 @@
         let currentWordIndex = 0;
         let timer;
         
-        let bestScore = 0;
+        // MODIFIED: Score tracking is now an object for each difficulty
+        let bestScores = { Easy: 0, Medium: 0, Hard: 0 };
         let allSessionScores = [];
         
         let wordsUsedLastRound = [];
@@ -396,19 +400,32 @@
             document.getElementById('game-container').classList.remove('hidden');
             document.getElementById('game-container').style.display = 'block';
             
+            // MODIFIED: Determine current difficulty and get its parameters
+            let currentDifficulty;
+            if (totalGamesPlayed < 3) {
+                currentDifficulty = difficultyLevels[0]; // Easy
+            } else if (totalGamesPlayed < 6) {
+                currentDifficulty = difficultyLevels[1]; // Medium
+            } else {
+                currentDifficulty = difficultyLevels[2]; // Hard
+            }
+
+            // Update UI with difficulty info
+            document.getElementById('game-heading').textContent = `Memorize these words! (${currentDifficulty.name})`;
+            document.getElementById('words-list').style.gridTemplateColumns = `repeat(${currentDifficulty.gridCols}, 1fr)`;
+
             updateWordHistory();
             
             const forbiddenWords = [...wordsUsedLastRound, ...wordsUsedTwoRoundsAgo];
             let availablePool = wordsPool.filter(word => !forbiddenWords.includes(word));
             
             if (availablePool.length < 20) {
-                console.warn("Word pool is small; reusing words from 2 rounds ago.");
                 availablePool = wordsPool.filter(word => !wordsUsedLastRound.includes(word));
             }
 
-            initialWords = getRandomWordsFromPool(15, availablePool);
+            initialWords = getRandomWordsFromPool(currentDifficulty.memorizeCount, availablePool);
             let distractorPool = availablePool.filter(word => !initialWords.includes(word));
-            recallWords = getRandomWordsFromPool(5, distractorPool);
+            recallWords = getRandomWordsFromPool(currentDifficulty.distractorCount, distractorPool);
             
             allWordsToRecall = [...initialWords, ...recallWords];
             shuffleArray(allWordsToRecall);
@@ -505,25 +522,16 @@
             const currentWord = allWordsToRecall[currentWordIndex];
             const isCorrect = (initialWords.includes(currentWord) && userAnswer === 'yes') || (!initialWords.includes(currentWord) && userAnswer === 'no');
 
-            feedbackPopup.classList.remove('incorrect');
+            if (isCorrect) score++;
 
-            if (isCorrect) {
-                score++;
-                feedbackPopup.textContent = 'Good Job!';
-            } else {
-                const randomMsg = incorrectFeedback[Math.floor(Math.random() * incorrectFeedback.length)];
-                feedbackPopup.textContent = randomMsg;
-                feedbackPopup.classList.add('incorrect');
-            }
-
-            currentWordIndex++;
+            feedbackPopup.classList.toggle('incorrect', !isCorrect);
+            feedbackPopup.textContent = isCorrect ? 'Good Job!' : incorrectFeedback[Math.floor(Math.random() * incorrectFeedback.length)];
             feedbackPopup.classList.add('show');
             
+            currentWordIndex++;
             setTimeout(() => {
                 feedbackPopup.classList.remove('show');
-                setTimeout(() => {
-                    displayRecallWord();
-                }, 150); 
+                setTimeout(() => displayRecallWord(), 150); 
             }, 800);
         }
 
@@ -531,40 +539,51 @@
             document.getElementById('recall-container').classList.add('hidden');
             document.getElementById('result').classList.remove('hidden');
 
+            // MODIFIED: Get difficulty name for the round that just ended
+            let currentDifficulty;
+            if (totalGamesPlayed < 3) currentDifficulty = difficultyLevels[0];
+            else if (totalGamesPlayed < 6) currentDifficulty = difficultyLevels[1];
+            else currentDifficulty = difficultyLevels[2];
+            const difficultyName = currentDifficulty.name;
+
+            // MODIFIED: Update score tracking objects
+            if (score > bestScores[difficultyName]) {
+                bestScores[difficultyName] = score;
+            }
+            allSessionScores.push({ score: score, total: allWordsToRecall.length, difficulty: difficultyName });
+            
             totalGamesPlayed++;
             
-            allSessionScores.push(score);
-            if (score > bestScore) {
-                bestScore = score;
-            }
-
             const elapsedTime = Date.now() - sessionStartTime;
-            const scoreText = `Your score: ${score} / ${allWordsToRecall.length}`;
             
             if (elapsedTime >= SESSION_DURATION) {
                 clearInterval(timer);
                 clearInterval(sessionTimerInterval);
                 document.getElementById('session-timer').classList.add('hidden');
 
-                let scoreListHTML = allSessionScores.map((s, index) => {
-                    if (s === bestScore) {
-                        return `<li class="best-score">Round ${index + 1}: ${s} / ${allWordsToRecall.length} (Best!)</li>`;
+                // MODIFIED: Build a categorized final score list
+                let finalScoreHTML = '';
+                difficultyLevels.forEach(level => {
+                    const scoresForLevel = allSessionScores.filter(s => s.difficulty === level.name);
+                    if (scoresForLevel.length > 0) {
+                        finalScoreHTML += `<h3>${level.name}</h3>`;
+                        scoresForLevel.forEach((s, i) => {
+                            const isBest = s.score === bestScores[level.name];
+                            finalScoreHTML += `<li class="${isBest ? 'best-score' : ''}">
+                                Round ${i + 1}: ${s.score} / ${s.total} ${isBest ? '(Best!)' : ''}
+                            </li>`;
+                        });
                     }
-                    return `<li>Round ${index + 1}: ${s} / ${allWordsToRecall.length}</li>`;
-                }).join('');
+                });
 
                 document.body.classList.add('no-scroll');
-                
-                // MODIFIED: Removed the "Play Again" button from the final result
                 document.getElementById('result').innerHTML = `
-                    <p>Session Ended!</p>
-                    <p>Best Score: ${bestScore} / ${allWordsToRecall.length}</p>
+                    <p style="font-size: 1.5em; font-weight: bold;">Session Ended!</p>
                     <hr>
-                    <h3>All Scores:</h3>
-                    <ul id="score-list">${scoreListHTML}</ul>
+                    <ul id="score-list">${finalScoreHTML}</ul>
                 `;
             } else {
-                document.getElementById('result').innerHTML = `<p id="score-text">${scoreText}</p>`;
+                document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
                 setTimeout(() => {
                     resetGame();
                     startGame();
@@ -579,9 +598,6 @@
             document.getElementById('game-container').style.display = 'none';
             document.getElementById('result').classList.add('hidden');
         }
-
-        // MODIFIED: This function is no longer used, so it has been removed.
-        // function returnToStart() { ... }
 
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
