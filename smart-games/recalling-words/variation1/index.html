@@ -2,9 +2,438 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Variation 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game</title>
+    <style>
+        body {
+ 	    font-family: 'Comic Sans MS', sans-serif;
+      	    display: flex;
+      	    flex-direction: column;
+     	    align-items: center;
+     	    justify-content: center;
+     	    height: 100vh;
+     	    margin: 0;
+     	    text-align: center;
+     	    font-size: 1.5rem;
+ 	    background: linear-gradient(135deg,
+        #ffb3ba,  /* pastel red */
+        #ffdfba,  /* pastel orange */
+        #ffffba,  /* pastel yellow */
+        #baffc9,  /* pastel green */
+        #bae1ff,  /* pastel blue */
+        #e3baff   /* pastel purple */
+    );
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+       
+	    #game-container {
+            display: none;
+	    }
+
+        #result {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            /* NEW: Styles for the final score list container */
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px 40px;
+            border-radius: 15px;
+            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+            max-width: 400px;
+        }
+
+        #words-list {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 35px;
+            justify-items: center;
+            margin-top: 20px;
+            padding: 10px;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .word-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px 10px;
+            width: 100%;
+            max-width: 120px;
+            text-align: center;
+            font-weight: normal;
+            font-size: 22px;
+            font-family: "Comic Sans MS", "Comic Sans", cursive;
+            text-transform: capitalize;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+    
+        .word-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+        }
+
+        .recall-button {
+            background-color: white; 
+            border: none; 
+            border-radius: 10px;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+            padding: 20px 10px;
+            width: 120px;
+            font-weight: normal;
+            font-size: 22px;
+            font-family: "Comic Sans MS", "Comic Sans", cursive;
+            text-transform: capitalize;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 0 10px; 
+            user-select: none;
+        }
+
+        .recall-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .main-action-button {
+            background-color: #ffffba;
+            border: none;
+            border-radius: 10px;
+            box-sizing: border-box;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+            padding: 20px 30px !important;
+            width: 300px !important;
+            font-weight: bold;
+            font-size: 22px !important;
+            font-family: "Comic Sans MS", "Comic Sans", cursive;
+            text-transform: capitalize;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            user-select: none;
+            display: block;
+            margin: 20px auto 0 auto;
+        }
+
+        .main-action-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #recall-word {
+            margin-bottom: 30px; 
+            font-size: 23px;
+        }
+
+        .hidden {
+            display: none;
+        }
+        
+        #info-screen {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+            max-width: 600px;
+            text-align: left;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        #info-screen h2, #info-screen p {
+            text-align: center;
+        }
+        #info-screen ul {
+            padding-left: 20px;
+            margin-top: 20px;
+        }
+
+        /* NEW: Styles for the session timer */
+        #session-timer {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* NEW: Styles for the score list */
+        #score-list {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        #score-list li {
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+        #score-list li.best-score {
+            font-weight: bold;
+            color: #2a9d8f; /* A nice teal color */
+        }
+
+    </style>
 </head>
 <body>
-    <h1>Welcome to Variation 1</h1>
+    <!-- NEW: Container for the session timer -->
+    <div id="session-timer" class="hidden">Time: 10:00</div>
+    
+    <div id="info-screen">
+        <p style="font-weight: bold; font-size: 20px;">
+            Welcome to the SMART Memory Game!<br>
+            This is a challenge just for you. Try to beat your best score each round!
+        </p>
+        <hr>
+        <h2>How to Play</h2>
+        <ul>
+            <li>You will be shown <strong>15 words</strong> for <strong>15 seconds</strong>. Try to memorize them!</li>
+            <li>After the timer runs out, the words will disappear.</li>
+            <li>You will then be shown a series of words, one by one.</li>
+            <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
+            <li>Your score is based on your correct answers.</li>
+            <li>The session lasts for 10 minutes.</li>
+        </ul>
+        <button class="main-action-button" onclick="startGame()">Play!</button>
+    </div>
+
+
+    <div id="game-container">
+        <h2>Memorize these words!</h2>
+        <div id="words-list"></div>
+        <p id="timer">Time left: <span id="time-left">15</span> seconds</p>
+        <div id="countdown"></div>
+    </div>
+
+    <div id="recall-container" class="hidden">
+        <h2>Recall the words!</h2>
+        <div id="recall-word"></div>
+        <button class="recall-button" onclick="answer('yes')">Yes</button>
+        <button class="recall-button" onclick="answer('no')">No</button>
+    </div>
+
+    <div id="result" class="hidden">
+        <p id="score-text"></p>
+    </div>
+
+    <script>
+        const wordsPool = [
+            "apple", "banana", "cat", "dog", "elephant", "guitar", "house", "island", "jellyfish", "kangaroo",
+            "lemon", "moon", "notebook", "octopus", "piano", "queen", "robot", "sunflower", "tree", "umbrella",
+            "violin", "whale", "xylophone", "yacht", "zebra", "airplane", "balloon", "carrot", "dragon", "eagle",
+            "forest", "garden", "hill", "iceberg", "jungle", "kite", "lake", "mountain", "nest", "ocean",
+            "pyramid", "quilt", "river", "star", "tiger", "volcano", "waterfall", "x-ray", "yogurt", "zeppelin"
+        ];
+
+        const SESSION_DURATION = 600000; // 10 minutes in milliseconds
+
+        let sessionStartTime = null;
+        let sessionTimerInterval = null; // NEW: To hold the session timer
+        let totalGamesPlayed = 0;
+        let sessionActive = false;
+        let initialWords = [];
+        let recallWords = [];
+        let allWordsToRecall = [];
+        let score = 0;
+        let currentWordIndex = 0;
+        let timer;
+        
+        // NEW: Variables for score tracking
+        let bestScore = 0;
+        let allSessionScores = [];
+
+	    function startGame() {
+	        if (!sessionActive) { 
+		        sessionActive = true;
+		        sessionStartTime = Date.now(); 
+                startSessionTimer(); // NEW: Start the main 10-min timer
+	        } 
+
+            document.getElementById('info-screen').classList.add('hidden');
+            document.getElementById('recall-container').classList.add('hidden');
+            document.getElementById('result').classList.add('hidden');
+            
+            document.getElementById('game-container').style.display = 'block';
+            
+            initialWords = getRandomWords(15);
+            recallWords = getRandomWords(10);
+            allWordsToRecall = [...initialWords, ...recallWords];
+            shuffleArray(allWordsToRecall);
+            
+            displayWords(initialWords);
+            startTimer();
+        }
+        
+        // NEW: Function to manage the 10-minute session timer
+        function startSessionTimer() {
+            const timerDisplay = document.getElementById('session-timer');
+            timerDisplay.classList.remove('hidden');
+
+            sessionTimerInterval = setInterval(() => {
+                const elapsedTime = Date.now() - sessionStartTime;
+                const remainingTime = SESSION_DURATION - elapsedTime;
+
+                if (remainingTime <= 0) {
+                    clearInterval(sessionTimerInterval);
+                    timerDisplay.textContent = "Time's up!";
+                    // The endGame() logic will handle showing the final score screen
+                } else {
+                    const minutes = Math.floor((remainingTime / 1000) / 60);
+                    const seconds = Math.floor((remainingTime / 1000) % 60);
+                    timerDisplay.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        function getRandomWords(count) {
+            const randomWords = [];
+            const pool = wordsPool.filter(word => !initialWords.includes(word));
+            while (randomWords.length < count) {
+                const randomWord = pool[Math.floor(Math.random() * pool.length)];
+                if (!randomWords.includes(randomWord)) {
+                    randomWords.push(randomWord);
+                }
+            }
+            return randomWords;
+        }
+
+	    function displayWords(words) {
+            const wordList = document.getElementById('words-list');
+            wordList.innerHTML = ''; 
+            words.forEach(word => {
+                const card = document.createElement('div');
+                card.classList.add('word-card');
+                card.textContent = word;
+                wordList.appendChild(card);
+            });
+        }
+
+        function startTimer() {
+            let timeLeft = 15;
+            document.getElementById('time-left').textContent = timeLeft;
+            timer = setInterval(function() {
+                timeLeft--;
+                document.getElementById('time-left').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('game-container').style.display = 'none';
+                    startRecallPhase();
+                }
+            }, 1000);
+        }
+
+        function startRecallPhase() {
+            document.getElementById('recall-container').classList.remove('hidden');
+            displayRecallWord();
+        }
+
+        function displayRecallWord() {
+            if (currentWordIndex < allWordsToRecall.length) {
+                const word = allWordsToRecall[currentWordIndex];
+                document.getElementById('recall-word').innerHTML = `
+                    <div style="display: flex; align-items: center; white-space: nowrap; justify-content: center; gap: 12px;">
+                        <span>Have you seen the word</span>
+                        <div class="word-card" style="display: inline-block; margin: 0;">${word}</div>
+                        <span>before?</span>
+                    </div>
+                `;
+            } else {
+                endGame();
+            }
+        }
+
+        function answer(answer) {
+            const currentWord = allWordsToRecall[currentWordIndex];
+            if ((initialWords.includes(currentWord) && answer === 'yes') || (!initialWords.includes(currentWord) && answer === 'no')) {
+                score++;
+            }
+            currentWordIndex++;
+            displayRecallWord();
+        }
+
+        function endGame() {
+            document.getElementById('recall-container').classList.add('hidden');
+            document.getElementById('result').classList.remove('hidden');
+
+            totalGamesPlayed++;
+            
+            // NEW: Update best score and add current score to the list
+            allSessionScores.push(score);
+            if (score > bestScore) {
+                bestScore = score;
+            }
+
+            const elapsedTime = Date.now() - sessionStartTime;
+            const scoreText = `Your score: ${score} / ${allWordsToRecall.length}`;
+            
+            if (elapsedTime >= SESSION_DURATION) {
+                // MODIFIED: Show the final detailed score list
+                clearInterval(timer); // Ensure round timer is stopped
+                clearInterval(sessionTimerInterval); // Ensure session timer is stopped
+                document.getElementById('session-timer').classList.add('hidden');
+
+                let scoreListHTML = allSessionScores.map((s, index) => {
+                    if (s === bestScore) {
+                        return `<li class="best-score">Round ${index + 1}: ${s} / ${allWordsToRecall.length} (Best!)</li>`;
+                    }
+                    return `<li>Round ${index + 1}: ${s} / ${allWordsToRecall.length}</li>`;
+                }).join('');
+
+                document.getElementById('result').innerHTML = `
+                    <p>Session Ended!</p>
+                    <p>Best Score: ${bestScore} / ${allWordsToRecall.length}</p>
+                    <hr>
+                    <h3>All Scores:</h3>
+                    <ul id="score-list">${scoreListHTML}</ul>
+                    <button class="main-action-button" onclick="returnToStart()">Play Again</button>
+                `;
+            } else {
+                document.getElementById('result').innerHTML = `<p id="score-text">${scoreText}</p>`;
+                setTimeout(() => {
+                    resetGame();
+                    startGame();
+                }, 4000); // Shortened the wait time slightly
+            }
+        }
+
+        function resetGame() {
+            score = 0;
+            currentWordIndex = 0;
+            initialWords = []; 
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('result').classList.add('hidden');
+        }
+
+        function returnToStart() {
+            resetGame(); 
+
+            // Reset the session state
+            sessionActive = false;
+            sessionStartTime = null;
+            totalGamesPlayed = 0;
+            clearInterval(sessionTimerInterval);
+            
+            // NEW: Reset score tracking variables
+            bestScore = 0;
+            allSessionScores = [];
+
+            // Show the info screen again
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('session-timer').classList.add('hidden');
+            document.getElementById('info-screen').classList.remove('hidden');
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+    </script>
 </body>
 </html>
