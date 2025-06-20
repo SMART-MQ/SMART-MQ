@@ -101,7 +101,7 @@
       font-family: 'Poppins', sans-serif; 
       font-size: 32px; 
       width: 100%;
-      min-width: 0; /* Allows buttons to shrink past their content size */
+      min-width: 0;
       height: 70px;
       background-color: #0077b6; 
       color: #fff; 
@@ -112,7 +112,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0; /* Remove padding to maximize space for content */
+      padding: 0;
     }
     .option-buttons button:hover, .option-buttons button:active {
       background-color: #00b7ff; 
@@ -132,17 +132,16 @@
       grid-column: 2 / 3;
     }
     
-    /* --- START: SUBMIT BUTTON ICON STYLE FIX --- */
+    /* --- START: FINAL SUBMIT BUTTON FIX --- */
+    /* Removed font-size and font-weight to ensure it matches other buttons */
     .option-buttons button#submit-btn { 
       background-color: #27ae60; 
       border-color: #2ecc71; 
       border-radius: 12px;
       grid-row: 4;
       grid-column: 3 / 4;
-      font-size: 36px;  /* Make the icon slightly larger */
-      font-weight: bold; /* Make the icon bolder */
     }
-    /* --- END: SUBMIT BUTTON ICON STYLE FIX --- */
+    /* --- END: FINAL SUBMIT BUTTON FIX --- */
     .option-buttons button#submit-btn:hover { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
     
     .hidden { display: none; }
@@ -400,9 +399,7 @@
       optionButtons.appendChild(backspaceBtn);
       
       var submitBtn = document.createElement('button');
-      // --- START: SUBMIT BUTTON TEXT FIX ---
-      submitBtn.innerHTML = '✓'; // Use a checkmark icon instead of text
-      // --- END: SUBMIT BUTTON TEXT FIX ---
+      submitBtn.innerHTML = '✓';
       submitBtn.id = 'submit-btn';
       submitBtn.onclick = checkAnswer;
       optionButtons.appendChild(submitBtn);
