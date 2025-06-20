@@ -25,25 +25,36 @@
             background-attachment: fixed;
             padding: 2rem 0;
             box-sizing: border-box;
+            transition: justify-content 0.3s; /* Smooth transition */
         }
-
-        /* NEW: Styles for the full-screen welcome wrapper */
-        #welcome-wrapper {
+        
+        /* NEW: Class to force vertical centering and no scrolling */
+        body.is-centered {
+            height: 100vh;
+            padding: 0;
+            justify-content: center;
+            overflow: hidden;
+        }
+       
+	    #game-container, #result {
+            display: none;
+	    }
+        
+        /* MODIFIED: Recall container is now a full-screen overlay */
+        #recall-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: flex;
+            display: none; /* Toggled by .hidden class */
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 200; /* Make sure it's on top */
-            /* The body's gradient will show through */
+            background-color: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 150;
         }
-       
-	    #game-container {
-            display: none;
-	    }
 
         #result {
             font-size: 20px;
@@ -308,53 +319,51 @@
 
     </style>
 </head>
-<body>
+<!-- MODIFIED: Start the body with the is-centered class -->
+<body class="is-centered">
     <div id="feedback-popup"></div>
     <div id="session-timer" class="hidden">Time: 10:00</div>
     
-    <!-- NEW: A wrapper to center the info pages on the screen -->
-    <div id="welcome-wrapper">
-        <div id="info-page-1" class="info-page-container">
-            <p>
-                <span class="rainbow-title">Welcome to the SMART Memory Game!</span>
-                <br>
-                <span class="welcome-subtitle">This is a challenge just for you. Try to beat your best score each round!</span>
-            </p>
-            <button class="main-action-button" onclick="showInstructionsPage()">How to Play</button>
-        </div>
+    <div id="info-page-1" class="info-page-container">
+        <p>
+            <span class="rainbow-title">Welcome to the SMART Memory Game!</span>
+            <br>
+            <span class="welcome-subtitle">This is a challenge just for you. Try to beat your best score each round!</span>
+        </p>
+        <button class="main-action-button" onclick="showInstructionsPage()">How to Play</button>
+    </div>
 
-        <div id="info-page-2" class="info-page-container hidden">
-            <h2>How to Play</h2>
-            <ul>
-                <li>You will be shown <strong>15 words</strong> for <strong>15 seconds</strong>. Try to memorize them!</li>
-                <li>After the timer runs out, the words will disappear.</li>
-                <li>You will then be shown a series of words, one by one.</li>
-                <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
-                <li>Your score is based on your correct answers.</li>
-                <li>The session lasts for 10 minutes.</li>
-            </ul>
-            <div class="info-button-group">
-                <button class="recall-button" onclick="showWelcomePage()">Back</button>
-                <button class="main-action-button" onclick="startGame()">Play!</button>
-            </div>
+    <div id="info-page-2" class="info-page-container hidden">
+        <h2>How to Play</h2>
+        <ul>
+            <li>You will be shown <strong>15 words</strong> for <strong>15 seconds</strong>. Try to memorize them!</li>
+            <li>After the timer runs out, the words will disappear.</li>
+            <li>You will then be shown a series of words, one by one.</li>
+            <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
+            <li>Your score is based on your correct answers.</li>
+            <li>The session lasts for 10 minutes.</li>
+        </ul>
+        <div class="info-button-group">
+            <button class="recall-button" onclick="showWelcomePage()">Back</button>
+            <button class="main-action-button" onclick="startGame()">Play!</button>
         </div>
     </div>
 
 
-    <div id="game-container" class="hidden">
+    <div id="game-container">
         <h2>Memorize these words!</h2>
         <div id="words-list"></div>
         <p id="timer">Time left: <span id="time-left">15</span> seconds</p>
     </div>
 
-    <div id="recall-container" class="hidden">
+    <div id="recall-container">
         <h2>Recall the words!</h2>
         <div id="recall-word"></div>
         <button class="recall-button" onclick="answer('yes')">Yes</button>
         <button class="recall-button" onclick="answer('no')">No</button>
     </div>
 
-    <div id="result" class="hidden">
+    <div id="result">
         <p id="score-text"></p>
     </div>
 
@@ -400,13 +409,14 @@
 		        sessionStartTime = Date.now(); 
                 startSessionTimer(); 
 	        } 
-            // MODIFIED: Hide the entire welcome wrapper
-            document.getElementById('welcome-wrapper').classList.add('hidden');
+            // MODIFIED: Remove the centering class to allow scrolling
+            document.body.classList.remove('is-centered');
             
+            document.getElementById('info-page-1').classList.add('hidden');
+            document.getElementById('info-page-2').classList.add('hidden');
             document.getElementById('recall-container').classList.add('hidden');
             document.getElementById('result').classList.add('hidden');
             document.getElementById('game-container').classList.remove('hidden');
-            document.getElementById('game-container').style.display = 'block';
             
             initialWords = getRandomWords(15);
             recallWords = getRandomWords(5);
@@ -467,14 +477,16 @@
                 document.getElementById('time-left').textContent = timeLeft;
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    document.getElementById('game-container').style.display = 'none';
+                    document.getElementById('game-container').classList.add('hidden');
                     startRecallPhase();
                 }
             }, 1000);
         }
 
         function startRecallPhase() {
+            // MODIFIED: No need to hide game-container, the recall screen is a fixed overlay
             document.getElementById('recall-container').classList.remove('hidden');
+            document.getElementById('recall-container').style.display = 'flex'; // Ensure it's flex
             displayRecallWord();
         }
 
@@ -495,7 +507,7 @@
         }
 
         function toggleRecallButtons(enabled) {
-            document.querySelectorAll('.recall-button').forEach(button => {
+            document.querySelectorAll('#recall-container .recall-button').forEach(button => {
                 button.disabled = !enabled;
             });
         }
@@ -576,7 +588,7 @@
             score = 0;
             currentWordIndex = 0;
             initialWords = []; 
-            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('game-container').classList.add('hidden');
             document.getElementById('result').classList.add('hidden');
         }
 
@@ -588,11 +600,12 @@
             clearInterval(sessionTimerInterval);
             bestScore = 0;
             allSessionScores = [];
-
-            // MODIFIED: Show the welcome wrapper and ensure the correct page is visible
+            
+            // MODIFIED: Add centering class back to the body
+            document.body.classList.add('is-centered');
+            
             document.getElementById('result').classList.add('hidden');
             document.getElementById('session-timer').classList.add('hidden');
-            document.getElementById('welcome-wrapper').classList.remove('hidden');
             showWelcomePage();
         }
 
