@@ -10,28 +10,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
+        /* MODIFIED: The entire body style has been updated for proper scrolling */
         body {
- 	    font-family: 'Comic Neue', cursive;
-      	    display: flex;
-      	    flex-direction: column;
-     	    align-items: center;
-     	    justify-content: center;
-     	    height: 100vh;
-     	    margin: 0;
-     	    text-align: center;
-     	    font-size: 1.5rem;
- 	    background: linear-gradient(135deg,
-        #ffb3ba,  /* pastel red */
-        #ffdfba,  /* pastel orange */
-        #ffffba,  /* pastel yellow */
-        #baffc9,  /* pastel green */
-        #bae1ff,  /* pastel blue */
-        #e3baff   /* pastel purple */
-    );
-    background-repeat: no-repeat;
-    background-size: cover;
-    overflow: hidden;
-}
+            font-family: 'Comic Neue', cursive;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Horizontally centers the main containers */
+            min-height: 100vh; /* Allows the body to grow taller than the screen */
+            margin: 0;
+            text-align: center;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #ffb3ba, #ffdfba, #ffffba, #baffc9, #bae1ff, #e3baff);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed; /* Keeps the gradient fixed during scroll */
+            padding: 2rem 0; /* Adds vertical spacing instead of justify-content */
+            box-sizing: border-box; /* Ensures padding is included in height calculation */
+        }
        
 	    #game-container {
             display: none;
@@ -134,22 +129,20 @@
             box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
         }
 
-        /* MODIFIED: Styles for the recall question container */
         #recall-word {
             width: 90%;
-            max-width: 500px; /* Constrains the width on larger screens */
-            margin: 0 auto 30px auto; /* Centers the container and adds bottom margin */
+            max-width: 500px;
+            margin: 0 auto 30px auto;
             font-size: 23px;
         }
 
-        /* NEW: Helper class to style the layout inside the question */
         .recall-question-layout {
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-wrap: wrap; /* Allows wrapping on small screens */
+            flex-wrap: wrap;
             gap: 12px;
-            line-height: 1.5; /* Improves readability when wrapped */
+            line-height: 1.5;
         }
 
         .hidden {
@@ -295,7 +288,6 @@
             .info-button-group .main-action-button {
                 width: 100% !important;
             }
-            /* NEW: Adjust recall question font size on mobile */
             #recall-word {
                 font-size: 1.25rem;
             }
@@ -472,7 +464,6 @@
         function displayRecallWord() {
             if (currentWordIndex < allWordsToRecall.length) {
                 const word = allWordsToRecall[currentWordIndex];
-                // MODIFIED: Simplified the innerHTML to use a CSS class instead of many inline styles
                 document.getElementById('recall-word').innerHTML = `
                     <div class="recall-question-layout">
                         <span>Have you seen the word</span>
