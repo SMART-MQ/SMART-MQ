@@ -1,10 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Variation 1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <title>The Flash Challenge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* All CSS is identical to the final perfect version */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Poppins', sans-serif; text-align: center; padding: 15px; overflow-x: hidden; color: #fff; background-color: #0d0d21; -webkit-tap-highlight-color: transparent; }
+    #digital-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; --grid-size: 50px; --line-color: rgba(0, 183, 255, 0.1); background-image: linear-gradient(to right, var(--line-color) 1px, transparent 1px), linear-gradient(to bottom, var(--line-color) 1px, transparent 1px); background-size: var(--grid-size) var(--grid-size); animation: pan-grid 60s linear infinite; }
+    @keyframes pan-grid { from { background-position: 0 0; } to { background-position: var(--grid-size) var(--grid-size); } }
+    .container { max-width: 900px; margin: auto; background-color: rgba(13, 13, 33, 0.5); border: 1px solid rgba(0, 183, 255, 0.3); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; box-shadow: 0 0 30px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+    .main { flex: 1; margin-bottom: 20px; width: 100%; }
+    .main-title { font-size: clamp(28px, 8vw, 42px); font-weight: 600; color: #fff; text-shadow: 0 0 10px rgba(0, 183, 255, 0.7); margin-bottom: 10px; }
+    #info-bar { font-size: clamp(18px, 5vw, 24px); font-weight: 600; text-shadow: 0 0 5px #fff; margin-bottom: 10px; }
+    .digit-display, #answer-display { font-size: clamp(36px, 10vw, 50px); font-weight: 600; color: #fff; text-shadow: 0 0 5px #fff, 0 0 10px #0ff; background-color: rgba(0,0,0,0.4); border-radius: 10px; margin: 15px 0; min-height: 70px; letter-spacing: 0.3em; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 0 10px; }
+    .option-buttons { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, auto); gap: 10px; margin-top: 20px; }
+    .option-buttons button { font-family: 'Poppins', sans-serif; font-size: 32px; width: 100%; min-width: 0; height: 70px; background-color: #0077b6; color: #fff; border: 2px solid #00b7ff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; padding: 0; }
+    .option-buttons button:hover, .option-buttons button:active { background-color: #00b7ff; box-shadow: 0 0 15px #00b7ff; }
+    .option-buttons button#backspace-btn { background-color: #c0392b; border-color: #e74c3c; grid-row: 4; grid-column: 1 / 2; }
+    .option-buttons button#backspace-btn:hover { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; }
+    .option-buttons button#btn-zero { grid-row: 4; grid-column: 2 / 3; }
+    .option-buttons button#submit-btn { background-color: #27ae60; border-color: #2ecc71; border-radius: 12px; grid-row: 4; grid-column: 3 / 4; font-size: 28px; }
+    .option-buttons button#submit-btn:hover { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
+    .hidden { display: none; }
+    .message { font-size: 22px; margin-top: 20px; min-height: 28px; color: #fff; font-weight: 600; }
+    #streak-tracker { margin-top: 15px; min-height: 35px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+    .data-packet { width: 50px; height: 15px; border: 2px solid #00b7ff; border-radius: 4px; background-color: transparent; transition: all 0.5s ease; }
+    .data-packet.filled { background-color: #00b7ff; box-shadow: 0 0 10px #00b7ff; }
+    .glitch { animation: glitch-animation 0.5s linear; }
+    .glitch::before, .glitch::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; }
+    .glitch::before { left: 2px; text-shadow: -2px 0 #ff00c1; animation: glitch-anim-1 0.5s linear infinite reverse; }
+    .glitch::after { left: -2px; text-shadow: -2px 0 #00fff9; animation: glitch-anim-2 0.5s linear infinite reverse; }
+    @keyframes glitch-anim-1 { 0% { clip-path: inset(45% 0 50% 0); } 100% { clip-path: inset(5% 0 80% 0); } }
+    @keyframes glitch-anim-2 { 0% { clip-path: inset(85% 0 5% 0); } 100% { clip-path: inset(55% 0 30% 0); } }
+    .badge-tracker { width: 100%; max-width: 400px; padding: 10px; background-color: rgba(13, 13, 33, 0.5); border: 1px solid rgba(0, 183, 255, 0.3); backdrop-filter: blur(10px); border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.4); height: fit-content; color: #fff; }
+    .badge-tracker h3 { margin-top: 0; text-shadow: 0 0 5px #fff; }
+    #badges-earned { display: flex; flex-wrap: wrap; justify-content: center; }
+    .badge-earned { background-color: #00b7ff; color: #fff; font-weight: 600; padding: 8px 12px; margin: 5px; border-radius: 10px; box-shadow: 0 0 8px #00b7ff; }
+    #badge-popup { position: fixed; left: 50%; transform: translateX(-50%); top: -150px; background-color: rgba(13, 13, 33, 0.7); border: 1px solid rgba(0, 183, 255, 0.5); backdrop-filter: blur(10px); padding: 20px 40px; border-radius: 10px; font-size: 20px; font-weight: 600; color: #fff; text-shadow: 0 0 8px #0ff; box-shadow: 0 0 20px rgba(0, 183, 255, 0.5); z-index: 10; transition: top 0.5s ease-out; overflow: hidden; width: 90vw; }
+    #badge-popup.show { top: 30px; }
+    #badge-popup::after { content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 100%; background: linear-gradient(0deg, transparent, rgba(0, 183, 255, 0.3), transparent); animation: scanline 3s linear infinite; }
+    @keyframes scanline { from { top: -100%; } to { top: 100%; } }
+    #final-summary { background: rgba(255, 255, 255, 0.88); border-radius: 20px; padding: 25px; box-shadow: 0 0 20px rgba(0,0,0,0.15); margin: 20px auto; font-size: 18px; color: #333; max-width: 90vw; }
+    #instructions-container { background: rgba(255, 255, 255, 0.94); border-radius: 20px; padding: 20px; box-shadow: 0 0 25px rgba(0,0,0,0.2); max-width: 600px; margin: 0 auto 30px auto; color: #333; }
+    #instructions-container h3 { font-size: 24px; margin-bottom: 15px; }
+    #instructions-container ul { list-style-type: none; padding: 0; margin: 0 auto; text-align: left; display: inline-block; }
+    #instructions-container li { font-size: 18px; line-height: 1.6; margin-bottom: 12px; }
+    #instructions-btn { font-size: 22px; font-weight: 600; background: #0077b6; border: 2px solid #00b7ff; border-radius: 30px; padding: 15px 40px; color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 20px; }
+    #instructions-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; }
+    @media (min-width: 768px) { .container { flex-direction: row; align-items: flex-start; padding: 30px; } .main { margin-right: 30px; margin-bottom: 0; } .badge-tracker { width: 200px; } }
+  </style>
 </head>
 <body>
-    <h1>Welcome to Variation 1</h1>
+  <div id="digital-background"></div>
+  
+  <div class="main-title">The Flash Challenge</div>
+
+  <div id="instructions-container">
+    <h3>The Flash Challenge ⚡</h3>
+    <ul>
+      <li>⭐ This is a challenge <strong>just for you.</strong></li>
+      <li>🧠 The numbers will appear all at once in a <strong>quick flash!</strong> Try to remember them in order.</li>
+      <li>🏆 See how high a level you can reach before the <strong>10-minute timer</strong> runs out.</li>
+    </ul>
+    <button id="instructions-btn">Let's go!</button>
+  </div>
+
+  <div class="container hidden" id="game">
+    <div class="main">
+      <div id="info-bar">Time: <span id="timer-display">10:00</span></div>
+      <div class="digit-display" id="digit-display"></div>
+      <div id="answer-display"></div>
+      <div class="option-buttons hidden" id="option-buttons"></div>
+      <div class="message" id="message"></div>
+      <div id="streak-tracker">
+        <div class="data-packet"></div><div class="data-packet"></div><div class="data-packet"></div>
+      </div>
+      <div id="final-summary" class="hidden"></div>
+    </div>
+    <div class="badge-tracker">
+      <h3>🏆 Badges</h3>
+      <div id="badges-earned"></div>
+    </div>
+  </div>
+
+  <div id="badge-popup"></div>
+
+  <script>
+    var digits = '1234567890';
+
+    var badgeLevels = { 
+        5: "Memory Master",
+        6: "Sequence Star", 
+        7: "Cognitive Champion", 
+        8: "Unstoppable", 
+        9: "Brainy Boss"
+    };
+
+    var correctMessages = ["Correct!", "Nice!", "Good job!", "You got it!", "Perfect!", "Excellent!", "You're on a roll!"];
+    var encouragementMessages = [ "Try again!", "Let's try a different one!", "You got this!", "Almost!" ];
+    var currentLength = 2;
+    var consecutiveCorrect = 0;
+    var personalBest = 0;
+    var earnedBadges = {};
+    var isChecking = false;
+    var isGameOver = false;
+    var gameTimerInterval = null;
+    const GAME_DURATION = 600;
+    
+    var instructionsContainer = document.getElementById('instructions-container');
+    var instructionsBtn = document.getElementById('instructions-btn');
+    var gameContainer = document.getElementById('game');
+    var timerDisplayEl = document.getElementById('timer-display');
+    var infoBar = document.getElementById('info-bar');
+    var digitDisplay = document.getElementById('digit-display');
+    var optionButtons = document.getElementById('option-buttons');
+    var answerDisplay = document.getElementById('answer-display');
+    var message = document.getElementById('message');
+    var badgesEarned = document.getElementById('badges-earned');
+    var badgePopup = document.getElementById('badge-popup');
+    var finalSummary = document.getElementById('final-summary');
+    var streakTracker = document.getElementById('streak-tracker');
+    
+    var sequence = '';
+    var userAnswer = '';
+
+    instructionsBtn.onclick = function() {
+      instructionsContainer.style.display = 'none';
+      gameContainer.classList.remove('hidden');
+      startGame();
+    };
+    function capLength(length) { return Math.min(length, 10); }
+    function generateDigits(length) {
+      var result = '';
+      var availableDigits = '0123456789'.split('');
+      for (var i = 0; i < length; i++) {
+        var randomIndex = Math.floor(Math.random() * availableDigits.length);
+        result += availableDigits.splice(randomIndex, 1)[0];
+      }
+      return result;
+    }
+    function updateStreakVisual() {
+      var packets = streakTracker.querySelectorAll('.data-packet');
+      packets.forEach(function(packet, index) { packet.classList.toggle('filled', index < consecutiveCorrect); });
+    }
+    function showBadge(name) {
+      if (earnedBadges[name]) return;
+      earnedBadges[name] = true;
+      var badge = document.createElement('div');
+      badge.className = 'badge-earned';
+      badge.textContent = '🎖️ ' + name;
+      badgesEarned.appendChild(badge);
+      badgePopup.textContent = '🎉 Badge Unlocked: ' + name + '! 🎉';
+      badgePopup.classList.add('show');
+      setTimeout(function() { badgePopup.classList.remove('show'); }, 3500);
+    }
+    function getReadyCountdown(callback) {
+      digitDisplay.textContent = 'Ready?';
+      setTimeout(function() { digitDisplay.textContent = ''; callback(); }, 1200);
+    }
+
+    // --- START: DYNAMIC FLASH DURATION LOGIC ---
+    function showDigits() {
+      if (isGameOver) return;
+      isChecking = true;
+      sequence = generateDigits(currentLength);
+      
+      answerDisplay.textContent = ''; userAnswer = '';
+      optionButtons.classList.add('hidden');
+      message.textContent = '';
+      getReadyCountdown(function() {
+        digitDisplay.textContent = sequence;
+        
+        // Calculate the dynamic flash duration
+        var baseDuration = 500; // Starts at a quick 0.5 seconds
+        var incrementPerDigit = 250; // Adds 0.25 seconds for each digit
+        // We subtract 2 because currentLength starts at 2.
+        var flashDuration = baseDuration + (incrementPerDigit * (currentLength - 2));
+
+        setTimeout(function() {
+            if (isGameOver) return;
+            digitDisplay.textContent = '';
+            displayOptions();
+            isChecking = false;
+        }, flashDuration);
+      });
+    }
+    // --- END: DYNAMIC FLASH DURATION LOGIC ---
+
+    function displayOptions() {
+      if (isGameOver) return;
+      optionButtons.innerHTML = '';
+      digits.split('').forEach(function(d) {
+        var btn = document.createElement('button');
+        btn.textContent = d;
+        if (d === '0') { btn.id = 'btn-zero'; }
+        btn.onclick = function() { 
+            if(userAnswer.length < sequence.length) { 
+                userAnswer += d; 
+                answerDisplay.textContent = userAnswer; 
+            } 
+        };
+        optionButtons.appendChild(btn);
+      });
+      var backspaceBtn = document.createElement('button');
+      backspaceBtn.innerHTML = '⌫'; backspaceBtn.id = 'backspace-btn';
+      backspaceBtn.onclick = function() { userAnswer = userAnswer.slice(0, -1); answerDisplay.textContent = userAnswer; };
+      optionButtons.appendChild(backspaceBtn);
+      var submitBtn = document.createElement('button');
+      submitBtn.innerHTML = '✓'; submitBtn.id = 'submit-btn';
+      submitBtn.onclick = checkAnswer;
+      optionButtons.appendChild(submitBtn);
+      optionButtons.classList.remove('hidden');
+    }
+    function triggerGlitch() {
+        digitDisplay.classList.add('glitch');
+        setTimeout(function() {
+            digitDisplay.classList.remove('glitch');
+        }, 500);
+    }
+
+    function checkAnswer() {
+      if (isGameOver || isChecking) return;
+      isChecking = true;
+      optionButtons.classList.add('hidden');
+      var delayForNextTurn = 1500;
+
+      if (userAnswer === sequence) {
+        consecutiveCorrect++;
+        updateStreakVisual();
+        personalBest = Math.max(personalBest, currentLength);
+        
+        if (consecutiveCorrect >= 3) {
+          consecutiveCorrect = 0;
+          currentLength = capLength(currentLength + 1);
+          message.textContent = 'Level Up!';
+          triggerGlitch();
+          if (badgeLevels[currentLength]) {
+            showBadge(badgeLevels[currentLength]);
+            delayForNextTurn = 3600;
+          }
+        } else {
+          var randomIndex = Math.floor(Math.random() * correctMessages.length);
+          message.textContent = correctMessages[randomIndex];
+        }
+
+      } else {
+        consecutiveCorrect = 0;
+        updateStreakVisual();
+        var randomIndex = Math.floor(Math.random() * encouragementMessages.length);
+        message.textContent = encouragementMessages[randomIndex];
+        currentLength = Math.max(2, currentLength - 1);
+      }
+      setTimeout(moveToNextTurn, delayForNextTurn);
+    }
+    
+    function moveToNextTurn() {
+      if (isGameOver) return;
+      if (consecutiveCorrect === 0) { setTimeout(updateStreakVisual, 500); }
+      showDigits();
+    }
+    function startGameTimer() {
+        if (gameTimerInterval) { clearInterval(gameTimerInterval); }
+        var timeRemaining = GAME_DURATION;
+        function updateTimer() {
+            if (timeRemaining < 0) { clearInterval(gameTimerInterval); showFinalSummary(); return; }
+            var minutes = Math.floor(timeRemaining / 60);
+            var seconds = timeRemaining % 60;
+            timerDisplayEl.textContent = minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+            timeRemaining--;
+        }
+        updateTimer();
+        gameTimerInterval = setInterval(updateTimer, 1000);
+    }
+    function showFinalSummary() {
+      isGameOver = true;
+      if (gameTimerInterval) clearInterval(gameTimerInterval);
+      isChecking = true;
+      infoBar.classList.add('hidden');
+      digitDisplay.textContent = '';
+      answerDisplay.textContent = '';
+      message.textContent = '';
+      optionButtons.classList.add('hidden');
+      streakTracker.classList.add('hidden');
+      finalSummary.classList.remove('hidden');
+      var summaryHtml = '<h2>Time\'s Up!</h2>';
+      summaryHtml += '<p><strong>Your Best Performance: Level ' + personalBest + '</strong></p>';
+      summaryHtml += '<p>Thanks for playing! Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>';
+      finalSummary.innerHTML = summaryHtml;
+    }
+    function startGame() {
+      isGameOver = false; currentLength = 2; consecutiveCorrect = 0; personalBest = 0; earnedBadges = {};
+      badgesEarned.innerHTML = '';
+      finalSummary.classList.add('hidden');
+      streakTracker.classList.remove('hidden');
+      infoBar.classList.remove('hidden');
+      updateStreakVisual();
+      startGameTimer();
+      showDigits();
+    }
+  </script>
 </body>
 </html>
