@@ -48,10 +48,11 @@
             max-width: 400px;
         }
 
+        /* MODIFIED: Switched to a flexible, auto-fitting grid */
         #words-list {
             display: grid;
-            /* Grid columns will be set by JS based on difficulty */
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 20px;
             justify-items: center;
             margin-top: 20px;
             padding: 10px;
@@ -65,7 +66,8 @@
             box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
             padding: 20px 10px;
             width: 100%;
-            max-width: 120px;
+            /* MODIFIED: Add box-sizing as a best practice for layout stability */
+            box-sizing: border-box; 
             text-align: center;
             font-weight: normal;
             font-size: 22px;
@@ -172,7 +174,6 @@
         .info-page-container ul {
             padding-left: 20px;
             margin-top: 20px;
-            /* MODIFIED: Add this line to align the list to the left */
             text-align: left;
         }
 
@@ -220,14 +221,13 @@
             list-style-type: none;
             padding: 0;
             text-align: left;
-            max-height: 250px; /* Increased height for more scores */
+            max-height: 250px;
             overflow-y: auto;
         }
         #score-list li.best-score {
             font-weight: bold;
             color: #2a9d8f;
         }
-        /* NEW: Style for the difficulty headers in the final score list */
         #score-list h3 {
             margin: 15px 0 5px 0;
             color: #555;
@@ -273,10 +273,6 @@
                  overflow: hidden;
                  padding: 0;
             }
-            #words-list {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
-            }
             .info-page-container, #result {
                 padding: 20px;
             }
@@ -304,7 +300,7 @@
         <p>
             <span class="rainbow-title">Welcome to the SMART Memory Game!</span>
             <br>
-            <span class="welcome-subtitle"> This is a challenge just for you. Try to beat your best score each round!</span>
+            <span class="welcome-subtitle"> The game gets harder as you play. Good luck!</span>
         </p>
         <button class="main-action-button" onclick="showInstructionsPage()">How to Play</button>
     </div>
@@ -312,10 +308,8 @@
     <div id="info-page-2" class="info-page-container hidden">
         <h2>How to Play</h2>
         <ul>
-            <!-- MODIFIED: Updated instructions -->
             <li>The game has three difficulties: Easy, Medium, and Hard. You will play 3 rounds of each before moving to the next.</li>
             <li>In each round, memorize the words you see.</li>
-            <li>You will then be shown a series of words, one by one.</li>
 	    <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
             <li>The session lasts for 10 minutes. Try to get the best score in each difficulty!</li>
         </ul>
@@ -349,11 +343,10 @@
         const incorrectFeedback = ['Almost!', 'Nearly there!', 'Not Quite'];
         const SESSION_DURATION = 600000;
 
-        // NEW: Define the parameters for each difficulty level
         const difficultyLevels = [
-            { name: 'Easy', memorizeCount: 6, distractorCount: 6, gridCols: 3 },
-            { name: 'Medium', memorizeCount: 9, distractorCount: 7, gridCols: 4 },
-            { name: 'Hard', memorizeCount: 15, distractorCount: 5, gridCols: 5 }
+            { name: 'Easy', memorizeCount: 6, distractorCount: 6 },
+            { name: 'Medium', memorizeCount: 9, distractorCount: 7 },
+            { name: 'Hard', memorizeCount: 15, distractorCount: 5 }
         ];
 
         let sessionStartTime = null;
@@ -367,7 +360,6 @@
         let currentWordIndex = 0;
         let timer;
         
-        // MODIFIED: Score tracking is now an object for each difficulty
         let bestScores = { Easy: 0, Medium: 0, Hard: 0 };
         let allSessionScores = [];
         
@@ -400,20 +392,18 @@
             document.getElementById('game-container').classList.remove('hidden');
             document.getElementById('game-container').style.display = 'block';
             
-            // MODIFIED: Determine current difficulty and get its parameters
             let currentDifficulty;
             if (totalGamesPlayed < 3) {
-                currentDifficulty = difficultyLevels[0]; // Easy
+                currentDifficulty = difficultyLevels[0];
             } else if (totalGamesPlayed < 6) {
-                currentDifficulty = difficultyLevels[1]; // Medium
+                currentDifficulty = difficultyLevels[1];
             } else {
-                currentDifficulty = difficultyLevels[2]; // Hard
+                currentDifficulty = difficultyLevels[2];
             }
 
-            // Update UI with difficulty info
             document.getElementById('game-heading').textContent = `Memorize these words! (${currentDifficulty.name})`;
-            document.getElementById('words-list').style.gridTemplateColumns = `repeat(${currentDifficulty.gridCols}, 1fr)`;
-
+            // MODIFIED: Removed the JS line that set grid columns
+            
             updateWordHistory();
             
             const forbiddenWords = [...wordsUsedLastRound, ...wordsUsedTwoRoundsAgo];
@@ -539,14 +529,12 @@
             document.getElementById('recall-container').classList.add('hidden');
             document.getElementById('result').classList.remove('hidden');
 
-            // MODIFIED: Get difficulty name for the round that just ended
             let currentDifficulty;
             if (totalGamesPlayed < 3) currentDifficulty = difficultyLevels[0];
             else if (totalGamesPlayed < 6) currentDifficulty = difficultyLevels[1];
             else currentDifficulty = difficultyLevels[2];
             const difficultyName = currentDifficulty.name;
 
-            // MODIFIED: Update score tracking objects
             if (score > bestScores[difficultyName]) {
                 bestScores[difficultyName] = score;
             }
@@ -561,7 +549,6 @@
                 clearInterval(sessionTimerInterval);
                 document.getElementById('session-timer').classList.add('hidden');
 
-                // MODIFIED: Build a categorized final score list
                 let finalScoreHTML = '';
                 difficultyLevels.forEach(level => {
                     const scoresForLevel = allSessionScores.filter(s => s.difficulty === level.name);
