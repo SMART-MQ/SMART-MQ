@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta charset="UTF-8" />
   <title>Digit Span Memory Challenge</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -97,10 +97,12 @@
       gap: 10px; 
       margin-top: 20px; 
     }
+    /* --- START: BUTTON SIZE FIX --- */
     .option-buttons button { 
       font-family: 'Poppins', sans-serif; 
       font-size: 32px; 
       width: 100%;
+      min-width: 0; /* THIS IS THE FIX: Allows buttons to shrink past their content size */
       height: 70px;
       background-color: #0077b6; 
       color: #fff; 
@@ -112,6 +114,7 @@
       align-items: center;
       justify-content: center;
     }
+    /* --- END: BUTTON SIZE FIX --- */
     .option-buttons button:hover, .option-buttons button:active {
       background-color: #00b7ff; 
       box-shadow: 0 0 15px #00b7ff; 
@@ -193,15 +196,26 @@
       padding: 20px; box-shadow: 0 0 25px rgba(0,0,0,0.2); 
       max-width: 600px; margin: 0 auto 30px auto; color: #333;
     }
-    #instructions-container .instructions-text-block {
+    #instructions-container h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+    #instructions-container ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0 auto;
+      text-align: left;
+      display: inline-block;
+    }
+    #instructions-container li {
       font-size: 18px;
       line-height: 1.6;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
     #instructions-btn { 
       font-size: 22px; font-weight: 600; background: #0077b6; 
       border: 2px solid #00b7ff; border-radius: 30px; padding: 15px 40px; 
-      color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 10px; 
+      color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 20px; 
     }
     #instructions-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; }
     
@@ -223,15 +237,15 @@
   
   <div class="main-title">Digit Span Challenge</div>
 
-  <!-- START: UPDATED INSTRUCTIONS HTML -->
   <div id="instructions-container">
-    <div class="instructions-text-block">
-      <p>This is a challenge <strong>just for you.</strong></p>
-      <p>Try to see how high a level you can reach before the <strong>10-minute timer</strong> runs out.</p>
-    </div>
+    <h3>How to Play</h3>
+    <ul>
+      <li>⭐ This is a challenge <strong>just for you.</strong></li>
+      <li>🧠 The numbers will flash one by one. Try to remember them <strong>in the correct order!</strong></li>
+      <li>🏆 Try to see how high a level you can reach before the <strong>10-minute timer</strong> runs out.</li>
+    </ul>
     <button id="instructions-btn">Let's go!</button>
   </div>
-  <!-- END: UPDATED INSTRUCTIONS HTML -->
 
   <div class="container hidden" id="game">
     <div class="main">
