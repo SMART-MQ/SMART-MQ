@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>SMART - Memory Game</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap"
+    rel="stylesheet"
+  />
   <style>
     body {
       font-family: 'Fredoka', sans-serif;
@@ -17,12 +20,22 @@
       font-size: 1.5rem;
     }
 
-    h1, h2, p {
+    h1,
+    h2,
+    p {
       margin: 10px;
     }
 
     .rainbow {
-      background: linear-gradient(90deg, #f06292, #ba68c8, #64b5f6, #4db6ac, #aed581, #ffd54f);
+      background: linear-gradient(
+        90deg,
+        #f06292,
+        #ba68c8,
+        #64b5f6,
+        #4db6ac,
+        #aed581,
+        #ffd54f
+      );
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       font-weight: 700;
@@ -49,8 +62,9 @@
       border-radius: 50px;
       cursor: pointer;
       margin-top: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
       transition: background 0.3s ease;
+      -webkit-tap-highlight-color: transparent; /* remove tap highlight */
     }
 
     .play-button:hover {
@@ -59,10 +73,11 @@
 
     .game-board {
       display: grid;
-      grid-template-columns: repeat(6, 100px);
+      grid-template-columns: repeat(4, 100px);
       gap: 15px;
       justify-content: center;
       margin: 20px 0;
+      -webkit-tap-highlight-color: transparent; /* remove tap highlight */
     }
 
     .card {
@@ -75,39 +90,17 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       user-select: none;
       transition: transform 0.3s ease;
+      -webkit-tap-highlight-color: transparent; /* remove tap highlight */
+      outline: none;
     }
 
     .card.flipped {
       background: #4dd0e1;
       color: white;
       transform: rotateY(180deg);
-    }
-
-    .card.shake {
-      animation: shake 0.4s;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      50% { transform: translateX(5px); }
-      75% { transform: translateX(-5px); }
-    }
-
-    .message {
-      color: #2e7d32;
-      font-size: 2.5rem;
-      display: none;
-      margin-bottom: 10px;
-      transition: opacity 0.5s ease;
-    }
-
-    .message.show {
-      display: block;
-      opacity: 1;
     }
 
     .countdown {
@@ -134,70 +127,120 @@
       border-radius: 10px;
     }
 
+    .game-timer {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #f06292;
+    }
+
     #startScreen {
       background-color: #fff9c4;
     }
-
     #countdownScreen {
       background-color: #b3e5fc;
     }
-
     #gameScreen {
       background-color: #c8e6c9;
     }
-
-    #congratsScreen {
+    #roundEndScreen {
+      background-color: #dcedc8;
+    }
+    #finalScreen {
       background-color: #c8e6c9;
+    }
+
+    /* Remove focus and active outlines on cards and buttons */
+    .card:focus,
+    .card:active,
+    .play-button:focus,
+    .play-button:active {
+      outline: none;
+      box-shadow: none;
     }
   </style>
 </head>
 <body>
-
-  <!-- SCREEN 1: Start -->
+  <!-- START SCREEN -->
   <div class="screen active" id="startScreen">
     <h1 class="rainbow">Welcome to the SMART Memory Game!</h1>
-    <p class="rainbow">To play, match each food to its pair.</p>
+    <p class="rainbow">To play, match each face to its pair.</p>
+    <p>
+      This game is a challenge just for you, only you see your scores. Try to
+      complete as many rounds as you can!
+    </p>
     <button class="play-button" onclick="startCountdown()">▶ Play</button>
   </div>
 
-  <!-- SCREEN 1.5: Countdown -->
+  <!-- COUNTDOWN -->
   <div class="screen" id="countdownScreen">
     <div class="countdown" id="countdownText">3</div>
   </div>
 
-  <!-- SCREEN 2: Game -->
+  <!-- GAME -->
   <div class="screen" id="gameScreen">
-    <h2 class="rainbow">SMART - Memory Game</h2>
+    <h2 class="rainbow" id="gameTitle">SMART - Memory Game</h2>
     <div class="game-board" id="gameBoard"></div>
-    <div class="good-job-message" id="goodJobMessage">Good Job!</div>
+    <div class="good-job-message" id="goodJobMessage">
+      Good job! Get ready for the next round
+    </div>
   </div>
 
-  <!-- SCREEN 3: Congrats -->
-  <div class="screen" id="congratsScreen">
-    <h2 class="rainbow">CONGRATULATIONS!</h2>
-    <p id="resultText"></p>
-    <p class="rainbow">Now, time to finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
+  <!-- ROUND COMPLETE -->
+  <div class="screen" id="roundEndScreen">
+    <h2 class="rainbow">Round Complete!</h2>
+    <p id="roundResultText"></p>
+    <button class="play-button" id="nextRoundBtn" onclick="startNextRound()">
+      Next Round
+    </button>
   </div>
+
+  <!-- FINAL SCREEN -->
+  <div class="screen" id="finalScreen">
+    <h2 class="rainbow">CONGRATULATIONS!</h2>
+    <p id="finalResults"></p>
+    <p class="rainbow">
+      Good job! Now, finish the survey and you will have earned an extra $2.50
+      for your SMART bank.
+    </p>
+  </div>
+
+  <div class="game-timer" id="gameTimer">Time: 10:00</div>
 
   <script>
-    const emojis = ['☕', '🍕', '🍭', '🍔', '🍟', '🥗', '🍎', '🍌', '🥛'];
-    let cards = [];
+    const emojis = ['🍇', '🍉', '🍕', '🌭', '🥟', '🍓', '🍌', '🍩'];
+    const totalPairs = emojis.length;
 
+    let cards = [];
     let firstCard = null;
     let lockBoard = false;
     let matches = 0;
-    let fastestMatch = Infinity;
-    let firstClickTime = null;
-    const totalPairs = emojis.length;
+    let roundNumber = 1;
+    let roundStartTime = null;
+    let roundTimes = [];
+    let timeRemaining = 600; // 10 minutes in seconds
+    let timer = null; // This will hold the interval ID
+    let roundsCompleted = 0; // Track rounds completed
 
     const startScreen = document.getElementById('startScreen');
     const countdownScreen = document.getElementById('countdownScreen');
     const gameScreen = document.getElementById('gameScreen');
-    const congratsScreen = document.getElementById('congratsScreen');
+    const roundEndScreen = document.getElementById('roundEndScreen');
+    const finalScreen = document.getElementById('finalScreen');
     const board = document.getElementById('gameBoard');
+    const gameTitle = document.getElementById('gameTitle');
     const goodJobMessage = document.getElementById('goodJobMessage');
-    const resultText = document.getElementById('resultText');
     const countdownText = document.getElementById('countdownText');
+    const roundResultText = document.getElementById('roundResultText');
+    const finalResults = document.getElementById('finalResults');
+    const gameTimer = document.getElementById('gameTimer');
+
+    function switchScreen(from, to) {
+      from.classList.remove('active');
+      to.classList.add('active');
+    }
 
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -205,11 +248,6 @@
         [array[i], array[j]] = [array[j], array[i]];
       }
       return array;
-    }
-
-    function switchScreen(from, to) {
-      from.classList.remove('active');
-      to.classList.add('active');
     }
 
     function startCountdown() {
@@ -223,11 +261,12 @@
         setTimeout(() => {
           count--;
           if (count === 0) {
-            countdownText.textContent = "GO!";
+            countdownText.textContent = 'GO!';
             countdownText.classList.add('fade-in');
             clearInterval(interval);
             setTimeout(() => {
               switchScreen(countdownScreen, gameScreen);
+              startGameTimer();
               initGame();
             }, 1000);
           } else {
@@ -238,13 +277,38 @@
       }, 1000);
     }
 
+    function startGameTimer() {
+      // Clear any previous timer if there is one
+      if (timer) {
+        clearInterval(timer);
+      }
+
+      timer = setInterval(() => {
+        if (timeRemaining <= 0) {
+          clearInterval(timer);
+          endGame();
+        } else {
+          timeRemaining--;
+          updateTimerDisplay();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeRemaining / 60);
+      const seconds = timeRemaining % 60;
+      gameTimer.textContent = `Time: ${
+        minutes < 10 ? '0' : ''
+      }${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
     function initGame() {
       cards = shuffle([...emojis, ...emojis]);
       board.innerHTML = '';
       matches = 0;
-      fastestMatch = Infinity;
       firstCard = null;
       lockBoard = false;
+      gameTitle.textContent = `SMART - Memory Game (Round ${roundNumber})`;
 
       cards.forEach((emoji, index) => {
         const card = document.createElement('div');
@@ -265,26 +329,25 @@
 
       if (!firstCard) {
         firstCard = this;
-        firstClickTime = performance.now();
         return;
       }
 
       const secondCard = this;
 
       if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
-        const matchTime = (performance.now() - firstClickTime) / 1000;
-        if (matchTime < fastestMatch) fastestMatch = matchTime;
-
-        showMessage("Good Job!");
         firstCard.removeEventListener('click', flipCard);
         secondCard.removeEventListener('click', flipCard);
         firstCard = null;
         matches++;
+        showMessage('Good job!');
 
         if (matches === totalPairs) {
-          setTimeout(showCongrats, 800);
+          roundsCompleted++; // Increase rounds completed
+          setTimeout(() => {
+            roundResultText.textContent = `Round ${roundNumber} completed!`;
+            switchScreen(gameScreen, roundEndScreen);
+          }, 1000);
         }
-        lockBoard = false;
       } else {
         lockBoard = true;
         firstCard.classList.add('shake');
@@ -308,12 +371,22 @@
       setTimeout(() => {
         goodJobMessage.style.display = 'none';
         lockBoard = false;
-      }, 3000);
+      }, 1000);
     }
 
-    function showCongrats() {
-      switchScreen(gameScreen, congratsScreen);
-      resultText.innerHTML = `✅ Fastest matched pair time: ${fastestMatch.toFixed(2)} seconds`;
+    function startNextRound() {
+      roundNumber++;
+      switchScreen(roundEndScreen, countdownScreen);
+      initGame();
+      setTimeout(() => {
+        switchScreen(countdownScreen, gameScreen);
+        startGameTimer();
+      }, 1000);
+    }
+
+    function endGame() {
+      finalResults.textContent = `Rounds Completed = ${roundsCompleted}`;
+      switchScreen(gameScreen, finalScreen);
     }
   </script>
 </body>
