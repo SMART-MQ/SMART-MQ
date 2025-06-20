@@ -4,607 +4,607 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memory Game - Progressive</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+	
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
 
-    <style>
-        body {
- 	    font-family: 'Comic Neue', cursive;
-      	    display: flex;
-      	    flex-direction: column;
-     	    align-items: center;
-     	    justify-content: center;
-     	    height: 100vh;
-     	    margin: 0;
-     	    text-align: center;
-     	    font-size: 1.5rem;
- 	    background: linear-gradient(135deg,
-        #ffb3ba,  /* pastel red */
-        #ffdfba,  /* pastel orange */
-        #ffffba,  /* pastel yellow */
-        #baffc9,  /* pastel green */
-        #bae1ff,  /* pastel blue */
-        #e3baff   /* pastel purple */
-    );
-    background-repeat: no-repeat;
-    background-size: cover;
-    overflow: hidden;
+<style>
+    body {
+    font-family: 'Comic Neue', cursive;
+  	    display: flex;
+  	    flex-direction: column;
+ 	    align-items: center;
+ 	    justify-content: center;
+ 	    height: 100vh;
+ 	    margin: 0;
+ 	    text-align: center;
+ 	    font-size: 1.5rem;
+    background: linear-gradient(135deg,
+    #ffb3ba,  /* pastel red */
+    #ffdfba,  /* pastel orange */
+    #ffffba,  /* pastel yellow */
+    #baffc9,  /* pastel green */
+    #bae1ff,  /* pastel blue */
+    #e3baff   /* pastel purple */
+);
+background-repeat: no-repeat;
+background-size: cover;
+overflow: hidden;
 }
-       
-	    #game-container {
-            display: none;
-	    }
+	
+    #game-container {
+        display: none;
+    }
 
-        #result {
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 20px;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 20px 40px;
-            border-radius: 15px;
-            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
-            max-width: 400px;
-        }
+    #result {
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 20px;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 20px 40px;
+        border-radius: 15px;
+        box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+        max-width: 400px;
+    }
 
-        #words-list {
-            display: grid;
-            /* Grid columns will be set by JS based on difficulty */
-            gap: 25px;
-            justify-items: center;
-            margin-top: 20px;
-            padding: 10px;
-            width: 90%;
-            max-width: 800px;
-        }
+    #words-list {
+        display: grid;
+        /* Grid columns will be set by JS based on difficulty */
+        gap: 25px;
+        justify-items: center;
+        margin-top: 20px;
+        padding: 10px;
+        width: 90%;
+        max-width: 800px;
+    }
 
-        .word-card {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px 10px;
-            width: 100%;
-            max-width: 120px;
-            text-align: center;
-            font-weight: normal;
-            font-size: 22px;
-            font-family: inherit;
-            text-transform: capitalize;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+    .word-card {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+        padding: 20px 10px;
+        width: 100%;
+        max-width: 120px;
+        text-align: center;
+        font-weight: normal;
+        font-size: 22px;
+        font-family: inherit;
+        text-transform: capitalize;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .word-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+    }
+
+    .recall-button {
+        background-color: white; 
+        border: none; 
+        border-radius: 10px;
+        box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+        padding: 20px 10px;
+        width: 120px;
+        font-weight: normal;
+        font-size: 22px;
+        font-family: inherit;
+        text-transform: capitalize;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        margin: 0 10px; 
+        user-select: none;
+    }
+
+    .recall-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .recall-button:disabled {
+        cursor: not-allowed;
+        background-color: #e0e0e0;
+        box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+        transform: none;
+    }
+
+    .main-action-button {
+        background-color: #ffffba;
+        border: none;
+        border-radius: 10px;
+        box-sizing: border-box;
+        box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+        padding: 20px 30px !important;
+        width: 300px !important;
+        max-width: 90%;
+        font-weight: bold;
+        font-size: 22px !important;
+        font-family: inherit;
+        text-transform: capitalize;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        user-select: none;
+        display: block;
+        margin: 20px auto 0 auto;
+    }
+
+    .main-action-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    #recall-word {
+        width: 90%;
+        max-width: 500px;
+        margin: 0 auto 30px auto;
+        font-size: 23px;
+    }
+
+    .recall-question-layout {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        line-height: 1.5;
+    }
+
+    .hidden {
+        display: none;
+    }
     
-        .word-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
-            cursor: pointer;
-        }
-
-        .recall-button {
-            background-color: white; 
-            border: none; 
-            border-radius: 10px;
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-            padding: 20px 10px;
-            width: 120px;
-            font-weight: normal;
-            font-size: 22px;
-            font-family: inherit;
-            text-transform: capitalize;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-            margin: 0 10px; 
-            user-select: none;
-        }
-
-        .recall-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .recall-button:disabled {
-            cursor: not-allowed;
-            background-color: #e0e0e0;
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-            transform: none;
-        }
-
-        .main-action-button {
-            background-color: #ffffba;
-            border: none;
-            border-radius: 10px;
-            box-sizing: border-box;
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-            padding: 20px 30px !important;
-            width: 300px !important;
-            max-width: 90%;
-            font-weight: bold;
-            font-size: 22px !important;
-            font-family: inherit;
-            text-transform: capitalize;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            user-select: none;
-            display: block;
-            margin: 20px auto 0 auto;
-        }
-
-        .main-action-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        #recall-word {
-            width: 90%;
-            max-width: 500px;
-            margin: 0 auto 30px auto;
-            font-size: 23px;
-        }
-
-        .recall-question-layout {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            line-height: 1.5;
-        }
-
-        .hidden {
-            display: none;
-        }
+    .info-page-container {
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+        max-width: 600px;
+        width: 90%;
+        text-align: center;
+        font-size: 18px;
+        line-height: 1.6;
+    }
         
-        .info-page-container {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
-            max-width: 600px;
-            width: 90%;
-            text-align: center;
-            font-size: 18px;
-            line-height: 1.6;
-        }
-            
-        .info-page-container h2 {
-            text-align: center;
-        }
-        .info-page-container ul {
-            padding-left: 20px;
-            margin-top: 20px;
-            /* MODIFIED: Add this line to align the list to the left */
-            text-align: left;
-        }
+    .info-page-container h2 {
+        text-align: center;
+    }
+    .info-page-container ul {
+        padding-left: 20px;
+        margin-top: 20px;
+        /* MODIFIED: Add this line to align the list to the left */
+        text-align: left;
+    }
 
-        .rainbow-title {
-            font-size: 2.2rem;
-            font-weight: 700;
-            line-height: 1.3;
-            background: linear-gradient(to right, 
-                #e74c3c, #f39c12, #f1c40f, #2ecc71, #3498db, #9b59b6
-            );
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        .welcome-subtitle {
-            display: inline-block;
-            margin-top: 15px;
-            font-size: 1.1rem;
-            color: #555;
-        }
+    .rainbow-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        line-height: 1.3;
+        background: linear-gradient(to right, 
+            #e74c3c, #f39c12, #f1c40f, #2ecc71, #3498db, #9b59b6
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .welcome-subtitle {
+        display: inline-block;
+        margin-top: 15px;
+        font-size: 1.1rem;
+        color: #555;
+    }
 
-        .info-button-group {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        #session-timer {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 10px 20px;
-            border-radius: 10px;
-            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+    .info-button-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin-top: 20px;
+    }
+    
+    #session-timer {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 10px 20px;
+        border-radius: 10px;
+        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    #score-list {
+        list-style-type: none;
+        padding: 0;
+        text-align: left;
+        max-height: 250px; /* Increased height for more scores */
+        overflow-y: auto;
+    }
+    #score-list li.best-score {
+        font-weight: bold;
+        color: #2a9d8f;
+    }
+    /* NEW: Style for the difficulty headers in the final score list */
+    #score-list h3 {
+        margin: 15px 0 5px 0;
+        color: #555;
+    }
+
+    #feedback-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8); 
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 30px 50px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        font-size: 2.5rem;
+        font-weight: 700;
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
+        pointer-events: none;
+        color: #2a9d8f;
+    }
+
+    #feedback-popup.show {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    #feedback-popup.incorrect {
+        color: #e67e22;
+    }
+    
+    @media (max-width: 650px) {
+        body {
             font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        #score-list {
-            list-style-type: none;
-            padding: 0;
-            text-align: left;
-            max-height: 250px; /* Increased height for more scores */
+            height: auto;
+            min-height: 100vh;
             overflow-y: auto;
+            padding: 1rem 0;
         }
-        #score-list li.best-score {
-            font-weight: bold;
-            color: #2a9d8f;
+        body.no-scroll {
+             height: 100vh;
+             overflow: hidden;
+             padding: 0;
         }
-        /* NEW: Style for the difficulty headers in the final score list */
-        #score-list h3 {
-            margin: 15px 0 5px 0;
-            color: #555;
+        #words-list {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
         }
-
+        .info-page-container, #result {
+            padding: 20px;
+        }
+        .rainbow-title {
+            font-size: 1.8rem;
+        }
         #feedback-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8); 
-            background-color: rgba(255, 255, 255, 0.95);
-            padding: 30px 50px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            font-size: 2.5rem;
-            font-weight: 700;
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
-            pointer-events: none;
-            color: #2a9d8f;
+            font-size: 2rem;
         }
-
-        #feedback-popup.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
+        .info-button-group {
+            flex-direction: column;
+            gap: 15px;
         }
-
-        #feedback-popup.incorrect {
-            color: #e67e22;
+        #recall-word {
+            font-size: 1.25rem;
         }
-        
-        @media (max-width: 650px) {
-            body {
-                font-size: 1.2rem;
-                height: auto;
-                min-height: 100vh;
-                overflow-y: auto;
-                padding: 1rem 0;
-            }
-            body.no-scroll {
-                 height: 100vh;
-                 overflow: hidden;
-                 padding: 0;
-            }
-            #words-list {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
-            }
-            .info-page-container, #result {
-                padding: 20px;
-            }
-            .rainbow-title {
-                font-size: 1.8rem;
-            }
-            #feedback-popup {
-                font-size: 2rem;
-            }
-            .info-button-group {
-                flex-direction: column;
-                gap: 15px;
-            }
-            #recall-word {
-                font-size: 1.25rem;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body class="no-scroll">
     <div id="feedback-popup"></div>
     <div id="session-timer" class="hidden">Time: 10:00</div>
+<div id="info-page-1" class="info-page-container">
+    <p>
+        <span class="rainbow-title">Welcome to the SMART Memory Game!</span>
+        <br>
+        <span class="welcome-subtitle"> This is a challenge just for you. Try to beat your best score each round!</span>
+    </p>
+    <button class="main-action-button" onclick="showInstructionsPage()">How to Play</button>
+</div>
+
+<div id="info-page-2" class="info-page-container hidden">
+    <h2>How to Play</h2>
+    <ul>
+        <!-- MODIFIED: Updated instructions -->
+        <li>The game has three difficulties: Easy, Medium, and Hard. You will play 3 rounds of each before moving to the next.</li>
+        <li>In each round, memorize the words you see.</li>
+        <li>You will then be shown a series of words, one by one.</li>
+    <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
+        <li>The session lasts for 10 minutes. Try to get the best score in each difficulty!</li>
+    </ul>
+    <div class="info-button-group">
+        <button class="recall-button" onclick="showWelcomePage()">Back</button>
+        <button class="main-action-button" onclick="startGame()">Play!</button>
+    </div>
+</div>
+
+<div id="game-container" class="hidden">
+    <h2 id="game-heading">Memorize these words!</h2>
+    <div id="words-list"></div>
+    <p id="timer">Time left: <span id="time-left">15</span> seconds</p>
+</div>
+
+<div id="recall-container" class="hidden">
+    <h2>Recall the words!</h2>
+    <div id="recall-word"></div>
+    <button class="recall-button" onclick="answer('yes')">Yes</button>
+    <button class="recall-button" onclick="answer('no')">No</button>
+</div>
+
+<div id="result" class="hidden">
+    <p id="score-text"></p>
+</div>
+
+<script>
+    document.body.classList.add('no-scroll');
+
+ const wordsPool = [ "lion", "tiger", "bear", "monkey", "zebra", "giraffe", "hippo", "rhino", "snake", "lizard", "frog", "eagle", "parrot", "owl", "wolf", "fox", "deer", "rabbit", "squirrel", "turtle", "whale", "dolphin", "shark", "octopus", "penguin", "koala", "panda", "camel", "bat", "bee", "jungle", "forest", "ocean", "river", "desert", "savanna", "nest", "den", "hive", "burrow", "paw", "claw", "wing", "fin", "tail", "fur", "feather", "scale", "fang", "web", "cow", "pig", "sheep", "horse", "goat", "dog", "cat", "mouse", "hamster", "leopard", "cheetah", "elephant", "raccoon", "skunk", "beaver", "chipmunk", "moose", "bison", "fish", "crab", "lobster", "shrimp", "starfish", "seahorse", "jellyfish", "seal", "walrus", "otter", "chicken", "duck", "goose", "robin", "cardinal", "sparrow", "hawk", "swan", "flamingo", "peacock", "alligator", "crocodile", "chameleon", "ant", "butterfly", "moth", "ladybug", "spider", "caterpillar", "beak", "horn", "tusk", "hoof", "shell", "pouch", "whisker", "mane", "farm", "barn", "zoo", "herd", "flock" ];
+    const incorrectFeedback = ['Almost!', 'Nearly there!', 'Not Quite'];
+    const SESSION_DURATION = 600000;
+	
+    // NEW: Define the parameters for each difficulty level
+    const difficultyLevels = [
+        { name: 'Easy', memorizeCount: 6, distractorCount: 6, gridCols: 3 },
+        { name: 'Medium', memorizeCount: 9, distractorCount: 7, gridCols: 4 },
+        { name: 'Hard', memorizeCount: 15, distractorCount: 5, gridCols: 5 }
+    ];
+
+    let sessionStartTime = null;
+    let sessionTimerInterval = null; 
+    let totalGamesPlayed = 0;
+    let sessionActive = false;
+    let initialWords = [];
+    let recallWords = [];
+    let allWordsToRecall = [];
+    let score = 0;
+    let currentWordIndex = 0;
+    let timer;
     
-    <div id="info-page-1" class="info-page-container">
-        <p>
-            <span class="rainbow-title">Welcome to the SMART Memory Game!</span>
-            <br>
-            <span class="welcome-subtitle"> This is a challenge just for you. Try to beat your best score each round!</span>
-        </p>
-        <button class="main-action-button" onclick="showInstructionsPage()">How to Play</button>
-    </div>
+    // MODIFIED: Score tracking is now an object for each difficulty
+    let bestScores = { Easy: 0, Medium: 0, Hard: 0 };
+    let allSessionScores = [];
+    
+    let wordsUsedLastRound = [];
+    let wordsUsedTwoRoundsAgo = [];
 
-    <div id="info-page-2" class="info-page-container hidden">
-        <h2>How to Play</h2>
-        <ul>
-            <!-- MODIFIED: Updated instructions -->
-            <li>The game has three difficulties: Easy, Medium, and Hard. You will play 3 rounds of each before moving to the next.</li>
-            <li>In each round, memorize the words you see.</li>
-            <li>You will then be shown a series of words, one by one.</li>
-	    <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
-            <li>The session lasts for 10 minutes. Try to get the best score in each difficulty!</li>
-        </ul>
-        <div class="info-button-group">
-            <button class="recall-button" onclick="showWelcomePage()">Back</button>
-            <button class="main-action-button" onclick="startGame()">Play!</button>
-        </div>
-    </div>
+    function showInstructionsPage() {
+        document.getElementById('info-page-1').classList.add('hidden');
+        document.getElementById('info-page-2').classList.remove('hidden');
+    }
 
-    <div id="game-container" class="hidden">
-        <h2 id="game-heading">Memorize these words!</h2>
-        <div id="words-list"></div>
-        <p id="timer">Time left: <span id="time-left">15</span> seconds</p>
-    </div>
+    function showWelcomePage() {
+        document.getElementById('info-page-2').classList.add('hidden');
+        document.getElementById('info-page-1').classList.remove('hidden');
+    }
 
-    <div id="recall-container" class="hidden">
-        <h2>Recall the words!</h2>
-        <div id="recall-word"></div>
-        <button class="recall-button" onclick="answer('yes')">Yes</button>
-        <button class="recall-button" onclick="answer('no')">No</button>
-    </div>
-
-    <div id="result" class="hidden">
-        <p id="score-text"></p>
-    </div>
-
-    <script>
-        document.body.classList.add('no-scroll');
-
-        const wordsPool = [ "lion", "tiger", "bear", "monkey", "zebra", "giraffe", "hippo", "rhino", "snake", "lizard", "frog", "eagle", "parrot", "owl", "wolf", "fox", "deer", "rabbit", "squirrel", "turtle", "whale", "dolphin", "shark", "octopus", "penguin", "koala", "panda", "camel", "bat", "bee", "jungle", "forest", "ocean", "river", "desert", "savanna", "nest", "den", "hive", "burrow", "paw", "claw", "wing", "fin", "tail", "fur", "feather", "scale", "fang", "web", "cow", "pig", "sheep", "horse", "goat", "dog", "cat", "mouse", "hamster", "leopard", "cheetah", "elephant", "raccoon", "skunk", "beaver", "chipmunk", "moose", "bison", "fish", "crab", "lobster", "shrimp", "starfish", "seahorse", "jellyfish", "seal", "walrus", "otter", "chicken", "duck", "goose", "robin", "cardinal", "sparrow", "hawk", "swan", "flamingo", "peacock", "alligator", "crocodile", "chameleon", "ant", "butterfly", "moth", "ladybug", "spider", "caterpillar", "beak", "horn", "tusk", "hoof", "shell", "pouch", "whisker", "mane", "farm", "barn", "zoo", "herd", "flock" ];
-        const incorrectFeedback = ['Almost!', 'Nearly there!', 'Not Quite'];
-        const SESSION_DURATION = 600000;
-
-        // NEW: Define the parameters for each difficulty level
-        const difficultyLevels = [
-            { name: 'Easy', memorizeCount: 6, distractorCount: 6, gridCols: 3 },
-            { name: 'Medium', memorizeCount: 9, distractorCount: 7, gridCols: 4 },
-            { name: 'Hard', memorizeCount: 15, distractorCount: 5, gridCols: 5 }
-        ];
-
-        let sessionStartTime = null;
-        let sessionTimerInterval = null; 
-        let totalGamesPlayed = 0;
-        let sessionActive = false;
-        let initialWords = [];
-        let recallWords = [];
-        let allWordsToRecall = [];
-        let score = 0;
-        let currentWordIndex = 0;
-        let timer;
+    function startGame() {
+        if (!sessionActive) { 
+	        sessionActive = true;
+	        sessionStartTime = Date.now(); 
+            startSessionTimer(); 
+        } 
         
-        // MODIFIED: Score tracking is now an object for each difficulty
-        let bestScores = { Easy: 0, Medium: 0, Hard: 0 };
-        let allSessionScores = [];
+        document.body.classList.remove('no-scroll');
+
+        document.getElementById('info-page-1').classList.add('hidden');
+        document.getElementById('info-page-2').classList.add('hidden');
+        document.getElementById('recall-container').classList.add('hidden');
+        document.getElementById('result').classList.add('hidden');
+        document.getElementById('game-container').classList.remove('hidden');
+        document.getElementById('game-container').style.display = 'block';
         
-        let wordsUsedLastRound = [];
-        let wordsUsedTwoRoundsAgo = [];
-
-        function showInstructionsPage() {
-            document.getElementById('info-page-1').classList.add('hidden');
-            document.getElementById('info-page-2').classList.remove('hidden');
+        // MODIFIED: Determine current difficulty and get its parameters
+        let currentDifficulty;
+        if (totalGamesPlayed < 3) {
+            currentDifficulty = difficultyLevels[0]; // Easy
+        } else if (totalGamesPlayed < 6) {
+            currentDifficulty = difficultyLevels[1]; // Medium
+        } else {
+            currentDifficulty = difficultyLevels[2]; // Hard
         }
 
-        function showWelcomePage() {
-            document.getElementById('info-page-2').classList.add('hidden');
-            document.getElementById('info-page-1').classList.remove('hidden');
-        }
+        // Update UI with difficulty info
+        document.getElementById('game-heading').textContent = `Memorize these words! (${currentDifficulty.name})`;
+        document.getElementById('words-list').style.gridTemplateColumns = `repeat(${currentDifficulty.gridCols}, 1fr)`;
 
-	    function startGame() {
-	        if (!sessionActive) { 
-		        sessionActive = true;
-		        sessionStartTime = Date.now(); 
-                startSessionTimer(); 
-	        } 
-            
-            document.body.classList.remove('no-scroll');
-
-            document.getElementById('info-page-1').classList.add('hidden');
-            document.getElementById('info-page-2').classList.add('hidden');
-            document.getElementById('recall-container').classList.add('hidden');
-            document.getElementById('result').classList.add('hidden');
-            document.getElementById('game-container').classList.remove('hidden');
-            document.getElementById('game-container').style.display = 'block';
-            
-            // MODIFIED: Determine current difficulty and get its parameters
-            let currentDifficulty;
-            if (totalGamesPlayed < 3) {
-                currentDifficulty = difficultyLevels[0]; // Easy
-            } else if (totalGamesPlayed < 6) {
-                currentDifficulty = difficultyLevels[1]; // Medium
-            } else {
-                currentDifficulty = difficultyLevels[2]; // Hard
-            }
-
-            // Update UI with difficulty info
-            document.getElementById('game-heading').textContent = `Memorize these words! (${currentDifficulty.name})`;
-            document.getElementById('words-list').style.gridTemplateColumns = `repeat(${currentDifficulty.gridCols}, 1fr)`;
-
-            updateWordHistory();
-            
-            const forbiddenWords = [...wordsUsedLastRound, ...wordsUsedTwoRoundsAgo];
-            let availablePool = wordsPool.filter(word => !forbiddenWords.includes(word));
-            
-            if (availablePool.length < 20) {
-                availablePool = wordsPool.filter(word => !wordsUsedLastRound.includes(word));
-            }
-
-            initialWords = getRandomWordsFromPool(currentDifficulty.memorizeCount, availablePool);
-            let distractorPool = availablePool.filter(word => !initialWords.includes(word));
-            recallWords = getRandomWordsFromPool(currentDifficulty.distractorCount, distractorPool);
-            
-            allWordsToRecall = [...initialWords, ...recallWords];
-            shuffleArray(allWordsToRecall);
-            
-            displayWords(initialWords);
-            startTimer();
-        }
-
-        function updateWordHistory() {
-            wordsUsedTwoRoundsAgo = [...wordsUsedLastRound];
-            wordsUsedLastRound = [...allWordsToRecall];
-        }
-
-        function getRandomWordsFromPool(count, pool) {
-            const shuffled = [...pool].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, count);
-        }
+        updateWordHistory();
         
-        function startSessionTimer() {
-            const timerDisplay = document.getElementById('session-timer');
-            timerDisplay.classList.remove('hidden');
-
-            sessionTimerInterval = setInterval(() => {
-                const elapsedTime = Date.now() - sessionStartTime;
-                const remainingTime = SESSION_DURATION - elapsedTime;
-
-                if (remainingTime <= 0) {
-                    clearInterval(sessionTimerInterval);
-                    timerDisplay.textContent = "Time's up!";
-                } else {
-                    const minutes = Math.floor((remainingTime / 1000) / 60);
-                    const seconds = Math.floor((remainingTime / 1000) % 60);
-                    timerDisplay.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
-                }
-            }, 1000);
+        const forbiddenWords = [...wordsUsedLastRound, ...wordsUsedTwoRoundsAgo];
+        let availablePool = wordsPool.filter(word => !forbiddenWords.includes(word));
+        
+        if (availablePool.length < 20) {
+            availablePool = wordsPool.filter(word => !wordsUsedLastRound.includes(word));
         }
 
-	    function displayWords(words) {
-            const wordList = document.getElementById('words-list');
-            wordList.innerHTML = ''; 
-            words.forEach(word => {
-                const card = document.createElement('div');
-                card.classList.add('word-card');
-                card.textContent = word;
-                wordList.appendChild(card);
-            });
-        }
+        initialWords = getRandomWordsFromPool(currentDifficulty.memorizeCount, availablePool);
+        let distractorPool = availablePool.filter(word => !initialWords.includes(word));
+        recallWords = getRandomWordsFromPool(currentDifficulty.distractorCount, distractorPool);
+        
+        allWordsToRecall = [...initialWords, ...recallWords];
+        shuffleArray(allWordsToRecall);
+        
+        displayWords(initialWords);
+        startTimer();
+    }
 
-        function startTimer() {
-            let timeLeft = 15;
-            document.getElementById('time-left').textContent = timeLeft;
-            timer = setInterval(function() {
-                timeLeft--;
-                document.getElementById('time-left').textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    document.getElementById('game-container').style.display = 'none';
-                    startRecallPhase();
-                }
-            }, 1000);
-        }
+    function updateWordHistory() {
+        wordsUsedTwoRoundsAgo = [...wordsUsedLastRound];
+        wordsUsedLastRound = [...allWordsToRecall];
+    }
 
-        function startRecallPhase() {
-            document.getElementById('recall-container').classList.remove('hidden');
-            displayRecallWord();
-        }
+    function getRandomWordsFromPool(count, pool) {
+        const shuffled = [...pool].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
+    }
+    
+    function startSessionTimer() {
+        const timerDisplay = document.getElementById('session-timer');
+        timerDisplay.classList.remove('hidden');
 
-        function displayRecallWord() {
-            if (currentWordIndex < allWordsToRecall.length) {
-                const word = allWordsToRecall[currentWordIndex];
-                document.getElementById('recall-word').innerHTML = `
-                    <div class="recall-question-layout">
-                        <span>Have you seen the word</span>
-                        <div class="word-card" style="display: inline-block; margin: 0; font-weight: bold;">${word}</div>
-                        <span>before?</span>
-                    </div>
-                `;
-                toggleRecallButtons(true);
-            } else {
-                endGame();
-            }
-        }
-
-        function toggleRecallButtons(enabled) {
-            document.querySelectorAll('.recall-button').forEach(button => {
-                button.disabled = !enabled;
-            });
-        }
-
-        function answer(userAnswer) {
-            toggleRecallButtons(false);
-            
-            const feedbackPopup = document.getElementById('feedback-popup');
-            const currentWord = allWordsToRecall[currentWordIndex];
-            const isCorrect = (initialWords.includes(currentWord) && userAnswer === 'yes') || (!initialWords.includes(currentWord) && userAnswer === 'no');
-
-            if (isCorrect) score++;
-
-            feedbackPopup.classList.toggle('incorrect', !isCorrect);
-            feedbackPopup.textContent = isCorrect ? 'Good Job!' : incorrectFeedback[Math.floor(Math.random() * incorrectFeedback.length)];
-            feedbackPopup.classList.add('show');
-            
-            currentWordIndex++;
-            setTimeout(() => {
-                feedbackPopup.classList.remove('show');
-                setTimeout(() => displayRecallWord(), 150); 
-            }, 800);
-        }
-
-        function endGame() {
-            document.getElementById('recall-container').classList.add('hidden');
-            document.getElementById('result').classList.remove('hidden');
-
-            // MODIFIED: Get difficulty name for the round that just ended
-            let currentDifficulty;
-            if (totalGamesPlayed < 3) currentDifficulty = difficultyLevels[0];
-            else if (totalGamesPlayed < 6) currentDifficulty = difficultyLevels[1];
-            else currentDifficulty = difficultyLevels[2];
-            const difficultyName = currentDifficulty.name;
-
-            // MODIFIED: Update score tracking objects
-            if (score > bestScores[difficultyName]) {
-                bestScores[difficultyName] = score;
-            }
-            allSessionScores.push({ score: score, total: allWordsToRecall.length, difficulty: difficultyName });
-            
-            totalGamesPlayed++;
-            
+        sessionTimerInterval = setInterval(() => {
             const elapsedTime = Date.now() - sessionStartTime;
-            
-            if (elapsedTime >= SESSION_DURATION) {
-                clearInterval(timer);
+            const remainingTime = SESSION_DURATION - elapsedTime;
+
+            if (remainingTime <= 0) {
                 clearInterval(sessionTimerInterval);
-                document.getElementById('session-timer').classList.add('hidden');
-
-                // MODIFIED: Build a categorized final score list
-                let finalScoreHTML = '';
-                difficultyLevels.forEach(level => {
-                    const scoresForLevel = allSessionScores.filter(s => s.difficulty === level.name);
-                    if (scoresForLevel.length > 0) {
-                        finalScoreHTML += `<h3>${level.name}</h3>`;
-                        scoresForLevel.forEach((s, i) => {
-                            const isBest = s.score === bestScores[level.name];
-                            finalScoreHTML += `<li class="${isBest ? 'best-score' : ''}">
-                                Round ${i + 1}: ${s.score} / ${s.total} ${isBest ? '(Best!)' : ''}
-                            </li>`;
-                        });
-                    }
-                });
-
-                document.body.classList.add('no-scroll');
-                document.getElementById('result').innerHTML = `
-                    <p style="font-size: 1.5em; font-weight: bold;">Session Ended!</p>
-                    <hr>
-                    <ul id="score-list">${finalScoreHTML}</ul>
-                `;
+                timerDisplay.textContent = "Time's up!";
             } else {
-                document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
-                setTimeout(() => {
-                    resetGame();
-                    startGame();
-                }, 5000);
+                const minutes = Math.floor((remainingTime / 1000) / 60);
+                const seconds = Math.floor((remainingTime / 1000) % 60);
+                timerDisplay.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
             }
-        }
+        }, 1000);
+    }
 
-        function resetGame() {
-            score = 0;
-            currentWordIndex = 0;
-            initialWords = []; 
-            document.getElementById('game-container').style.display = 'none';
-            document.getElementById('result').classList.add('hidden');
-        }
+    function displayWords(words) {
+        const wordList = document.getElementById('words-list');
+        wordList.innerHTML = ''; 
+        words.forEach(word => {
+            const card = document.createElement('div');
+            card.classList.add('word-card');
+            card.textContent = word;
+            wordList.appendChild(card);
+        });
+    }
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+    function startTimer() {
+        let timeLeft = 15;
+        document.getElementById('time-left').textContent = timeLeft;
+        timer = setInterval(function() {
+            timeLeft--;
+            document.getElementById('time-left').textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                document.getElementById('game-container').style.display = 'none';
+                startRecallPhase();
             }
+        }, 1000);
+    }
+
+    function startRecallPhase() {
+        document.getElementById('recall-container').classList.remove('hidden');
+        displayRecallWord();
+    }
+
+    function displayRecallWord() {
+        if (currentWordIndex < allWordsToRecall.length) {
+            const word = allWordsToRecall[currentWordIndex];
+            document.getElementById('recall-word').innerHTML = `
+                <div class="recall-question-layout">
+                    <span>Have you seen the word</span>
+                    <div class="word-card" style="display: inline-block; margin: 0; font-weight: bold;">${word}</div>
+                    <span>before?</span>
+                </div>
+            `;
+            toggleRecallButtons(true);
+        } else {
+            endGame();
         }
-    </script>
+    }
+
+    function toggleRecallButtons(enabled) {
+        document.querySelectorAll('.recall-button').forEach(button => {
+            button.disabled = !enabled;
+        });
+    }
+
+    function answer(userAnswer) {
+        toggleRecallButtons(false);
+        
+        const feedbackPopup = document.getElementById('feedback-popup');
+        const currentWord = allWordsToRecall[currentWordIndex];
+        const isCorrect = (initialWords.includes(currentWord) && userAnswer === 'yes') || (!initialWords.includes(currentWord) && userAnswer === 'no');
+
+        if (isCorrect) score++;
+
+        feedbackPopup.classList.toggle('incorrect', !isCorrect);
+        feedbackPopup.textContent = isCorrect ? 'Good Job!' : incorrectFeedback[Math.floor(Math.random() * incorrectFeedback.length)];
+        feedbackPopup.classList.add('show');
+        
+        currentWordIndex++;
+        setTimeout(() => {
+            feedbackPopup.classList.remove('show');
+            setTimeout(() => displayRecallWord(), 150); 
+        }, 800);
+    }
+
+    function endGame() {
+        document.getElementById('recall-container').classList.add('hidden');
+        document.getElementById('result').classList.remove('hidden');
+
+        // MODIFIED: Get difficulty name for the round that just ended
+        let currentDifficulty;
+        if (totalGamesPlayed < 3) currentDifficulty = difficultyLevels[0];
+        else if (totalGamesPlayed < 6) currentDifficulty = difficultyLevels[1];
+        else currentDifficulty = difficultyLevels[2];
+        const difficultyName = currentDifficulty.name;
+
+        // MODIFIED: Update score tracking objects
+        if (score > bestScores[difficultyName]) {
+            bestScores[difficultyName] = score;
+        }
+        allSessionScores.push({ score: score, total: allWordsToRecall.length, difficulty: difficultyName });
+        
+        totalGamesPlayed++;
+        
+        const elapsedTime = Date.now() - sessionStartTime;
+        
+        if (elapsedTime >= SESSION_DURATION) {
+            clearInterval(timer);
+            clearInterval(sessionTimerInterval);
+            document.getElementById('session-timer').classList.add('hidden');
+
+            // MODIFIED: Build a categorized final score list
+            let finalScoreHTML = '';
+            difficultyLevels.forEach(level => {
+                const scoresForLevel = allSessionScores.filter(s => s.difficulty === level.name);
+                if (scoresForLevel.length > 0) {
+                    finalScoreHTML += `<h3>${level.name}</h3>`;
+                    scoresForLevel.forEach((s, i) => {
+                        const isBest = s.score === bestScores[level.name];
+                        finalScoreHTML += `<li class="${isBest ? 'best-score' : ''}">
+                            Round ${i + 1}: ${s.score} / ${s.total} ${isBest ? '(Best!)' : ''}
+                        </li>`;
+                    });
+                }
+            });
+
+            document.body.classList.add('no-scroll');
+            document.getElementById('result').innerHTML = `
+                <p style="font-size: 1.5em; font-weight: bold;">Session Ended!</p>
+                <hr>
+                <ul id="score-list">${finalScoreHTML}</ul>
+            `;
+        } else {
+            document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
+            setTimeout(() => {
+                resetGame();
+                startGame();
+            }, 5000);
+        }
+    }
+
+    function resetGame() {
+        score = 0;
+        currentWordIndex = 0;
+        initialWords = []; 
+        document.getElementById('game-container').style.display = 'none';
+        document.getElementById('result').classList.add('hidden');
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+</script>
 </body>
 </html>
+
