@@ -82,7 +82,11 @@
   user-select: none;
   transition: transform 0.3s ease;
 }
-
+.card.flipped {
+  background: #4dd0e1;
+  color: white;
+  transform: rotateY(180deg);
+}
   .countdown {
     font-size: 6rem;
     font-weight: bold;
@@ -298,47 +302,47 @@
       });
     }
 
-    function flipCard() {
-      if (lockBoard || this.classList.contains('flipped')) return;
+function flipCard() {
+  if (lockBoard || this.classList.contains('flipped')) return;
 
-      this.classList.add('flipped');
-      this.textContent = this.dataset.emoji;
+  this.classList.add('flipped');
+  this.textContent = this.dataset.emoji;
 
-      if (!firstCard) {
-        firstCard = this;
-        return;
-      }
+  if (!firstCard) {
+    firstCard = this;
+    return;
+  }
 
-      const secondCard = this;
+  const secondCard = this;
 
-      if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
-        firstCard.removeEventListener('click', flipCard);
-        secondCard.removeEventListener('click', flipCard);
-        firstCard = null;
-        matches++;
-        showMessage('Good job!');
+  if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
+    firstCard.removeEventListener('click', flipCard);
+    secondCard.removeEventListener('click', flipCard);
+    firstCard = null;
+    matches++;
+    showMessage('Good job!');
 
-        if (matches === totalPairs) {
-          roundsCompleted++;
-          setTimeout(() => {
-            roundResultText.textContent = `Round ${roundNumber} completed!`;
-            switchScreen(gameScreen, roundEndScreen);
-          }, 1000);
-        }
-      } else {
-        lockBoard = true;
-        firstCard.classList.add('shake');
-        secondCard.classList.add('shake');
-        setTimeout(() => {
-          firstCard.classList.remove('flipped', 'shake');
-          secondCard.classList.remove('flipped', 'shake');
-          firstCard.textContent = '';
-          secondCard.textContent = '';
-          firstCard = null;
-          lockBoard = false;
-        }, 800);
-      }
+    if (matches === totalPairs) {
+      roundsCompleted++;
+      setTimeout(() => {
+        roundResultText.textContent = `Round ${roundNumber} completed!`;
+        switchScreen(gameScreen, roundEndScreen);
+      }, 1000);
     }
+  } else {
+    lockBoard = true;
+    firstCard.classList.add('shake');
+    secondCard.classList.add('shake');
+    setTimeout(() => {
+      firstCard.classList.remove('flipped', 'shake');
+      secondCard.classList.remove('flipped', 'shake');
+      firstCard.textContent = '';
+      secondCard.textContent = '';
+      firstCard = null;
+      lockBoard = false;
+    }, 800);
+  }
+}
 
     function showMessage(text) {
       goodJobMessage.textContent = text;
