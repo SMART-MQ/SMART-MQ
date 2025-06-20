@@ -59,34 +59,29 @@
   }
 
   .game-board {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    justify-content: center;
-    margin: 20px 0;
-    max-width: 90vw;
-  }
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  justify-content: center;
+  margin: 20px 0;
+  width: 100%;
+  max-width: 450px; /* ✅ Limits size on desktops */
+}
 
-  .card {
-    aspect-ratio: 1 / 1;
-    width: calc((90vw - 45px) / 4); /* 4 cards per row, 3 gaps of 15px */
-    font-size: 2.5rem;
-    background: #b3e5fc;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    user-select: none;
-    transition: transform 0.3s ease;
-  }
-
-  .card.flipped {
-    background: #4dd0e1;
-    color: white;
-    transform: rotateY(180deg);
-  }
+.card {
+  aspect-ratio: 1 / 1;
+  width: 100%; /* Each card fills its grid cell */
+  font-size: 2.5rem;
+  background: #b3e5fc;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  user-select: none;
+  transition: transform 0.3s ease;
+}
 
   .countdown {
     font-size: 6rem;
@@ -132,7 +127,14 @@
     h1, h2, p {
       font-size: 1.2rem;
     }
+.game-board {
+    max-width: 90vw; /* ✅ Fluid and compact on small screens */
+  }
 
+  .card {
+    font-size: 2rem; /* Optional tweak for mobile readability */
+  }
+}
     .game-timer {
       font-size: 1.5rem;
       top: 10px;
