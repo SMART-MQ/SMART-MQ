@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta charset="UTF-8" />
   <title>Digit Span Memory Challenge</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -117,32 +117,29 @@
       box-shadow: 0 0 15px #00b7ff; 
     }
     
-    /* --- START OF CORRECTED NUMPAD CSS --- */
     .option-buttons button#backspace-btn { 
       background-color: #c0392b; 
       border-color: #e74c3c;
       grid-row: 4;
-      grid-column: 1 / 2; /* Position: Bottom-left */
+      grid-column: 1 / 2;
     }
     .option-buttons button#backspace-btn:hover { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; }
     
     .option-buttons button#btn-zero {
       grid-row: 4;
-      grid-column: 2 / 3; /* Position: Bottom-center */
+      grid-column: 2 / 3;
     }
-
+    
     .option-buttons button#submit-btn { 
       background-color: #27ae60; 
       border-color: #2ecc71; 
       border-radius: 12px; 
-      width: auto; 
       padding: 0 20px;
       grid-row: 4;
-      grid-column: 3 / 4; /* Position: Bottom-right */
+      grid-column: 3 / 4;
     }
     .option-buttons button#submit-btn:hover { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
-    /* --- END OF CORRECTED NUMPAD CSS --- */
-
+    
     .hidden { display: none; }
     .message { font-size: 22px; margin-top: 20px; min-height: 28px; color: #fff; font-weight: 600; }
     
@@ -158,16 +155,11 @@
     @keyframes glitch-anim-2 { 0% { clip-path: inset(85% 0 5% 0); } 100% { clip-path: inset(55% 0 30% 0); } }
 
     .badge-tracker { 
-      width: 100%;
-      max-width: 400px;
-      padding: 10px; 
+      width: 100%; max-width: 400px; padding: 10px; 
       background-color: rgba(13, 13, 33, 0.5);
-      border: 1px solid rgba(0, 183, 255, 0.3);
-      backdrop-filter: blur(10px);
-      border-radius: 15px; 
-      box-shadow: 0 0 10px rgba(0,0,0,0.4); 
-      height: fit-content; 
-      color: #fff;
+      border: 1px solid rgba(0, 183, 255, 0.3); backdrop-filter: blur(10px);
+      border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.4); 
+      height: fit-content; color: #fff;
     }
     .badge-tracker h3 { margin-top: 0; text-shadow: 0 0 5px #fff; }
     #badges-earned { display: flex; flex-wrap: wrap; justify-content: center; }
@@ -193,23 +185,32 @@
     #final-summary { 
       background: rgba(255, 255, 255, 0.88); border-radius: 20px; padding: 25px; 
       box-shadow: 0 0 20px rgba(0,0,0,0.15); margin: 20px auto; 
-      font-size: 18px; color: #333;
-      max-width: 90vw;
+      font-size: 18px; color: #333; max-width: 90vw;
     }
-    #instructions-btn { font-size: 24px; font-weight: 600; background: #0077b6; border: 2px solid #00b7ff; border-radius: 30px; padding: 15px 40px; color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 25px; }
+    
+    #instructions-container { 
+      background: rgba(255, 255, 255, 0.94); border-radius: 20px; 
+      padding: 20px; box-shadow: 0 0 25px rgba(0,0,0,0.2); 
+      max-width: 600px; margin: 0 auto 30px auto; color: #333;
+    }
+    #instructions-container .instructions-text-block {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    #instructions-btn { 
+      font-size: 22px; font-weight: 600; background: #0077b6; 
+      border: 2px solid #00b7ff; border-radius: 30px; padding: 15px 40px; 
+      color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 10px; 
+    }
     #instructions-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; }
-    #instructions-container { background: rgba(255, 255, 255, 0.94); border-radius: 20px; padding: 30px; box-shadow: 0 0 25px rgba(0,0,0,0.2); max-width: 600px; margin: 0 auto 30px auto; font-size: 18px; line-height: 1.5; position: relative; min-height: 250px; color: #333; }
-    #instructions-text { margin-bottom: 25px; }
-
+    
     @media (min-width: 768px) {
       .container {
-        flex-direction: row;
-        align-items: flex-start;
-        padding: 30px;
+        flex-direction: row; align-items: flex-start; padding: 30px;
       }
       .main {
-        margin-right: 30px;
-        margin-bottom: 0;
+        margin-right: 30px; margin-bottom: 0;
       }
       .badge-tracker {
         width: 200px;
@@ -222,14 +223,15 @@
   
   <div class="main-title">Digit Span Challenge</div>
 
+  <!-- START: UPDATED INSTRUCTIONS HTML -->
   <div id="instructions-container">
-    <div id="instructions-text">
-      <p>This is a 10-minute challenge just for you.</p>
-      <p>The numbers will flash one after the other. Try to remember them in the correct order!</p>
-      <p>See how high a level you can reach before the time runs out!</p>
+    <div class="instructions-text-block">
+      <p>This is a challenge <strong>just for you.</strong></p>
+      <p>Try to see how high a level you can reach before the <strong>10-minute timer</strong> runs out.</p>
     </div>
     <button id="instructions-btn">Let's go!</button>
   </div>
+  <!-- END: UPDATED INSTRUCTIONS HTML -->
 
   <div class="container hidden" id="game">
     <div class="main">
@@ -254,7 +256,10 @@
   <script>
     var digits = '1234567890';
     var badgeLevels = { 5: "Memory Master", 6: "Sequence Star", 7: "Cognitive Champion", 8: "Unstoppable", 9: "Brainy Boss" };
+    
+    var correctMessages = ["Correct!", "Nice!", "Good job!", "You got it!", "Perfect!", "Excellent!", "You're on a roll!"];
     var encouragementMessages = [ "Try again!", "Let's try a different one!", "You got this!", "Almost!" ];
+
     var currentLength = 2;
     var consecutiveCorrect = 0;
     var personalBest = 0;
@@ -262,7 +267,7 @@
     var isChecking = false;
     var isGameOver = false;
     var gameTimerInterval = null;
-    const GAME_DURATION = 600; // 10 minutes in seconds
+    const GAME_DURATION = 600;
     
     var instructionsContainer = document.getElementById('instructions-container');
     var instructionsBtn = document.getElementById('instructions-btn');
@@ -354,15 +359,12 @@
         }, 750);
     }
 
-    // --- START OF CORRECTED JAVASCRIPT ---
     function displayOptions() {
       if (isGameOver) return;
       optionButtons.innerHTML = '';
-      // Create number buttons
       digits.split('').forEach(function(d) {
         var btn = document.createElement('button');
         btn.textContent = d;
-        // Give the zero button a special ID for CSS targeting
         if (d === '0') { 
           btn.id = 'btn-zero'; 
         }
@@ -375,9 +377,8 @@
         optionButtons.appendChild(btn);
       });
       
-      // Create functional buttons
       var backspaceBtn = document.createElement('button');
-      backspaceBtn.innerHTML = '⌫'; // Backspace symbol
+      backspaceBtn.innerHTML = '⌫';
       backspaceBtn.id = 'backspace-btn';
       backspaceBtn.onclick = function() { userAnswer = userAnswer.slice(0, -1); answerDisplay.textContent = userAnswer; };
       optionButtons.appendChild(backspaceBtn);
@@ -390,7 +391,6 @@
 
       optionButtons.classList.remove('hidden');
     }
-    // --- END OF CORRECTED JAVASCRIPT ---
     
     function triggerGlitch() {
         digitDisplay.classList.add('glitch');
@@ -404,8 +404,8 @@
       isChecking = true;
       optionButtons.classList.add('hidden');
       var delayForNextTurn = 1500;
+
       if (userAnswer === sequence) {
-        message.textContent = 'Correct!';
         consecutiveCorrect++;
         updateStreakVisual();
         personalBest = Math.max(personalBest, currentLength);
@@ -419,7 +419,11 @@
             showBadge(badgeLevels[currentLength]);
             delayForNextTurn = 3600;
           }
+        } else {
+          var randomIndex = Math.floor(Math.random() * correctMessages.length);
+          message.textContent = correctMessages[randomIndex];
         }
+
       } else {
         consecutiveCorrect = 0;
         updateStreakVisual();
