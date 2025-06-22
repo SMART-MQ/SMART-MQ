@@ -569,6 +569,10 @@
                     startGame();
                 }, 5000);
             }
+		 finalResults.textContent = `🏆Rounds Completed🏆 = ${roundsCompleted}`;
+      switchScreen(gameScreen, finalScreen);
+      // Tell Qualtrics the game is done, so it can show the Next button
+  window.parent.postMessage("showNext", "*");
         }
 
         function resetGame() {
