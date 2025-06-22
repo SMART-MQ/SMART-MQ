@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memory Game - Progressive</title>
-	
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
@@ -32,7 +31,6 @@ background-repeat: no-repeat;
 background-size: cover;
 overflow: hidden;
 }
-	
     #game-container {
         display: none;
     }
@@ -64,7 +62,7 @@ overflow: hidden;
         border-radius: 10px;
         box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
         padding: 20px 20px;
-        width: 100%;
+        width: 90%;
         max-width: 120px;
         text-align: center;
         font-weight: normal;
@@ -295,6 +293,7 @@ overflow: hidden;
         }
     }
 </style>
+
 </head>
 <body class="no-scroll">
     <div id="feedback-popup"></div>
@@ -344,10 +343,10 @@ overflow: hidden;
 <script>
     document.body.classList.add('no-scroll');
 
- const wordsPool = [ "lion", "tiger", "bear", "monkey", "zebra", "giraffe", "hippo", "rhino", "snake", "lizard", "frog", "eagle", "parrot", "owl", "wolf", "fox", "deer", "rabbit", "squirrel", "turtle", "whale", "dolphin", "shark", "octopus", "penguin", "koala", "panda", "camel", "bat", "bee", "jungle", "forest", "ocean", "river", "desert", "savanna", "nest", "den", "hive", "burrow", "paw", "claw", "wing", "fin", "tail", "fur", "feather", "scale", "fang", "web", "cow", "pig", "sheep", "horse", "goat", "dog", "cat", "mouse", "hamster", "leopard", "cheetah", "elephant", "raccoon", "skunk", "beaver", "chipmunk", "moose", "bison", "fish", "crab", "lobster", "shrimp", "starfish", "seahorse", "jellyfish", "seal", "walrus", "otter", "chicken", "duck", "goose", "robin", "cardinal", "sparrow", "hawk", "swan", "flamingo", "peacock", "alligator", "crocodile", "chameleon", "ant", "butterfly", "moth", "ladybug", "spider", "caterpillar", "beak", "horn", "tusk", "hoof", "shell", "pouch", "whisker", "mane", "farm", "barn", "zoo", "herd", "flock" ];
+    const wordsPool = [ "lion", "tiger", "bear", "monkey", "zebra", "giraffe", "hippo", "rhino", "snake", "lizard", "frog", "eagle", "parrot", "owl", "wolf", "fox", "deer", "rabbit", "squirrel", "turtle", "whale", "dolphin", "shark", "octopus", "penguin", "koala", "panda", "camel", "bat", "bee", "jungle", "forest", "ocean", "river", "desert", "savanna", "nest", "den", "hive", "burrow", "paw", "claw", "wing", "fin", "tail", "fur", "feather", "scale", "fang", "web", "cow", "pig", "sheep", "horse", "goat", "dog", "cat", "mouse", "hamster", "leopard", "cheetah", "elephant", "raccoon", "skunk", "beaver", "chipmunk", "moose", "bison", "fish", "crab", "lobster", "shrimp", "starfish", "seahorse", "jellyfish", "seal", "walrus", "otter", "chicken", "duck", "goose", "robin", "cardinal", "sparrow", "hawk", "swan", "flamingo", "peacock", "alligator", "crocodile", "chameleon", "ant", "butterfly", "moth", "ladybug", "spider", "caterpillar", "beak", "horn", "tusk", "hoof", "shell", "pouch", "whisker", "mane", "farm", "barn", "zoo", "herd", "flock" ];
     const incorrectFeedback = ['Almost!', 'Nearly there!', 'Not Quite'];
     const SESSION_DURATION = 600000;
-	
+
     // NEW: Define the parameters for each difficulty level
     const difficultyLevels = [
         { name: 'Easy', memorizeCount: 6, distractorCount: 6, gridCols: 3 },
@@ -588,6 +587,10 @@ overflow: hidden;
                 startGame();
             }, 5000);
         }
+	 finalResults.textContent = `🏆Rounds Completed🏆 = ${roundsCompleted}`;
+      switchScreen(gameScreen, finalScreen);
+      // Tell Qualtrics the game is done, so it can show the Next button
+  window.parent.postMessage("showNext", "*");   
     }
 
     function resetGame() {
@@ -607,4 +610,3 @@ overflow: hidden;
 </script>
 </body>
 </html>
-
