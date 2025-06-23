@@ -18,7 +18,7 @@
     body {
       font-family: 'Poppins', sans-serif;
       text-align: center;
-      padding: 15px;
+      padding: 10px; /* --- CHANGE: Reduced body padding --- */
       overflow-x: hidden;
       color: #fff;
       background-color: #0d0d21;
@@ -44,7 +44,7 @@
       border: 1px solid rgba(0, 183, 255, 0.3); 
       backdrop-filter: blur(10px);
       border-radius: 20px; 
-      padding: 15px; /* --- CHANGE: Reduced padding --- */
+      padding: 15px 10px; /* --- CHANGE: Reduced container padding --- */
       box-shadow: 0 0 30px rgba(0,0,0,0.4);
       display: flex; 
       flex-direction: column; 
@@ -54,37 +54,37 @@
     }
     .main { 
       flex: 1; 
-      margin-bottom: 20px; 
+      margin-bottom: 15px; /* --- CHANGE: Reduced margin --- */
       width: 100%;
     }
-    
+
     /* --- CHANGE: Reduced font size --- */
     .main-title { 
-      font-size: clamp(24px, 7vw, 36px);
+      font-size: clamp(22px, 6vw, 32px);
       font-weight: 600; 
       color: #fff; 
       text-shadow: 0 0 10px rgba(0, 183, 255, 0.7); 
-      margin-bottom: 10px; 
+      margin-bottom: 8px; 
     }
-    /* --- CHANGE: Reduced font size --- */
+    /* --- CHANGE: Reduced font size and margin --- */
     #info-bar { 
-      font-size: clamp(16px, 4.5vw, 22px);
+      font-size: clamp(16px, 4vw, 20px);
       font-weight: 600; 
       text-shadow: 0 0 5px #fff; 
-      margin-bottom: 10px; 
+      margin-bottom: 8px; 
     }
     
-    /* --- CHANGE: Reduced font size and height --- */
+    /* --- CHANGE: Reduced font size, height, and margin --- */
     .digit-display, #answer-display {
-      font-size: clamp(32px, 9vw, 46px);
+      font-size: clamp(28px, 8vw, 42px);
       font-weight: 600; 
       color: #fff; 
       text-shadow: 0 0 5px #fff, 0 0 10px #0ff;
       background-color: rgba(0,0,0,0.4); 
       border-radius: 10px; 
-      margin: 15px 0;
-      min-height: 65px;
-      letter-spacing: 0.3em; 
+      margin: 10px 0;
+      min-height: 55px;
+      letter-spacing: 0.2em; 
       display: flex; 
       align-items: center; 
       justify-content: center;
@@ -98,16 +98,16 @@
       display: grid; 
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(4, auto);
-      gap: 8px; 
+      gap: 5px; 
       margin-top: 15px; 
     }
     /* --- CHANGE: Reduced font size and height --- */
     .option-buttons button { 
       font-family: 'Poppins', sans-serif; 
-      font-size: 28px; 
+      font-size: 26px; 
       width: 100%;
       min-width: 0;
-      height: 65px;
+      height: 55px;
       background-color: #0077b6; 
       color: #fff; 
       border: 2px solid #00b7ff; 
@@ -149,10 +149,12 @@
     .option-buttons button#submit-btn:hover { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
     
     .hidden { display: none; }
-    .message { font-size: 22px; margin-top: 20px; min-height: 28px; color: #fff; font-weight: 600; }
+    /* --- CHANGE: Reduced font size and margin --- */
+    .message { font-size: 18px; margin-top: 15px; min-height: 24px; color: #fff; font-weight: 600; }
     
-    #streak-tracker { margin-top: 15px; min-height: 35px; display: flex; justify-content: center; align-items: center; gap: 10px; }
-    .data-packet { width: 50px; height: 15px; border: 2px solid #00b7ff; border-radius: 4px; background-color: transparent; transition: all 0.5s ease; }
+    /* --- CHANGE: Reduced margin and size --- */
+    #streak-tracker { margin-top: 10px; min-height: 25px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+    .data-packet { width: 40px; height: 12px; border: 2px solid #00b7ff; border-radius: 4px; background-color: transparent; transition: all 0.5s ease; }
     .data-packet.filled { background-color: #00b7ff; box-shadow: 0 0 10px #00b7ff; }
     
     .glitch { animation: glitch-animation 0.5s linear; }
@@ -173,7 +175,7 @@
     #badges-earned { display: flex; flex-wrap: wrap; justify-content: center; }
     .badge-earned { 
       background-color: #00b7ff; color: #fff; font-weight: 600;
-      padding: 8px 12px; margin: 5px; border-radius: 10px; 
+      padding: 5px 10px; margin: 4px; border-radius: 8px; 
       box-shadow: 0 0 8px #00b7ff;
     }
 
@@ -181,29 +183,30 @@
       position: fixed; left: 50%; transform: translateX(-50%); top: -150px; 
       background-color: rgba(13, 13, 33, 0.7);
       border: 1px solid rgba(0, 183, 255, 0.5); backdrop-filter: blur(10px);
-      padding: 20px 40px; border-radius: 10px; font-size: 20px; font-weight: 600;
+      padding: 15px 30px; border-radius: 10px; font-size: 18px; font-weight: 600;
       color: #fff; text-shadow: 0 0 8px #0ff;
       box-shadow: 0 0 20px rgba(0, 183, 255, 0.5); z-index: 10;
       transition: top 0.5s ease-out; overflow: hidden; width: 90vw;
     }
-    #badge-popup.show { top: 30px; }
+    #badge-popup.show { top: 20px; }
     #badge-popup::after { content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 100%; background: linear-gradient(0deg, transparent, rgba(0, 183, 255, 0.3), transparent); animation: scanline 3s linear infinite; }
     @keyframes scanline { from { top: -100%; } to { top: 100%; } }
 
     #final-summary { 
-      background: rgba(255, 255, 255, 0.88); border-radius: 20px; padding: 25px; 
-      box-shadow: 0 0 20px rgba(0,0,0,0.15); margin: 20px auto; 
-      font-size: 18px; color: #333; max-width: 90vw;
+      background: rgba(255, 255, 255, 0.88); border-radius: 20px; padding: 20px; 
+      box-shadow: 0 0 20px rgba(0,0,0,0.15); margin: 15px auto; 
+      font-size: 16px; color: #333; max-width: 90vw;
     }
     
+    /* --- CHANGE: Shrunk instructions container --- */
     #instructions-container { 
       background: rgba(255, 255, 255, 0.94); border-radius: 20px; 
-      padding: 20px; box-shadow: 0 0 25px rgba(0,0,0,0.2); 
-      max-width: 600px; margin: 0 auto 30px auto; color: #333;
+      padding: 15px; box-shadow: 0 0 25px rgba(0,0,0,0.2); 
+      max-width: 600px; margin: 0 auto 20px auto; color: #333;
     }
     #instructions-container h3 {
-      font-size: 24px;
-      margin-bottom: 15px;
+      font-size: 20px;
+      margin-bottom: 10px;
     }
     #instructions-container ul {
       list-style-type: none;
@@ -213,14 +216,14 @@
       display: inline-block;
     }
     #instructions-container li {
-      font-size: 18px;
-      line-height: 1.6;
-      margin-bottom: 12px;
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 10px;
     }
     #instructions-btn { 
-      font-size: 22px; font-weight: 600; background: #0077b6; 
-      border: 2px solid #00b7ff; border-radius: 30px; padding: 15px 40px; 
-      color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 20px; 
+      font-size: 18px; font-weight: 600; background: #0077b6; 
+      border: 2px solid #00b7ff; border-radius: 30px; padding: 12px 30px; 
+      color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 15px; 
     }
     #instructions-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; }
     
@@ -491,14 +494,13 @@
       streakTracker.classList.add('hidden');
       finalSummary.classList.remove('hidden');
 
-      // --- CHANGE: Updated the summary message as requested ---
+      // The final message logic is correct as requested.
       var summaryHtml = '<h2>Time\'s Up!</h2>';
       summaryHtml += '<p><strong>🏆 Level Reached: ' + personalBest + ' 🏆</strong></p>';
       summaryHtml += '<p>Thanks for playing! Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>';
       finalSummary.innerHTML = summaryHtml;
-
-      // This line was already present in your code and is correct.
-      // It tells Qualtrics the game is done, so it can show the Next button.
+      
+      // Tell Qualtrics the game is done, so it can show the Next button
       window.parent.postMessage("showNext", "*");
     }
     
