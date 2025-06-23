@@ -8,51 +8,227 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* All CSS is identical to the final perfect version */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Poppins', sans-serif; text-align: center; padding: 15px; overflow-x: hidden; color: #fff; background-color: #0d0d21; -webkit-tap-highlight-color: transparent; }
-    #digital-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; --grid-size: 50px; --line-color: rgba(0, 183, 255, 0.1); background-image: linear-gradient(to right, var(--line-color) 1px, transparent 1px), linear-gradient(to bottom, var(--line-color) 1px, transparent 1px); background-size: var(--grid-size) var(--grid-size); animation: pan-grid 60s linear infinite; }
+    /* CSS Reset and Global Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      padding: 10px;
+      overflow-x: hidden;
+      color: #fff;
+      background-color: #0d0d21;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #digital-background {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+      --grid-size: 50px;
+      --line-color: rgba(0, 183, 255, 0.1);
+      background-image:
+        linear-gradient(to right, var(--line-color) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--line-color) 1px, transparent 1px);
+      background-size: var(--grid-size) var(--grid-size);
+      animation: pan-grid 60s linear infinite;
+    }
     @keyframes pan-grid { from { background-position: 0 0; } to { background-position: var(--grid-size) var(--grid-size); } }
-    .container { max-width: 900px; margin: auto; background-color: rgba(13, 13, 33, 0.5); border: 1px solid rgba(0, 183, 255, 0.3); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; box-shadow: 0 0 30px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
-    .main { flex: 1; margin-bottom: 20px; width: 100%; }
-    .main-title { font-size: clamp(28px, 8vw, 42px); font-weight: 600; color: #fff; text-shadow: 0 0 10px rgba(0, 183, 255, 0.7); margin-bottom: 10px; }
-    #info-bar { font-size: clamp(18px, 5vw, 24px); font-weight: 600; text-shadow: 0 0 5px #fff; margin-bottom: 10px; }
-    .digit-display, #answer-display { font-size: clamp(36px, 10vw, 50px); font-weight: 600; color: #fff; text-shadow: 0 0 5px #fff, 0 0 10px #0ff; background-color: rgba(0,0,0,0.4); border-radius: 10px; margin: 15px 0; min-height: 70px; letter-spacing: 0.3em; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 0 10px; }
-    .option-buttons { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, auto); gap: 10px; margin-top: 20px; }
-    .option-buttons button { font-family: 'Poppins', sans-serif; font-size: 32px; width: 100%; min-width: 0; height: 70px; background-color: #0077b6; color: #fff; border: 2px solid #00b7ff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; padding: 0; }
-    .option-buttons button:hover, .option-buttons button:active { background-color: #00b7ff; box-shadow: 0 0 15px #00b7ff; }
-    .option-buttons button#backspace-btn { background-color: #c0392b; border-color: #e74c3c; grid-row: 4; grid-column: 1 / 2; }
+
+    .container {
+      max-width: 900px; 
+      margin: auto; 
+      background-color: rgba(13, 13, 33, 0.5);
+      border: 1px solid rgba(0, 183, 255, 0.3); 
+      backdrop-filter: blur(10px);
+      border-radius: 20px; 
+      padding: 15px 10px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+      display: flex; 
+      flex-direction: column; 
+      align-items: center;
+      position: relative; 
+      z-index: 1;
+    }
+    .main { 
+      flex: 1; 
+      margin-bottom: 15px;
+      width: 100%;
+    }
+
+    .main-title { 
+      font-size: clamp(22px, 6vw, 32px);
+      font-weight: 600; 
+      color: #fff; 
+      text-shadow: 0 0 10px rgba(0, 183, 255, 0.7); 
+      margin-bottom: 8px; 
+    }
+    #info-bar { 
+      font-size: clamp(16px, 4vw, 20px);
+      font-weight: 600; 
+      text-shadow: 0 0 5px #fff; 
+      margin-bottom: 8px; 
+    }
+    
+    .digit-display, #answer-display {
+      font-size: clamp(28px, 8vw, 42px);
+      font-weight: 600; 
+      color: #fff; 
+      text-shadow: 0 0 5px #fff, 0 0 10px #0ff;
+      background-color: rgba(0,0,0,0.4); 
+      border-radius: 10px; 
+      margin: 10px 0;
+      min-height: 55px;
+      letter-spacing: 0.2em; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      position: relative;
+      overflow: hidden; 
+      padding: 0 10px;
+    }
+    
+    .option-buttons { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(4, auto);
+      gap: 5px; 
+      margin-top: 15px; 
+    }
+    .option-buttons button { 
+      font-family: 'Poppins', sans-serif; 
+      font-size: 26px; 
+      width: 100%;
+      min-width: 0;
+      height: 55px;
+      background-color: #0077b6; 
+      color: #fff; 
+      border: 2px solid #00b7ff; 
+      border-radius: 50%; 
+      cursor: pointer; 
+      transition: all 0.2s ease; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .option-buttons button:hover, .option-buttons button:active {
+      background-color: #00b7ff; 
+      box-shadow: 0 0 15px #00b7ff; 
+    }
+    
+    .option-buttons button#backspace-btn { 
+      background-color: #c0392b; 
+      border-color: #e74c3c;
+      grid-row: 4;
+      grid-column: 1 / 2;
+    }
     .option-buttons button#backspace-btn:hover { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; }
-    .option-buttons button#btn-zero { grid-row: 4; grid-column: 2 / 3; }
-    .option-buttons button#submit-btn { background-color: #27ae60; border-color: #2ecc71; border-radius: 12px; grid-row: 4; grid-column: 3 / 4; font-size: 28px; }
+    
+    .option-buttons button#btn-zero {
+      grid-row: 4;
+      grid-column: 2 / 3;
+    }
+    
+    .option-buttons button#submit-btn { 
+      background-color: #27ae60; 
+      border-color: #2ecc71; 
+      border-radius: 12px;
+      grid-row: 4;
+      grid-column: 3 / 4;
+      font-size: 24px; 
+    }
     .option-buttons button#submit-btn:hover { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
+    
     .hidden { display: none; }
-    .message { font-size: 22px; margin-top: 20px; min-height: 28px; color: #fff; font-weight: 600; }
-    #streak-tracker { margin-top: 15px; min-height: 35px; display: flex; justify-content: center; align-items: center; gap: 10px; }
-    .data-packet { width: 50px; height: 15px; border: 2px solid #00b7ff; border-radius: 4px; background-color: transparent; transition: all 0.5s ease; }
+    .message { font-size: 18px; margin-top: 15px; min-height: 24px; color: #fff; font-weight: 600; }
+    
+    #streak-tracker { margin-top: 10px; min-height: 25px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+    .data-packet { width: 40px; height: 12px; border: 2px solid #00b7ff; border-radius: 4px; background-color: transparent; transition: all 0.5s ease; }
     .data-packet.filled { background-color: #00b7ff; box-shadow: 0 0 10px #00b7ff; }
+    
     .glitch { animation: glitch-animation 0.5s linear; }
     .glitch::before, .glitch::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; }
     .glitch::before { left: 2px; text-shadow: -2px 0 #ff00c1; animation: glitch-anim-1 0.5s linear infinite reverse; }
     .glitch::after { left: -2px; text-shadow: -2px 0 #00fff9; animation: glitch-anim-2 0.5s linear infinite reverse; }
     @keyframes glitch-anim-1 { 0% { clip-path: inset(45% 0 50% 0); } 100% { clip-path: inset(5% 0 80% 0); } }
     @keyframes glitch-anim-2 { 0% { clip-path: inset(85% 0 5% 0); } 100% { clip-path: inset(55% 0 30% 0); } }
-    .badge-tracker { width: 100%; max-width: 400px; padding: 10px; background-color: rgba(13, 13, 33, 0.5); border: 1px solid rgba(0, 183, 255, 0.3); backdrop-filter: blur(10px); border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.4); height: fit-content; color: #fff; }
+
+    .badge-tracker { 
+      width: 100%; max-width: 400px; padding: 10px; 
+      background-color: rgba(13, 13, 33, 0.5);
+      border: 1px solid rgba(0, 183, 255, 0.3); backdrop-filter: blur(10px);
+      border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.4); 
+      height: fit-content; color: #fff;
+    }
     .badge-tracker h3 { margin-top: 0; text-shadow: 0 0 5px #fff; }
     #badges-earned { display: flex; flex-wrap: wrap; justify-content: center; }
-    .badge-earned { background-color: #00b7ff; color: #fff; font-weight: 600; padding: 8px 12px; margin: 5px; border-radius: 10px; box-shadow: 0 0 8px #00b7ff; }
-    #badge-popup { position: fixed; left: 50%; transform: translateX(-50%); top: -150px; background-color: rgba(13, 13, 33, 0.7); border: 1px solid rgba(0, 183, 255, 0.5); backdrop-filter: blur(10px); padding: 20px 40px; border-radius: 10px; font-size: 20px; font-weight: 600; color: #fff; text-shadow: 0 0 8px #0ff; box-shadow: 0 0 20px rgba(0, 183, 255, 0.5); z-index: 10; transition: top 0.5s ease-out; overflow: hidden; width: 90vw; }
-    #badge-popup.show { top: 30px; }
+    .badge-earned { 
+      background-color: #00b7ff; color: #fff; font-weight: 600;
+      padding: 5px 10px; margin: 4px; border-radius: 8px; 
+      box-shadow: 0 0 8px #00b7ff;
+    }
+
+    #badge-popup { 
+      position: fixed; left: 50%; transform: translateX(-50%); top: -150px; 
+      background-color: rgba(13, 13, 33, 0.7);
+      border: 1px solid rgba(0, 183, 255, 0.5); backdrop-filter: blur(10px);
+      padding: 15px 30px; border-radius: 10px; font-size: 18px; font-weight: 600;
+      color: #fff; text-shadow: 0 0 8px #0ff;
+      box-shadow: 0 0 20px rgba(0, 183, 255, 0.5); z-index: 10;
+      transition: top 0.5s ease-out; overflow: hidden; width: 90vw;
+    }
+    #badge-popup.show { top: 20px; }
     #badge-popup::after { content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 100%; background: linear-gradient(0deg, transparent, rgba(0, 183, 255, 0.3), transparent); animation: scanline 3s linear infinite; }
     @keyframes scanline { from { top: -100%; } to { top: 100%; } }
-    #final-summary { background: rgba(255, 255, 255, 0.88); border-radius: 20px; padding: 25px; box-shadow: 0 0 20px rgba(0,0,0,0.15); margin: 20px auto; font-size: 18px; color: #333; max-width: 90vw; }
-    #instructions-container { background: rgba(255, 255, 255, 0.94); border-radius: 20px; padding: 20px; box-shadow: 0 0 25px rgba(0,0,0,0.2); max-width: 600px; margin: 0 auto 30px auto; color: #333; }
-    #instructions-container h3 { font-size: 24px; margin-bottom: 15px; }
-    #instructions-container ul { list-style-type: none; padding: 0; margin: 0 auto; text-align: left; display: inline-block; }
-    #instructions-container li { font-size: 18px; line-height: 1.6; margin-bottom: 12px; }
-    #instructions-btn { font-size: 22px; font-weight: 600; background: #0077b6; border: 2px solid #00b7ff; border-radius: 30px; padding: 15px 40px; color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 20px; }
+
+    #final-summary { 
+      background: rgba(255, 255, 255, 0.88); border-radius: 20px; padding: 20px; 
+      box-shadow: 0 0 20px rgba(0,0,0,0.15); margin: 15px auto; 
+      font-size: 16px; color: #333; max-width: 90vw;
+    }
+    
+    #instructions-container { 
+      background: rgba(255, 255, 255, 0.94); border-radius: 20px; 
+      padding: 15px; box-shadow: 0 0 25px rgba(0,0,0,0.2); 
+      max-width: 600px; margin: 0 auto 20px auto; color: #333;
+    }
+    #instructions-container h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    #instructions-container ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0 auto;
+      text-align: left;
+      display: inline-block;
+    }
+    #instructions-container li {
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    #instructions-btn { 
+      font-size: 18px; font-weight: 600; background: #0077b6; 
+      border: 2px solid #00b7ff; border-radius: 30px; padding: 12px 30px; 
+      color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 15px; 
+    }
     #instructions-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; }
-    @media (min-width: 768px) { .container { flex-direction: row; align-items: flex-start; padding: 30px; } .main { margin-right: 30px; margin-bottom: 0; } .badge-tracker { width: 200px; } }
+    
+    @media (min-width: 768px) {
+      .container {
+        flex-direction: row; align-items: flex-start; padding: 30px;
+      }
+      .main {
+        margin-right: 30px; margin-bottom: 0;
+      }
+      .badge-tracker {
+        width: 200px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -164,7 +340,7 @@
       setTimeout(function() { digitDisplay.textContent = ''; callback(); }, 1200);
     }
 
-    // --- START: DYNAMIC FLASH DURATION LOGIC ---
+    // The unique flash game logic is preserved.
     function showDigits() {
       if (isGameOver) return;
       isChecking = true;
@@ -176,10 +352,8 @@
       getReadyCountdown(function() {
         digitDisplay.textContent = sequence;
         
-        // Calculate the dynamic flash duration
-        var baseDuration = 500; // Starts at a quick 0.5 seconds
-        var incrementPerDigit = 250; // Adds 0.25 seconds for each digit
-        // We subtract 2 because currentLength starts at 2.
+        var baseDuration = 500; 
+        var incrementPerDigit = 250;
         var flashDuration = baseDuration + (incrementPerDigit * (currentLength - 2));
 
         setTimeout(function() {
@@ -190,7 +364,6 @@
         }, flashDuration);
       });
     }
-    // --- END: DYNAMIC FLASH DURATION LOGIC ---
 
     function displayOptions() {
       if (isGameOver) return;
@@ -277,6 +450,7 @@
         updateTimer();
         gameTimerInterval = setInterval(updateTimer, 1000);
     }
+    
     function showFinalSummary() {
       isGameOver = true;
       if (gameTimerInterval) clearInterval(gameTimerInterval);
@@ -288,13 +462,23 @@
       optionButtons.classList.add('hidden');
       streakTracker.classList.add('hidden');
       finalSummary.classList.remove('hidden');
+
+      // The final message logic is correct.
       var summaryHtml = '<h2>Time\'s Up!</h2>';
-      summaryHtml += '<p><strong>Your Best Performance: Level ' + personalBest + '</strong></p>';
+      summaryHtml += '<p><strong>🏆 Level Reached: ' + personalBest + ' 🏆</strong></p>';
       summaryHtml += '<p>Thanks for playing! Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>';
       finalSummary.innerHTML = summaryHtml;
+      
+      // Tell Qualtrics the game is done, so it can show the Next button
+      window.parent.postMessage("showNext", "*");
     }
+    
     function startGame() {
-      isGameOver = false; currentLength = 2; consecutiveCorrect = 0; personalBest = 0; earnedBadges = {};
+      isGameOver = false; 
+      currentLength = 2; 
+      consecutiveCorrect = 0; 
+      personalBest = 0; 
+      earnedBadges = {};
       badgesEarned.innerHTML = '';
       finalSummary.classList.add('hidden');
       streakTracker.classList.remove('hidden');
