@@ -406,7 +406,7 @@
 <script>
     document.body.classList.add('no-scroll');
 
-    const wordsPool = [ "lion", "tiger", "bear", "monkey", "zebra", "giraffe", "hippo", "rhino", "snake", "lizard", "frog", "eagle", "parrot", "owl", "wolf", "fox", "deer", "rabbit", "squirrel", "turtle", "whale", "dolphin", "shark", "octopus", "penguin", "koala", "panda", "camel", "bat", "bee", "jungle", "forest", "ocean", "river", "desert", "savanna", "nest", "den", "hive", "burrow", "paw", "claw", "wing", "fin", "tail", "fur", "feather", "scale", "fang", "web", "cow", "pig", "sheep", "horse", "goat", "dog", "cat", "mouse", "hamster", "leopard", "cheetah", "elephant", "raccoon", "skunk", "beaver", "chipmunk", "moose", "bison", "fish", "crab", "lobster", "shrimp", "starfish", "seahorse", "jellyfish", "seal", "walrus", "otter", "chicken", "duck", "goose", "robin", "cardinal", "sparrow", "hawk", "swan", "flamingo", "peacock", "alligator", "crocodile", "chameleon", "ant", "butterfly", "moth", "ladybug", "spider", "caterpillar", "beak", "horn", "tusk", "hoof", "shell", "pouch", "whisker", "mane", "farm", "barn", "zoo", "herd", "flock" ];
+    const wordsPool = [ "lion", "tiger", "bear", "monkey", "zebra", "giraffe", "hippo", "rhino", "snake", "lizard", "frog", "eagle", "parrot", "owl", "wolf", "fox", "deer", "rabbit", "squirrel", "turtle", "whale", "dolphin", "shark", "octopus", "penguin", "koala", "panda", "camel", "bat", "bee", "jungle", "forest", "ocean", "river", "desert", "savanna", "nest", "den", "hive", "burrow", "paw", "claw", "wing", "fin", "tail", "fur", "feather", "scale", "fang", "web", "cow", "pig", "sheep", "horse", "goat", "dog", "cat", "mouse", "hamster", "leopard", "cheetah", "elephant", "raccoon", "skunk", "beaver", "chipmunk", "moose", "bison", "fish", "crab", "lobster", "shrimp", "starfish", "seahorse", "jellyfish", "seal", "walrus", "otter", "chicken", "duck", "goose", "robin", "cardinal", "sparrow", "hawk", "swan", "flamingo", "peacock", "alligator", "crocodile", "chameleon", "ant", "butterfly", "moth", "ladybug", "spider", "caterpillar", "beak", "horn", "tusk", "hoof", "shell", "pouch", "whisker", "mane", "farm", "barn", "zoo", "herd", "flock", "coyote", "badger", "weasel", "heron", "finch", "toucan", "vulture", "pigeon", "ostrich", "squid", "clam", "oyster", "coral", "urchin", "stingray", "swordfish", "cricket", "wasp", "hornet", "termite", "dragonfly", "grasshopper", "anteater", "armadillo", "lemur", "sloth", "meerkat", "wombat", "porcupine", "volcano", "glacier", "canyon", "valley", "meadow", "creek", "pond", "boulder", "pebble", "cliff", "dune", "cactus", "fern", "moss", "blossom", "petal", "stem", "root", "seed", "pine" ];
     const incorrectFeedback = ['Almost!', 'Nearly there!', 'Not Quite'];
     const SESSION_DURATION = 600000;
 
@@ -536,7 +536,7 @@
     }
 
     function startTimer() {
-        let timeLeft = 15;
+        let timeLeft = 20;
         document.getElementById('time-left').textContent = timeLeft;
         timer = setInterval(function() {
             timeLeft--;
