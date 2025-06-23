@@ -202,20 +202,19 @@
   <div id="countdownOverlay"><div id="countdownText"></div></div>
 
   <script>
-    // Object emojis replacing previous food emojis:
-    const foodEmojis = [...'📱💻⌚️📷📺📻🎥🎙️🎚️🎛️📻📡🔋🔌💡🔦🕯️🧯🛢️💸💵💴💶💷💰💳💎🔑🗝️🛠️⚙️🧰🔨⛏️🔧🔩⚒️🛠️🗡️⚔️🔫🛡️🚪🪑🛏️🛋️🚽🚿🛁🪥🧴🧹🧺🧻🪣🧼🧽🧯🛒🛍️🎁🎈🎏🎀🏮🎎🎐🪅🪄🎊🎉🎎🎐🎀'];
+    const foodEmojis = [...'📱💻⌚️📷📺📻🎥🎙️🎚️🎛️📡🔋🔌💡🔦🕯️🧯🛢️💸💵💴💶💷💰💳💎🔑🗝️🛠️⚙️🧰🔨⛏️🔧🔩⚒️🗡️⚔️🛡️🚪🪑🛏️🛋️🚽🚿🛁🪥🧴🧹🧺🧻🪣🧼🧽🛒🛍️🎁🎈🎏🎀🏮🎎🎐🪅🪄🎊🎉🪜🧲🧮📦📫📬📭📮📇📂📁🗂️🗃️🗄️🗑️🪪💼🧳🌡️⏰🕰️🌂☂️🧵🪡🧶🧤🧣🧥👓🕶️🥽🥼🦺🩱🩲🩳👔👕👖🧢🎓⛑️'];
 
     const rounds = [
-      { gridSize: 4, time: 20, differences: 2, columns: 2, cellSize: 140 }, // Round 1
-      { gridSize: 4, time: 20, differences: 2, columns: 2, cellSize: 140 }, // Round 2
-      { gridSize: 6, time: 30, differences: 3, columns: 3, cellSize: 90 },  // Round 3
-      { gridSize: 6, time: 30, differences: 3, columns: 3, cellSize: 90 },  // Round 4
-      { gridSize: 8, time: 45, differences: 4, columns: 4, cellSize: 70 },  // Round 5
-      { gridSize: 8, time: 45, differences: 4, columns: 4, cellSize: 70 },  // Round 6
-      { gridSize: 10, time: 60, differences: 4, columns: 3, cellSize: 90 }, // Round 7
-      { gridSize: 10, time: 60, differences: 4, columns: 3, cellSize: 90 }, // Round 8
-      { gridSize: 12, time: 60, differences: 5, columns: 4, cellSize: 70 }, // Round 9
-      { gridSize: 12, time: 60, differences: 5, columns: 4, cellSize: 70 }  // Round 10
+      { gridSize: 4, time: 20, differences: 2, columns: 2, cellSize: 140 },
+      { gridSize: 4, time: 20, differences: 2, columns: 2, cellSize: 140 },
+      { gridSize: 6, time: 30, differences: 3, columns: 3, cellSize: 90 },
+      { gridSize: 6, time: 30, differences: 3, columns: 3, cellSize: 90 },
+      { gridSize: 8, time: 45, differences: 4, columns: 4, cellSize: 70 },
+      { gridSize: 8, time: 45, differences: 4, columns: 4, cellSize: 70 },
+      { gridSize: 10, time: 60, differences: 4, columns: 3, cellSize: 90 },
+      { gridSize: 10, time: 60, differences: 4, columns: 3, cellSize: 90 },
+      { gridSize: 12, time: 60, differences: 5, columns: 4, cellSize: 70 },
+      { gridSize: 12, time: 60, differences: 5, columns: 4, cellSize: 70 }
     ];
 
     let currentRound = 0;
@@ -291,19 +290,28 @@
 
     function modifyGrid(grid, count) {
       const newGrid = [...grid];
-      const indices = [];
-      while (indices.length < count) {
+      const indices = new Set();
+      let attempts = 0;
+
+      while (indices.size < count && attempts < 1000) {
         const i = Math.floor(Math.random() * grid.length);
-        if (!indices.includes(i)) {
+        if (!indices.has(i)) {
           let newEmoji;
+          let attemptsToFindNewEmoji = 0;
           do {
             newEmoji = foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
-          } while (newEmoji === newGrid[i]);
-          newGrid[i] = newEmoji;
-          indices.push(i);
+            attemptsToFindNewEmoji++;
+          } while (newEmoji === newGrid[i] && attemptsToFindNewEmoji < 100);
+
+          if (newEmoji !== newGrid[i]) {
+            newGrid[i] = newEmoji;
+            indices.add(i);
+          }
         }
+        attempts++;
       }
-      return { newGrid, changedIndices: indices };
+
+      return { newGrid, changedIndices: [...indices] };
     }
 
     function displayRoundIntro(round, callback) {
