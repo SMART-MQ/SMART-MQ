@@ -277,14 +277,28 @@
       gridElement.innerHTML = '';
       gridElement.className = 'grid';
       gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-      // For rounds 1 and 2, adjust margin and justifyContent to center columns closely:
+
+      // Fix alignment for rounds 1 and 2: bring columns closer and center properly
       if (currentRound === 0 || currentRound === 1) {
         gridElement.style.justifyContent = 'center';
-        gridElement.style.columnGap = '40px'; // closer columns
-      } else {
+        gridElement.style.columnGap = '20px';  // reduced gap to bring columns closer
+        gridElement.style.marginLeft = 'auto';
+        gridElement.style.marginRight = 'auto';
+      }
+      // Fix alignment for rounds 3 and 4: center properly with default gap
+      else if (currentRound === 2 || currentRound === 3) {
         gridElement.style.justifyContent = 'center';
         gridElement.style.columnGap = '15px';
+        gridElement.style.marginLeft = 'auto';
+        gridElement.style.marginRight = 'auto';
       }
+      else {
+        gridElement.style.justifyContent = 'center';
+        gridElement.style.columnGap = '15px';
+        gridElement.style.marginLeft = '';
+        gridElement.style.marginRight = '';
+      }
+
       grid.forEach((emoji, i) => {
         const cell = document.createElement('div');
         cell.className = 'cell';
@@ -445,6 +459,3 @@
   </script>
 </body>
 </html>
-
-
-
