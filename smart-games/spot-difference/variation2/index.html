@@ -358,6 +358,8 @@
           } else {
             document.getElementById('game').style.display = 'none';
             document.getElementById('end').style.display = 'flex';
+            // Tell Qualtrics the game is done, so it can show the Next button
+            window.parent.postMessage("showNext", "*");
           }
         }, 2000);
       }
