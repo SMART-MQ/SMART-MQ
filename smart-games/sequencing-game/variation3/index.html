@@ -137,12 +137,6 @@
       color: #333;
       margin-top: 20px;
     }
-    #gameInstructionLine {
-      font-size: 4vw;
-      margin: 10px 0 30px;
-      color: #333;
-      display: none;
-    }
   </style>
 </head>
 <body>
@@ -176,8 +170,6 @@
     <div class="button-container" id="buttonContainer"></div>
   </div>
 
-  <p id="gameInstructionLine">Repeat the pattern shown.</p>
-
   <div id="timerBox">10:00</div>
 
   <div id="finalPopup">
@@ -204,7 +196,6 @@
     function startGame() {
       document.getElementById("instructionModal").style.display = "none";
       document.getElementById("gameArea").style.display = "block";
-      document.getElementById("gameInstructionLine").style.display = "block";
       score = 0;
       sequence = [];
       userSequence = [];
