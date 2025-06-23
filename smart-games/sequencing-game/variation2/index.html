@@ -57,16 +57,16 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 5vw;
-    padding: 5vw;
+    gap: 3vw;
+    padding: 3vw;
     margin-top: 20px;
   }
   .color-button {
-    width: 22vw;
-    height: 22vw;
-    border: 4px solid transparent;
+    width: 15vw;
+    height: 15vw;
+    border: 3px solid transparent;
     border-radius: 50%;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
     cursor: pointer;
     transition: transform 0.2s, opacity 0.2s, border 0.2s;
     opacity: 1;
@@ -74,12 +74,7 @@
   .color-button.flash {
     opacity: 0.4 !important;
     transform: scale(1.1);
-    border: 4px solid #555;
-  }
-  .color-button.active {
-    opacity: 0.6;
-    transform: scale(1.05);
-    border: 4px solid #999;
+    border: 3px solid #555;
   }
   .scoreboard {
     display: flex;
@@ -155,50 +150,54 @@
 </head>
 <body>
 <div class="content" id="startScreen">
-<h1>Welcome to the SMART Memory Game!</h1>
-<p><strong>This is a challenge just for you. Try to beat your best score each round!</strong></p>
-<button class="play-button" onclick="showInstructions()">Play</button>
+  <h1>Welcome to the SMART Memory Game!</h1>
+  <p><strong>This is a challenge just for you. Try to beat your best score each round!</strong></p>
+  <button class="play-button" onclick="showInstructions()">Play</button>
 </div>
+
 <div id="instructionModal">
-<div id="instructionBox">
-<h2>Instructions</h2>
-<ul>
-<li>Watch the sequence of colours flash on the screen.</li>
-<li>Repeat the pattern by clicking the buttons in the same order.</li>
-<li>Each round adds a new colour to the sequence.</li>
-<li>Try to get the highest score in 10 minutes by beating your personal best!</li>
-</ul>
-<div style="text-align:center; margin-top: 20px;">
-<button class="play-button" onclick="startCountdown()">Start</button>
-<button class="play-button" onclick="goBack()">Back</button>
+  <div id="instructionBox">
+    <h2>Instructions</h2>
+    <ul>
+      <li>Watch the sequence of colours flash on the screen.</li>
+      <li>Repeat the pattern by clicking the buttons in the same order.</li>
+      <li>Each round adds a new colour to the sequence.</li>
+      <li>Try to get the highest score in 10 minutes by beating your personal best!</li>
+    </ul>
+    <div style="text-align:center; margin-top: 20px;">
+      <button class="play-button" onclick="startCountdown()">Start</button>
+      <button class="play-button" onclick="goBack()">Back</button>
+    </div>
+  </div>
 </div>
-</div>
-</div>
+
 <div class="content" id="gameArea" style="display:none">
-<h2 id="roundTitle">Try and beat your personal best to get the highest score in 10 minutes!</h2>
-<div class="scoreboard">
-<p class="score" id="currentScore">Current Score: 0</p>
-<p class="score" id="bestScore">Personal Best: 0</p>
+  <h2 id="roundTitle">Try and beat your personal best to get the highest score in 10 minutes!</h2>
+  <div class="scoreboard">
+    <p class="score" id="currentScore">Current Score: 0</p>
+    <p class="score" id="bestScore">Personal Best: 0</p>
+  </div>
+  <div id="countdownBox"></div>
+  <div class="button-container" id="buttonContainer">
+    <button class="color-button" id="btn1" style="background-color: #ffb3ba;"></button>
+    <button class="color-button" id="btn2" style="background-color: #ffdfba;"></button>
+    <button class="color-button" id="btn3" style="background-color: #ffffba;"></button>
+    <button class="color-button" id="btn4" style="background-color: #baffc9;"></button>
+    <button class="color-button" id="btn5" style="background-color: #bae1ff;"></button>
+    <button class="color-button" id="btn6" style="background-color: #e0bbff;"></button>
+    <button class="color-button" id="btn7" style="background-color: #d5f4e6;"></button>
+    <button class="color-button" id="btn8" style="background-color: #ffc4d6;"></button>
+    <button class="color-button" id="btn9" style="background-color: #fdfd96;"></button>
+    <button class="color-button" id="btn10" style="background-color: #a0e7e5;"></button>
+    <button class="color-button" id="btn11" style="background-color: #c2f0c2;"></button>
+    <button class="color-button" id="btn12" style="background-color: #ffb347;"></button>
+  </div>
+  <p id="message"></p>
+  <div id="timerBox">10:00</div>
 </div>
-<div id="countdownBox"></div>
-<div class="button-container" id="buttonContainer">
-  <button class="color-button" id="btn1" style="background-color: #ffb3ba;"></button>
-  <button class="color-button" id="btn2" style="background-color: #ffdfba;"></button>
-  <button class="color-button" id="btn3" style="background-color: #ffffba;"></button>
-  <button class="color-button" id="btn4" style="background-color: #baffc9;"></button>
-  <button class="color-button" id="btn5" style="background-color: #bae1ff;"></button>
-  <button class="color-button" id="btn6" style="background-color: #e0bbff;"></button>
-  <button class="color-button" id="btn7" style="background-color: #d5f4e6;"></button>
-  <button class="color-button" id="btn8" style="background-color: #ffc4d6;"></button>
-  <button class="color-button" id="btn9" style="background-color: #fdfd96;"></button>
-  <button class="color-button" id="btn10" style="background-color: #a0e7e5;"></button>
-  <button class="color-button" id="btn11" style="background-color: #c2f0c2;"></button>
-  <button class="color-button" id="btn12" style="background-color: #ffb347;"></button>
-</div>
-<p id="message"></p>
-<div id="timerBox">10:00</div>
-</div>
+
 <p id="gameInstructionLine" style="display: none;">Repeat the pattern shown.</p>
+
 <div id="finalPopup">
   <div>
     <h2>Congratulations!</h2>
@@ -206,8 +205,10 @@
     <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
   </div>
 </div>
+
 <audio id="flashSound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
 <audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.mp3"></audio>
+
 <script>
 let sequence = [], userSequence = [], score = 0, best = 0, timer, timeLeft = 600;
 const buttons = Array.from({ length: 12 }, (_, i) => document.getElementById(`btn${i + 1}`));
