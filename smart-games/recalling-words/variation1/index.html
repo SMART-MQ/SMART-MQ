@@ -130,9 +130,9 @@
         border-radius: 10px;
         box-sizing: border-box;
         box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-        padding: 20px 30px !important;
+        padding: 20px 20px !important;
         /* MODIFIED: Changed from fixed width to a more flexible approach */
-        width: 100%;
+        width: 90%;
         max-width: 300px !important; /* The max-width now acts as the old width on large screens */
         font-weight: bold;
         font-size: 22px !important;
@@ -142,7 +142,7 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         user-select: none;
         display: block;
-        margin: 20px auto 0 auto;
+        margin: 10px auto 0 auto;
     }
 
     #recall-word {
@@ -173,16 +173,16 @@
 
     .info-page-container {
         background-color: rgba(255, 255, 255, 0.9);
-        padding: 30px;
-        border-radius: 15px;
+        padding: 25px;
+        border-radius: 10px;
         box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
         /* MODIFIED: Use width and max-width for better flexibility */
-        width: 90%;
+        width: 95%;
         max-width: 600px;
         box-sizing: border-box; /* NEW */
         text-align: center;
-        font-size: 18px;
-        line-height: 1.6;
+        font-size: 17px;
+        line-height: 1.5;
     }
 
     .info-page-container h2 {
@@ -400,8 +400,7 @@
 
 <!-- ADD THIS NEW DIV RIGHT AFTER YOUR #result DIV -->
 <div id="end-page-container" class="info-page-container hidden">
-    <h2>Thank you for participating!</h2>
-    <p>Your game is now over. Please head back to the survey to finish it and receive your $2.50 in your SMART bank account!</p>
+    <h2>Good job! Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</h2>
 </div>
 
 <script>
@@ -474,7 +473,7 @@
 
         // Update UI with difficulty info
         document.getElementById('game-heading').textContent = `Memorize these words! (${currentDifficulty.name})`;
-        document.getElementById('words-list').style.gridTemplateColumns = 'repeat (3, 1fr)';
+        document.getElementById('words-list').style.gridTemplateColumns = `repeat(3, 1fr)`;
 
         updateWordHistory();
         
@@ -537,7 +536,7 @@
     }
 
     function startTimer() {
-        let timeLeft = 15;
+        let timeLeft = 20;
         document.getElementById('time-left').textContent = timeLeft;
         timer = setInterval(function() {
             timeLeft--;
@@ -601,14 +600,12 @@
         document.getElementById('recall-container').classList.add('hidden');
         document.getElementById('result').classList.remove('hidden');
 
-        // MODIFIED: Get difficulty name for the round that just ended
         let currentDifficulty;
         if (totalGamesPlayed < 3) currentDifficulty = difficultyLevels[0];
         else if (totalGamesPlayed < 6) currentDifficulty = difficultyLevels[1];
         else currentDifficulty = difficultyLevels[2];
         const difficultyName = currentDifficulty.name;
 
-        // MODIFIED: Update score tracking objects
         if (score > bestScores[difficultyName]) {
             bestScores[difficultyName] = score;
         }
@@ -618,58 +615,48 @@
         
         const elapsedTime = Date.now() - sessionStartTime;
 
-    // In your endGame() function, find this 'if' block...
-if (elapsedTime >= SESSION_DURATION) {
-    // ... and replace its contents with this:
+        if (elapsedTime >= SESSION_DURATION) {
+            clearInterval(timer);
+            clearInterval(sessionTimerInterval);
+            document.getElementById('session-timer').classList.add('hidden');
 
-    clearInterval(timer);
-    clearInterval(sessionTimerInterval);
-    document.getElementById('session-timer').classList.add('hidden');
-
-    // Build the categorized final score list (this part is the same)
-    let finalScoreHTML = '';
-    difficultyLevels.forEach(level => {
-        const scoresForLevel = allSessionScores.filter(s => s.difficulty === level.name);
-        if (scoresForLevel.length > 0) {
-            finalScoreHTML += `<h3>${level.name}</h3>`;
-            scoresForLevel.forEach((s, i) => {
-                const isBest = s.score === bestScores[level.name];
-                finalScoreHTML += `<li class="${isBest ? 'best-score' : ''}">
-                    Round ${i + 1}: ${s.score} / ${s.total} ${isBest ? '(Best!)' : ''}
-                </li>`;
+            let finalScoreHTML = '';
+            difficultyLevels.forEach(level => {
+                const scoresForLevel = allSessionScores.filter(s => s.difficulty === level.name);
+                if (scoresForLevel.length > 0) {
+                    finalScoreHTML += `<h3>${level.name}</h3>`;
+                    scoresForLevel.forEach((s, i) => {
+                        const isBest = s.score === bestScores[level.name];
+                        finalScoreHTML += `<li class="${isBest ? 'best-score' : ''}">
+                            Round ${i + 1}: ${s.score} / ${s.total} ${isBest ? '(Best!)' : ''}
+                        </li>`;
+                    });
+                }
             });
+
+            document.body.classList.add('no-scroll');
+            document.getElementById('result').innerHTML = `
+                <p style="font-size: 1.5em; font-weight: bold;">Session Ended!</p>
+                <hr>
+                <ul id="score-list">${finalScoreHTML}</ul>
+            `;
+
+            setTimeout(() => {
+                document.getElementById('result').classList.add('hidden');
+                document.getElementById('end-page-container').classList.remove('hidden');
+                window.parent.postMessage("showNext", "*");
+            }, 8000); 
+
+        } else {
+            document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
+            setTimeout(() => {
+                resetGame();
+                startGame();
+            }, 5000);
         }
-    });
+    } // <-- THE MISSING BRACE WAS HERE. THE FUNCTION IS NOW CLOSED.
 
-    document.body.classList.add('no-scroll');
-    document.getElementById('result').innerHTML = `
-        <p style="font-size: 1.5em; font-weight: bold;">Session Ended!</p>
-        <hr>
-        <ul id="score-list">${finalScoreHTML}</ul>
-    `;
-
-    // --- NEW LOGIC STARTS HERE ---
-    // After showing the final scores, wait 8 seconds, then show the end page.
-    setTimeout(() => {
-        // Hide the score screen
-        document.getElementById('result').classList.add('hidden');
-        // Show the new "Thank You" end page
-        document.getElementById('end-page-container').classList.remove('hidden');
-
-        // IMPORTANT: Tell the survey the game is completely over so it can show the "Next" button.
-        window.parent.postMessage("showNext", "*");
-    }, 8000); // 8000 milliseconds = 8 seconds. Adjust this time as you see fit.
-
-	} else {
-	    // This part for continuing to the next round remains the same.
-	    document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
-	    setTimeout(() => {
-	        resetGame();
-	        startGame();
-	    }, 5000);
-	}
-}
-
+    // --- THESE FUNCTIONS ARE NOW CORRECTLY OUTSIDE endGame() ---
     function resetGame() {
         score = 0;
         currentWordIndex = 0;
