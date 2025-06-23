@@ -16,47 +16,41 @@
     }
 
     h1 {
-      margin-top: 20px;
-      font-size: 22px; /* Adjusted font size for mobile */
-      padding: 0 10px;
+      margin-top: 10px;
+      font-size: 22px;
     }
 
     .game-area {
-      margin: 20px auto;
-      max-width: 90%; /* Max width to ensure it's not too wide on small screens */
+      margin: 10px auto;
+      max-width: 95%;
       position: relative;
-    }
-
-    /* Moved instructions and countdown to the top of the page */
-    #topInfo {
-      background-color: #a8dadc;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 10px;
-      font-size: 16px;
-      font-weight: bold;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 20px;
-      max-width: 100%;
+      gap: 6px;
+      margin-top: 10px;
     }
 
     .cell {
       width: 100%;
-      padding-top: 100%; /* Maintain square aspect ratio */
-      border-radius: 10px;
+      padding-top: 50%; /* Smaller height (square with half height) */
+      position: relative;
+      border-radius: 8px;
       background-color: #ffffff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 14px; /* Smaller text for mobile */
       font-weight: bold;
+      font-size: 14px;
       overflow: hidden;
-      box-sizing: border-box;
+    }
+
+    .cell::after {
+      content: attr(data-word);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
     }
 
     .hidden {
@@ -64,9 +58,9 @@
     }
 
     .message {
-      font-size: 16px; /* Adjusted font size for mobile */
-      margin-top: 10px;
-      line-height: 1.5;
+      font-size: 16px;
+      margin: 8px 0;
+      line-height: 1.4;
     }
 
     button {
@@ -74,49 +68,48 @@
       border: none;
       color: black;
       padding: 12px 20px;
-      margin: 15px 10px;
+      margin: 10px;
       font-size: 16px;
       border-radius: 10px;
       cursor: pointer;
-      width: 80%; /* Ensure buttons are wide enough on mobile */
-      max-width: 300px; /* Limit max button size */
+      width: 80%;
+      max-width: 300px;
     }
 
     input[type="text"] {
-      padding: 12px;
+      padding: 10px;
       font-size: 16px;
       margin: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
-      width: 80%; /* Ensure input fits well on mobile */
+      width: 80%;
       max-width: 300px;
     }
 
     #roundCounter {
       position: fixed;
-      top: 10px;
+      bottom: 10px;
       left: 10px;
       background: #a8dadc;
       padding: 8px 12px;
       border-radius: 8px;
       font-weight: bold;
       z-index: 1000;
-      user-select: none;
       font-size: 14px;
     }
 
     #finalSummary {
-      margin-top: 40px;
-      font-size: 22px;
+      margin-top: 30px;
+      font-size: 20px;
       background: #e1f0f7;
       border-radius: 10px;
-      padding: 30px;
+      padding: 25px;
       display: none;
     }
 
     #correctDisplay {
       font-size: 16px;
-      margin-top: 20px;
+      margin-top: 15px;
       background: #f0f0f0;
       border-radius: 10px;
       padding: 15px;
@@ -128,7 +121,7 @@
       display: flex;
       justify-content: center;
       gap: 10px;
-      flex-wrap: wrap; /* Allow wrapping on smaller screens */
+      flex-wrap: wrap;
     }
 
     .word-box {
@@ -139,33 +132,37 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 14px; /* Adjust font size to fit text on mobile */
+      font-size: 14px;
     }
 
-    #infoBanner {
-      font-size: 18px;
-      margin-top: 20px;
-      padding: 20px;
+    #welcomeMessage {
+      font-size: 16px;
+      margin: 15px auto;
+      padding: 15px;
       background-color: #ffcc00;
       border-radius: 10px;
       display: block;
       font-weight: bold;
+      max-width: 95%;
     }
   </style>
 </head>
 <body>
-  <div id="infoBanner">
+  <h1>🧠 Word Memory Game 🧠</h1>
+
+  <!-- Welcome Message Section -->
+  <div id="welcomeMessage">
     Welcome to the SMART Memory Game! Let's test your memory skills.
   </div>
 
-  <div id="topInfo" class="message">
-    <span id="roundCounter">Round 0 of 5 — 5 rounds remaining</span>
-    <p id="prompt" class="hidden">Remember the words in the row/column...</p>
-    <p id="countdown" class="hidden">⏳ Time left to remember: <span id="timer">60</span> seconds</p>
-  </div>
+  <div id="roundCounter" class="message">Round 0 of 5 — 5 rounds remaining</div>
 
   <div class="game-area">
+    <p id="prompt" class="message hidden"></p>
+    <p id="countdown" class="message hidden">⏳ Time left to remember: <span id="timer">60</span> seconds</p>
+
     <div id="grid" class="grid"></div>
+
     <div id="input-area" class="hidden">
       <p>Type the words in order (like "dog, cat, bird"):</p>
       <input type="text" id="answer" placeholder="e.g. dog, cat, bird" autocomplete="off"/>
@@ -196,8 +193,7 @@
     const nextBtn = document.getElementById("next");
     const roundCounter = document.getElementById("roundCounter");
     const finalSummary = document.getElementById("finalSummary");
-    const infoBanner = document.getElementById("infoBanner");
-    const topInfo = document.getElementById("topInfo");
+    const welcomeMessage = document.getElementById("welcomeMessage");
 
     let currentRound = 0;
     let grid = [];
@@ -207,65 +203,64 @@
     let timeLeft = 60;
     let score = 0;
 
-    // Function to normalize input (remove spaces and lowercase the words)
     function normalizeWord(input) {
       return input.toLowerCase().trim();
     }
 
-    // Function to create a grid of words
     function createGrid() {
       const chosenWords = [];
-      const totalCells = 16;
-      const wordsCount = simpleWords.length;
-
-      while (chosenWords.length < totalCells) {
+      while (chosenWords.length < 16) {
         for (let word of simpleWords) {
-          if (chosenWords.length < totalCells) {
+          if (chosenWords.length < 16) {
             chosenWords.push(word);
           } else {
             break;
           }
         }
       }
-
       for (let i = chosenWords.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [chosenWords[i], chosenWords[j]] = [chosenWords[j], chosenWords[i]];
       }
-
       grid = [];
       for (let i = 0; i < 4; i++) {
         grid.push(chosenWords.slice(i * 4, i * 4 + 4));
       }
     }
 
-    // Function to display the grid
     function showGrid() {
       gridDiv.innerHTML = "";
       for (let row of grid) {
         for (let c of row) {
           const cell = document.createElement("div");
           cell.className = "cell";
-          cell.textContent = c;
+          cell.setAttribute("data-word", c);
           gridDiv.appendChild(cell);
         }
       }
       gridDiv.classList.remove("hidden");
     }
 
-    // Function to start the game round
     function startRound() {
       currentRound++;
       if (currentRound === totalRounds) {
         roundCounter.textContent = "Last Round!";
       } else {
-        roundCounter.textContent = `Round ${currentRound} of ${totalRounds}`;
+        roundCounter.textContent = `Round ${currentRound} of ${totalRounds} — ${totalRounds - currentRound} rounds remaining`;
       }
+      resultDiv.classList.add("hidden");
+      correctDisplay.style.display = "none";
+      inputArea.classList.add("hidden");
+      answerInput.value = "";
+      promptP.classList.remove("hidden");
+      countdownP.classList.remove("hidden");
+      nextBtn.classList.add("hidden");
+      welcomeMessage.style.display = "none";
 
       createGrid();
       showGrid();
 
-      const isRow = Math.random() > 0.5;
+      const isRow = Math.random() < 0.5;
       const index = Math.floor(Math.random() * 4);
       promptText = `${isRow ? "row" : "column"} ${index + 1}`;
       recallSet = isRow ? grid[index] : grid.map(r => r[index]);
@@ -283,11 +278,9 @@
         }
       }, 1000);
 
-      infoBanner.style.display = "none"; // Hide the initial banner after game starts
       startBtn.classList.add("hidden");
     }
 
-    // Function to start recalling the words
     function startRecall() {
       gridDiv.classList.add("hidden");
       countdownP.classList.add("hidden");
@@ -296,7 +289,6 @@
       answerInput.focus();
     }
 
-    // Function to check the answer
     function checkAnswer() {
       clearInterval(timer);
       const userInputRaw = answerInput.value.split(",").map(s => s.trim());
@@ -331,10 +323,7 @@
       } else {
         finalSummary.style.display = "block";
         finalSummary.innerHTML = `Game over! Your total score: ${score} out of ${totalRounds * 4}<br>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.`;
-
-        // Tell Qualtrics the game is done, so it can show the Next button
         window.parent.postMessage("showNext", "*");
-
         startBtn.textContent = "Play Again";
         startBtn.classList.remove("hidden");
       }
