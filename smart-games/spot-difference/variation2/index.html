@@ -47,6 +47,9 @@
     /* Special smaller gap for 2 column grids (Rounds 1 & 2) */
     .grid.two-columns {
       gap: 15px 8px; /* vertical gap 15px, horizontal gap 8px */
+      /* Added: max-width to fit exactly 2 cells plus gap */
+      max-width: calc(2 * 140px + 8px); /* 2 cells * 140px + 8px gap */
+      margin: 0 auto; /* center horizontally */
     }
     .grid.guessing .cell:hover {
       transform: scale(1.05);
@@ -183,6 +186,10 @@
         height: 60px !important;
         font-size: 2.2rem !important;
       }
+      /* Override max-width for smaller cells in 2-column rounds */
+      .grid.two-columns {
+        max-width: calc(2 * 60px + 8px);
+      }
     }
   </style>
 </head>
@@ -287,15 +294,14 @@
       gridElement.innerHTML = '';
       gridElement.className = 'grid';
       gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-      // Clear previous width/margin to allow natural centering by wrapper
-      gridElement.style.width = '';
-      gridElement.style.margin = '';
 
-      // Apply special class for 2-column rounds to adjust gap
+      // Apply special class for 2-column rounds to adjust gap and max-width
       if (columns === 2) {
         gridElement.classList.add('two-columns');
       } else {
         gridElement.classList.remove('two-columns');
+        gridElement.style.maxWidth = ''; // reset max-width if any
+        gridElement.style.margin = ''; // reset margin if any
       }
 
       grid.forEach((emoji, i) => {
