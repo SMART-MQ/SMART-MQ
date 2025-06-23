@@ -16,25 +16,39 @@
 
     h1 {
       margin-top: 20px;
+      font-size: 1.8em;
+    }
+
+    /* Welcome banner styles */
+    #welcomeBanner {
+      background-color: #a8dadc;
+      color: black;
+      padding: 15px 10px;
+      font-size: 1.3em;
+      font-weight: bold;
+      border-radius: 0 0 10px 10px;
+      margin: 0 auto 15px;
+      max-width: 600px;
     }
 
     .game-area {
       margin: 20px auto;
-      max-width: 600px;
+      max-width: 95%;
       position: relative;
+      padding: 10px;
     }
 
     .scene {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
+      gap: 10px;
       margin-top: 20px;
-      min-height: 300px;
+      min-height: 240px;
     }
 
     .object {
-      width: 90px;
-      height: 90px;
+      width: 100%;
+      aspect-ratio: 1 / 1;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -42,8 +56,8 @@
     }
 
     .object img {
-      width: 80px;
-      height: 80px;
+      width: 70%;
+      height: auto;
     }
 
     .curtain {
@@ -52,7 +66,7 @@
       height: 0;
       overflow: hidden;
       background-color: #d3cce3;
-      font-size: 24px;
+      font-size: 1.2em;
       padding: 0;
       transition: height 1s ease;
       border-radius: 10px;
@@ -68,7 +82,7 @@
     }
 
     .message, #countdown {
-      font-size: 18px;
+      font-size: 1em;
       margin-top: 10px;
       color: #333;
     }
@@ -79,17 +93,19 @@
       color: black;
       padding: 10px 20px;
       margin: 20px 10px;
-      font-size: 16px;
+      font-size: 1em;
       border-radius: 10px;
       cursor: pointer;
     }
 
     input[type="text"] {
       padding: 8px;
-      font-size: 16px;
+      font-size: 1em;
       margin: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
+      width: 90%;
+      max-width: 400px;
     }
 
     .hidden {
@@ -106,22 +122,27 @@
       font-weight: bold;
       z-index: 1000;
       user-select: none;
-      font-size: 16px;
+      font-size: 1em;
     }
 
     #finalSummary {
       margin-top: 40px;
-      font-size: 22px;
+      font-size: 1.2em;
       background: #e1f0f7;
       border-radius: 10px;
       padding: 30px;
       display: none;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
   </style>
 </head>
 <body>
 
   <h1>🎉 Memory Challenge Game 🎉</h1>
+  <div id="welcomeBanner">Welcome to the SMART memory game!</div>  <!-- Added banner -->
+
   <p>Look carefully and remember the pictures! You'll be asked to remember a specific row or column.</p>
 
   <div id="roundCounter" class="message">Round 0 of 5 — 5 rounds remaining</div>
@@ -200,6 +221,7 @@
 
     const roundCounterEl = document.getElementById('roundCounter');
     const finalSummaryDiv = document.getElementById('finalSummary');
+    const welcomeBanner = document.getElementById('welcomeBanner');
 
     const startBtn = document.getElementById('startBtn');
     const nextBtn = document.getElementById('nextBtn');
@@ -229,6 +251,10 @@
       startBtn.classList.add('hidden');
       nextBtn.classList.add('hidden');
       roundCounterEl.style.display = 'block';
+
+      // Hide welcome banner when game starts
+      if(welcomeBanner) welcomeBanner.style.display = 'none';
+
       updateRoundCounter();
       nextRound();
     }
@@ -279,30 +305,21 @@
       updateRoundCounter();
     }
 
-    function resetTimers() {
-      clearInterval(viewTimer);
-      clearInterval(answerTimer);
-    }
-
     function hideSceneShowCurtain() {
       document.getElementById('scene').classList.add('hidden');
-      document.getElementById('curtain').classList.add('active');
       document.getElementById('viewingMessage').classList.add('hidden');
+      const curtain = document.getElementById('curtain');
+      curtain.classList.add('active');
 
-      setTimeout(() => {
-        document.getElementById('input-area').classList.remove('hidden');
-        document.getElementById('recallInstruction').textContent = `Now think carefully... what did you see in ${currentPrompt}?`;
-        startAnswerCountdown();
-      }, 2000);
-    }
+      document.getElementById('input-area').classList.remove('hidden');
 
-    function startAnswerCountdown() {
-      let time = 60;
-      document.getElementById('answerCountdown').textContent = time;
+      let answerTime = 60;
+      document.getElementById('answerCountdown').textContent = answerTime;
+
       answerTimer = setInterval(() => {
-        time--;
-        document.getElementById('answerCountdown').textContent = time;
-        if (time <= 0) {
+        answerTime--;
+        document.getElementById('answerCountdown').textContent = answerTime;
+        if (answerTime <= 0) {
           clearInterval(answerTimer);
           checkAnswer();
         }
@@ -310,34 +327,37 @@
     }
 
     function checkAnswer() {
-      resetTimers();
-      const userInput = document.getElementById('answer').value.toLowerCase().split(',').map(s => s.trim());
-      let correctCount = 0;
+      clearInterval(answerTimer);
+
+      const input = document.getElementById('answer').value.toLowerCase();
+      const answers = input.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+      let roundScore = 0;
 
       recallObjects.forEach(obj => {
-        const acceptable = acceptableAnswers[obj] || [obj];
-        if (userInput.some(input => acceptable.includes(input))) {
-          correctCount++;
+        const possibleAnswers = acceptableAnswers[obj];
+        if (answers.some(a => possibleAnswers.includes(a))) {
+          roundScore++;
         }
       });
 
-      score += correctCount;
-      roundScores.push(correctCount);
+      score += roundScore;
+      roundScores.push(roundScore);
 
-      document.getElementById('result').classList.remove('hidden');
-      document.getElementById('result').innerHTML = `
-        <p>You remembered <strong>${correctCount}</strong> out of <strong>4</strong> from ${currentPrompt}!</p>
-        <p>Your current total score: <strong>${score}</strong></p>
-      `;
+      const result = document.getElementById('result');
+      result.innerHTML = `<p>You scored <strong>${roundScore}</strong> points this round.</p>`;
+      result.classList.remove('hidden');
 
       document.getElementById('input-area').classList.add('hidden');
+      document.getElementById('curtain').classList.remove('active');
 
-      round++;
-      if (round >= totalRounds) {
+      if (round + 1 >= totalRounds) {
         showFinalSummary();
       } else {
         nextBtn.classList.remove('hidden');
       }
+      round++;
+      updateRoundCounter();
     }
 
     function showFinalSummary() {
@@ -367,12 +387,20 @@
       }
 
       summaryHTML += `</ul><p>🏆 Your highest score was in <strong>Round ${highestRound}</strong> with <strong>${highestScore}</strong> point(s).</p>`;
+      summaryHTML += `<p><strong>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</strong></p>`;
       summaryHTML += `<p>Thanks for playing!</p>`;
 
       finalSummaryDiv.innerHTML = summaryHTML;
       finalSummaryDiv.style.display = 'block';
+
+      // Notify Qualtrics survey parent frame to proceed
+      window.parent.postMessage("showNext", "*");
+    }
+
+    function resetTimers() {
+      clearInterval(viewTimer);
+      clearInterval(answerTimer);
     }
   </script>
 </body>
 </html>
-
