@@ -33,7 +33,7 @@
       font-weight: bold;
       color: #e91e63;
     }
-    /* New wrapper for emoji grid centering */
+    /* Wrapper for emoji grid centering */
     #emojiGridWrapper {
       display: flex;
       justify-content: center;
@@ -42,8 +42,11 @@
     .grid {
       display: grid;
       gap: 15px 15px;
-      /* Remove margin and width here for better centering */
       user-select: none;
+    }
+    /* Special smaller gap for 2 column grids (Rounds 1 & 2) */
+    .grid.two-columns {
+      gap: 15px 8px; /* vertical gap 15px, horizontal gap 8px */
     }
     .grid.guessing .cell:hover {
       transform: scale(1.05);
@@ -200,7 +203,6 @@
     <div id="gameUI">
       <div id="roundNumber"></div>
       <div id="roundInfo"></div>
-      <!-- Wrapper added to center grid -->
       <div id="emojiGridWrapper">
         <div id="emojiGrid" class="grid"></div>
       </div>
@@ -285,9 +287,16 @@
       gridElement.innerHTML = '';
       gridElement.className = 'grid';
       gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-      // Remove fixed width and margin to allow natural centering via wrapper flexbox
+      // Clear previous width/margin to allow natural centering by wrapper
       gridElement.style.width = '';
       gridElement.style.margin = '';
+
+      // Apply special class for 2-column rounds to adjust gap
+      if (columns === 2) {
+        gridElement.classList.add('two-columns');
+      } else {
+        gridElement.classList.remove('two-columns');
+      }
 
       grid.forEach((emoji, i) => {
         const cell = document.createElement('div');
