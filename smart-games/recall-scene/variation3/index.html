@@ -10,59 +10,48 @@
       font-family: 'Arial', sans-serif;
       color: black;
       text-align: center;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       overflow-x: hidden;
     }
-
     h1 {
       margin-top: 10px;
       font-size: 22px;
     }
-
     .game-area {
       margin: 10px auto;
       max-width: 95%;
       position: relative;
     }
-
     .grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 6px;
       margin-top: 10px;
     }
-
     .cell {
       width: 100%;
-      padding-top: 50%; /* Smaller height (square with half height) */
+      padding-top: 50%;
       position: relative;
       border-radius: 8px;
       background-color: #ffffff;
       font-weight: bold;
       font-size: 14px;
+      box-sizing: border-box;
       overflow: hidden;
     }
-
     .cell::after {
       content: attr(data-word);
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       white-space: nowrap;
     }
-
-    .hidden {
-      display: none;
-    }
-
+    .hidden { display: none; }
     .message {
       font-size: 16px;
       margin: 8px 0;
       line-height: 1.4;
     }
-
     button {
       background-color: #a8dadc;
       border: none;
@@ -75,7 +64,6 @@
       width: 80%;
       max-width: 300px;
     }
-
     input[type="text"] {
       padding: 10px;
       font-size: 16px;
@@ -85,11 +73,9 @@
       width: 80%;
       max-width: 300px;
     }
-
     #roundCounter {
       position: fixed;
-      bottom: 10px;
-      left: 10px;
+      bottom: 10px; left: 10px;
       background: #a8dadc;
       padding: 8px 12px;
       border-radius: 8px;
@@ -97,7 +83,6 @@
       z-index: 1000;
       font-size: 14px;
     }
-
     #finalSummary {
       margin-top: 30px;
       font-size: 20px;
@@ -106,7 +91,6 @@
       padding: 25px;
       display: none;
     }
-
     #correctDisplay {
       font-size: 16px;
       margin-top: 15px;
@@ -115,7 +99,6 @@
       padding: 15px;
       display: none;
     }
-
     .display-words {
       margin-top: 10px;
       display: flex;
@@ -123,10 +106,8 @@
       gap: 10px;
       flex-wrap: wrap;
     }
-
     .word-box {
-      width: 60px;
-      height: 60px;
+      width: 60px; height: 60px;
       border-radius: 5px;
       background-color: #f0f0f0;
       display: flex;
@@ -134,7 +115,6 @@
       align-items: center;
       font-size: 14px;
     }
-
     #welcomeMessage {
       font-size: 16px;
       margin: 15px auto;
@@ -149,17 +129,16 @@
 </head>
 <body>
   <h1>🧠 Word Memory Game 🧠</h1>
-
-  <!-- Welcome Message Section -->
   <div id="welcomeMessage">
     Welcome to the SMART Memory Game! Let's test your memory skills.
   </div>
-
   <div id="roundCounter" class="message">Round 0 of 5 — 5 rounds remaining</div>
 
   <div class="game-area">
     <p id="prompt" class="message hidden"></p>
-    <p id="countdown" class="message hidden">⏳ Time left to remember: <span id="timer">60</span> seconds</p>
+    <p id="countdown" class="message hidden">
+      ⏳ Time left to remember: <span id="timer">60</span> seconds
+    </p>
 
     <div id="grid" class="grid"></div>
 
@@ -177,7 +156,7 @@
   </div>
 
   <script>
-    const simpleWords = ["dog", "cat", "bird", "fish", "apple", "banana", "tree", "sun", "moon", "book", "ball", "star", "car", "hat", "shoe", "cloud"];
+    const simpleWords = ["dog","cat","bird","fish","apple","banana","tree","sun","moon","book","ball","star","car","hat","shoe","cloud"];
     const totalRounds = 5;
 
     const gridDiv = document.getElementById("grid");
@@ -195,41 +174,35 @@
     const finalSummary = document.getElementById("finalSummary");
     const welcomeMessage = document.getElementById("welcomeMessage");
 
-    let currentRound = 0;
-    let grid = [];
-    let recallSet = [];
-    let promptText = "";
-    let timer = null;
-    let timeLeft = 60;
-    let score = 0;
+    let currentRound = 0, grid = [], recallSet = [], promptText = "",
+        timer = null, timeLeft = 60, score = 0;
+
+    let bestRound = 0, bestCorrect = 0;
 
     function normalizeWord(input) {
       return input.toLowerCase().trim();
     }
 
     function createGrid() {
-      const chosenWords = [];
-      while (chosenWords.length < 16) {
-        for (let word of simpleWords) {
-          if (chosenWords.length < 16) {
-            chosenWords.push(word);
-          } else {
-            break;
-          }
+      const chosen = [];
+      while (chosen.length < 16) {
+        for (let w of simpleWords) {
+          if (chosen.length < 16) chosen.push(w);
+          else break;
         }
       }
-      for (let i = chosenWords.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [chosenWords[i], chosenWords[j]] = [chosenWords[j], chosenWords[i]];
+      for (let i = chosen.length -1; i>0; i--) {
+        const j = Math.floor(Math.random()*(i+1));
+        [chosen[i], chosen[j]] = [chosen[j], chosen[i]];
       }
       grid = [];
-      for (let i = 0; i < 4; i++) {
-        grid.push(chosenWords.slice(i * 4, i * 4 + 4));
+      for (let i=0;i<4;i++) {
+        grid.push(chosen.slice(i*4, i*4+4));
       }
     }
 
     function showGrid() {
-      gridDiv.innerHTML = "";
+      gridDiv.innerHTML="";
       for (let row of grid) {
         for (let c of row) {
           const cell = document.createElement("div");
@@ -243,45 +216,46 @@
 
     function startRound() {
       currentRound++;
+      resultDiv.classList.add("hidden");
+      correctDisplay.style.display = "none";
+      inputArea.classList.add("hidden");
+      answerInput.value="";
+      promptP.classList.remove("hidden");
+      countdownP.classList.remove("hidden");
+      nextBtn.classList.add("hidden");
+      welcomeMessage.style.display="none";
+
       if (currentRound === totalRounds) {
         roundCounter.textContent = "Last Round!";
       } else {
         roundCounter.textContent = `Round ${currentRound} of ${totalRounds} — ${totalRounds - currentRound} rounds remaining`;
       }
-      resultDiv.classList.add("hidden");
-      correctDisplay.style.display = "none";
-      inputArea.classList.add("hidden");
-      answerInput.value = "";
-      promptP.classList.remove("hidden");
-      countdownP.classList.remove("hidden");
-      nextBtn.classList.add("hidden");
-      welcomeMessage.style.display = "none";
 
       createGrid();
       showGrid();
 
-      const isRow = Math.random() < 0.5;
-      const index = Math.floor(Math.random() * 4);
-      promptText = `${isRow ? "row" : "column"} ${index + 1}`;
-      recallSet = isRow ? grid[index] : grid.map(r => r[index]);
-
+      const isRow = Math.random()<0.5;
+      const idx = Math.floor(Math.random()*4);
+      promptText = `${isRow?"row":"column"} ${idx+1}`;
+      recallSet = isRow? grid[idx] : grid.map(r=>r[idx]);
       promptP.textContent = `Remember the words in ${promptText}`;
+
       timeLeft = 60;
       timerSpan.textContent = timeLeft;
 
-      timer = setInterval(() => {
+      timer = setInterval(()=>{
         timeLeft--;
-        timerSpan.textContent = timeLeft;
-        if (timeLeft <= 0) {
+        timerSpan.textContent=timeLeft;
+        if(timeLeft<=0){
           clearInterval(timer);
           startRecall();
         }
-      }, 1000);
+      },1000);
 
       startBtn.classList.add("hidden");
     }
 
-    function startRecall() {
+    function startRecall(){
       gridDiv.classList.add("hidden");
       countdownP.classList.add("hidden");
       promptP.textContent = `Enter the words in ${promptText}`;
@@ -289,75 +263,80 @@
       answerInput.focus();
     }
 
-    function checkAnswer() {
+    function checkAnswer(){
       clearInterval(timer);
-      const userInputRaw = answerInput.value.split(",").map(s => s.trim());
-      const userInput = userInputRaw.map(normalizeWord);
-
-      let correctCount = 0;
-      for (let i = 0; i < 4; i++) {
-        if (normalizeWord(recallSet[i]) === userInput[i]) {
-          correctCount++;
-        }
+      const userInput = answerInput.value.split(",").map(s=>normalizeWord(s.trim()));
+      let correctC=0;
+      for (let i=0;i<4;i++){
+        if (normalizeWord(recallSet[i]) === userInput[i]) correctC++;
       }
-      score += correctCount;
 
-      resultDiv.textContent = `You got ${correctCount} out of 4 correct!`;
+      score+=correctC;
+      // update best round
+      if(correctC > bestCorrect){
+        bestCorrect = correctC;
+        bestRound = currentRound;
+      }
+
+      resultDiv.textContent = `You got ${correctC} out of 4 correct!`;
       resultDiv.classList.remove("hidden");
       inputArea.classList.add("hidden");
 
-      correctDisplay.style.display = "block";
-      correctDisplay.innerHTML = `
+      correctDisplay.style.display="block";
+      correctDisplay.innerHTML=`
         <strong>Correct sequence:</strong>
         <div class="display-words">
-          ${recallSet.map(w => `<div class="word-box">${w}</div>`).join('')}
+          ${recallSet.map(w=>`<div class="word-box">${w}</div>`).join("")}
         </div>
         <strong>Your answer:</strong>
         <div class="display-words">
-          ${userInput.map(w => `<div class="word-box">${w}</div>`).join('')}
+          ${userInput.map(w=>`<div class="word-box">${w}</div>`).join("")}
         </div>
       `;
 
-      if (currentRound < totalRounds) {
+      if(currentRound < totalRounds){
         nextBtn.classList.remove("hidden");
       } else {
-        finalSummary.style.display = "block";
-        finalSummary.innerHTML = `Game over! Your total score: ${score} out of ${totalRounds * 4}<br>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.`;
+        finalSummary.style.display="block";
+        finalSummary.innerHTML = `
+          Game over! Your total score: ${score} out of ${totalRounds*4}.<br>
+          Good Job! Your best round was Round ${bestRound} where you got ${bestCorrect} out of 4 correct.<br>
+          Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.
+        `;
         window.parent.postMessage("showNext", "*");
-        startBtn.textContent = "Play Again";
+        startBtn.textContent="Play Again";
         startBtn.classList.remove("hidden");
       }
     }
 
-    startBtn.addEventListener("click", () => {
-      finalSummary.style.display = "none";
-      currentRound = 0;
-      score = 0;
+    startBtn.addEventListener("click",()=>{
+      finalSummary.style.display="none";
+      currentRound=0; score=0;
+      bestRound=0; bestCorrect=0;
       startRound();
     });
 
-    submitBtn.addEventListener("click", () => {
-      if (answerInput.value.trim() === "") {
-        alert("Please enter your answer.");
-        return;
+    submitBtn.addEventListener("click",()=>{
+      if(answerInput.value.trim()===""){
+        alert("Please enter your answer."); return;
       }
       checkAnswer();
     });
 
-    nextBtn.addEventListener("click", () => {
+    nextBtn.addEventListener("click",()=>{
       nextBtn.classList.add("hidden");
       resultDiv.classList.add("hidden");
-      correctDisplay.style.display = "none";
+      correctDisplay.style.display="none";
       gridDiv.classList.remove("hidden");
       promptP.classList.remove("hidden");
       countdownP.classList.remove("hidden");
       inputArea.classList.add("hidden");
-      answerInput.value = "";
+      answerInput.value="";
       startRound();
     });
 
-    answerInput.addEventListener("keydown", e => {
-      if (e.key === "Enter") {
+    answerInput.addEventListener("keydown",e=>{
+      if(e.key==="Enter"){
         e.preventDefault();
         submitBtn.click();
       }
