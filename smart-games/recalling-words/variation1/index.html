@@ -10,27 +10,31 @@
 
 <style>
     body {
-    font-family: 'Comic Neue', cursive;
-  	    display: flex;
-  	    flex-direction: column;
- 	    align-items: center;
- 	    justify-content: center;
- 	    height: 100vh;
- 	    margin: 0;
- 	    text-align: center;
- 	    font-size: 1.5rem;
-    background: linear-gradient(135deg,
-    #ffb3ba,  /* pastel red */
-    #ffdfba,  /* pastel orange */
-    #ffffba,  /* pastel yellow */
-    #baffc9,  /* pastel green */
-    #bae1ff,  /* pastel blue */
-    #e3baff   /* pastel purple */
-);
-background-repeat: no-repeat;
-background-size: cover;
-overflow: hidden;
-}
+        font-family: 'Comic Neue', cursive;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        text-align: center;
+        font-size: 1.5rem;
+        background: linear-gradient(135deg,
+            #ffb3ba,  /* pastel red */
+            #ffdfba,  /* pastel orange */
+            #ffffba,  /* pastel yellow */
+            #baffc9,  /* pastel green */
+            #bae1ff,  /* pastel blue */
+            #e3baff   /* pastel purple */
+        );
+        background-repeat: no-repeat;
+        background-size: cover;
+        overflow: hidden;
+        /* NEW: Smoother font rendering */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
     #game-container {
         display: none;
     }
@@ -43,7 +47,10 @@ overflow: hidden;
         padding: 20px 40px;
         border-radius: 15px;
         box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+        /* MODIFIED: Use width and max-width for better flexibility */
+        width: 90%; 
         max-width: 400px;
+        box-sizing: border-box; /* NEW: Important for consistent padding/width calculation */
     }
 
     #words-list {
@@ -62,8 +69,9 @@ overflow: hidden;
         border-radius: 10px;
         box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
         padding: 20px 20px;
-        width: 90%;
-        max-width: 120px;
+        /* MODIFIED: Let the grid cell control the width */
+        width: 100%; 
+        box-sizing: border-box;
         text-align: center;
         font-weight: normal;
         font-size: 22px;
@@ -72,32 +80,41 @@ overflow: hidden;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .word-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
-        cursor: pointer;
+    /* MODIFIED: Remove hover effects on touch devices where they don't work */
+    @media (hover: hover) {
+        .word-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+        }
+
+        .recall-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .main-action-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+        }
     }
 
     .recall-button {
-        background-color: white; 
-        border: none; 
+        background-color: white;
+        border: none;
         border-radius: 10px;
         box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
         padding: 20px 10px;
-        width: 120px;
+        /* MODIFIED: Let flexbox handle the sizing */
+        width: 120px; 
         font-weight: normal;
         font-size: 22px;
         font-family: inherit;
         text-transform: capitalize;
         cursor: pointer;
         transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-        margin: 0 10px; 
+        margin: 0 10px;
         user-select: none;
-    }
-
-    .recall-button:hover {
-        transform: translateY(-5px);
-        box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
     }
 
     .recall-button:disabled {
@@ -114,8 +131,9 @@ overflow: hidden;
         box-sizing: border-box;
         box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
         padding: 20px 30px !important;
-        width: 300px !important;
-        max-width: 90%;
+        /* MODIFIED: Changed from fixed width to a more flexible approach */
+        width: 100%;
+        max-width: 300px !important; /* The max-width now acts as the old width on large screens */
         font-weight: bold;
         font-size: 22px !important;
         font-family: inherit;
@@ -125,11 +143,6 @@ overflow: hidden;
         user-select: none;
         display: block;
         margin: 20px auto 0 auto;
-    }
-
-    .main-action-button:hover {
-        transform: translateY(-5px);
-        box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
     }
 
     #recall-word {
@@ -147,30 +160,37 @@ overflow: hidden;
         gap: 12px;
         line-height: 1.5;
     }
+    
+    /* NEW: This is the container for the Yes/No buttons */
+    #recall-container > .recall-button {
+        width: 40%;
+        max-width: 150px;
+    }
 
     .hidden {
         display: none;
     }
-    
+
     .info-page-container {
         background-color: rgba(255, 255, 255, 0.9);
         padding: 30px;
         border-radius: 15px;
         box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
-        max-width: 600px;
+        /* MODIFIED: Use width and max-width for better flexibility */
         width: 90%;
+        max-width: 600px;
+        box-sizing: border-box; /* NEW */
         text-align: center;
         font-size: 18px;
         line-height: 1.6;
     }
-        
+
     .info-page-container h2 {
         text-align: center;
     }
     .info-page-container ul {
         padding-left: 20px;
         margin-top: 20px;
-        /* MODIFIED: Add this line to align the list to the left */
         text-align: left;
     }
 
@@ -178,7 +198,7 @@ overflow: hidden;
         font-size: 2.2rem;
         font-weight: 700;
         line-height: 1.3;
-        background: linear-gradient(to right, 
+        background: linear-gradient(to right,
             #e74c3c, #f39c12, #f1c40f, #2ecc71, #3498db, #9b59b6
         );
         background-clip: text;
@@ -186,7 +206,7 @@ overflow: hidden;
         color: transparent;
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
-    
+
     .welcome-subtitle {
         display: inline-block;
         margin-top: 15px;
@@ -201,7 +221,7 @@ overflow: hidden;
         gap: 20px;
         margin-top: 20px;
     }
-    
+
     #session-timer {
         position: fixed;
         top: 15px;
@@ -218,14 +238,13 @@ overflow: hidden;
         list-style-type: none;
         padding: 0;
         text-align: left;
-        max-height: 250px; /* Increased height for more scores */
+        max-height: 250px;
         overflow-y: auto;
     }
     #score-list li.best-score {
         font-weight: bold;
         color: #2a9d8f;
     }
-    /* NEW: Style for the difficulty headers in the final score list */
     #score-list h3 {
         margin: 15px 0 5px 0;
         color: #555;
@@ -235,7 +254,7 @@ overflow: hidden;
         position: fixed;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%) scale(0.8); 
+        transform: translate(-50%, -50%) scale(0.8);
         background-color: rgba(255, 255, 255, 0.95);
         padding: 30px 50px;
         border-radius: 15px;
@@ -257,10 +276,14 @@ overflow: hidden;
     #feedback-popup.incorrect {
         color: #e67e22;
     }
-    
+
+    /* =========================================== */
+    /* ===== MOBILE IMPROVEMENTS START HERE ====== */
+    /* =========================================== */
+
     @media (max-width: 650px) {
         body {
-            font-size: 1.2rem;
+            font-size: 1.1rem; /* MODIFIED: Slightly smaller base font */
             height: auto;
             min-height: 100vh;
             overflow-y: auto;
@@ -273,25 +296,60 @@ overflow: hidden;
         }
         #words-list {
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            gap: 15px; /* MODIFIED: Slightly less gap */
         }
         .info-page-container, #result {
-            padding: 20px;
+            padding: 20px 15px; /* MODIFIED: Less side padding */
         }
         .rainbow-title {
             font-size: 1.8rem;
         }
         #feedback-popup {
             font-size: 2rem;
+            /* NEW: Make popup padding smaller on mobile */
+            padding: 20px 30px;
+            width: 80%;
+            text-align: center;
         }
         .info-button-group {
             flex-direction: column;
             gap: 15px;
+            /* NEW: Make buttons in this group take full width */
+            width: 100%; 
         }
         #recall-word {
             font-size: 1.25rem;
         }
+        /* NEW: Make recall word card smaller */
+        .recall-question-layout .word-card {
+            padding: 10px 15px;
+            font-size: 1.1rem;
+        }
     }
+
+    /* NEW: Add a media query for very narrow screens */
+    @media (max-width: 400px) {
+        #words-list {
+            /* Your JS sets 3 columns, this will be tight. Let's try 2 */
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .word-card {
+            padding: 15px 10px; /* MODIFIED: Smaller padding */
+            font-size: 1rem;    /* MODIFIED: Smaller font */
+        }
+        body {
+            font-size: 1rem; /* MODIFIED: Even smaller base font for tiny screens */
+        }
+        .rainbow-title {
+            font-size: 1.6rem;
+            line-height: 1.2;
+        }
+        .welcome-subtitle {
+            font-size: 1rem;
+        }
+    }
+
 </style>
 
 </head>
@@ -340,18 +398,24 @@ overflow: hidden;
     <p id="score-text"></p>
 </div>
 
+<!-- ADD THIS NEW DIV RIGHT AFTER YOUR #result DIV -->
+<div id="end-page-container" class="info-page-container hidden">
+    <h2>Thank you for participating!</h2>
+    <p>Your game is now over. Please head back to the survey to finish it and receive your $2.5 in your SMART bank account!</p>
+</div>
+
 <script>
     document.body.classList.add('no-scroll');
 
-    const wordsPool = [ "lion", "tiger", "bear", "monkey", "zebra", "giraffe", "hippo", "rhino", "snake", "lizard", "frog", "eagle", "parrot", "owl", "wolf", "fox", "deer", "rabbit", "squirrel", "turtle", "whale", "dolphin", "shark", "octopus", "penguin", "koala", "panda", "camel", "bat", "bee", "jungle", "forest", "ocean", "river", "desert", "savanna", "nest", "den", "hive", "burrow", "paw", "claw", "wing", "fin", "tail", "fur", "feather", "scale", "fang", "web", "cow", "pig", "sheep", "horse", "goat", "dog", "cat", "mouse", "hamster", "leopard", "cheetah", "elephant", "raccoon", "skunk", "beaver", "chipmunk", "moose", "bison", "fish", "crab", "lobster", "shrimp", "starfish", "seahorse", "jellyfish", "seal", "walrus", "otter", "chicken", "duck", "goose", "robin", "cardinal", "sparrow", "hawk", "swan", "flamingo", "peacock", "alligator", "crocodile", "chameleon", "ant", "butterfly", "moth", "ladybug", "spider", "caterpillar", "beak", "horn", "tusk", "hoof", "shell", "pouch", "whisker", "mane", "farm", "barn", "zoo", "herd", "flock" ];
+    const wordsPool = [ "table", "chair", "couch", "desk", "bed", "door", "window", "lamp", "shelf", "clock", "kitchen", "office", "school", "store", "market", "airport", "station", "museum", "hospital", "library", "park", "beach", "city", "island", "mountain", "garden", "street", "bridge", "tunnel", "road", "key", "phone", "book", "pen", "pencil", "paper", "bottle", "box", "cup", "plate", "fork", "knife", "spoon", "brush", "mirror", "hammer", "rope", "ladder", "button", "zipper", "car", "boat", "train", "plane", "bike", "truck", "wheel", "star", "moon", "cloud", "blanket", "pillow", "towel", "soap", "sponge", "broom", "basket", "vase", "rug", "curtain", "shirt", "pants", "dress", "skirt", "sock", "shoe", "hat", "glove", "belt", "jacket", "castle", "cabin", "cottage", "factory", "studio", "garage", "stadium", "arena", "chapel", "temple", "balloon", "candle", "trophy", "statue", "fountain", "flag", "coin", "dice", "gem", "marble", "screw", "wrench", "nail", "pliers", "battery", "cable", "drone", "laptop", "screen", "keyboard" ];
     const incorrectFeedback = ['Almost!', 'Nearly there!', 'Not Quite'];
     const SESSION_DURATION = 600000;
 
     // NEW: Define the parameters for each difficulty level
     const difficultyLevels = [
-        { name: 'Easy', memorizeCount: 6, distractorCount: 6, gridCols: 3 },
-        { name: 'Medium', memorizeCount: 9, distractorCount: 7, gridCols: 4 },
-        { name: 'Hard', memorizeCount: 15, distractorCount: 5, gridCols: 5 }
+        { name: 'Easy', memorizeCount: 6, distractorCount: 6 },
+        { name: 'Medium', memorizeCount: 9, distractorCount: 7 },
+        { name: 'Hard', memorizeCount: 15, distractorCount: 5 }
     ];
 
     let sessionStartTime = null;
@@ -410,7 +474,7 @@ overflow: hidden;
 
         // Update UI with difficulty info
         document.getElementById('game-heading').textContent = `Memorize these words! (${currentDifficulty.name})`;
-        document.getElementById('words-list').style.gridTemplateColumns = `repeat(${currentDifficulty.gridCols}, 1fr)`;
+        document.getElementById('words-list').style.gridTemplateColumns = `3, 1fr)`;
 
         updateWordHistory();
         
@@ -533,7 +597,7 @@ overflow: hidden;
         }, 800);
     }
 
-    function endGame() {
+ function endGame() {
         document.getElementById('recall-container').classList.add('hidden');
         document.getElementById('result').classList.remove('hidden');
 
@@ -553,45 +617,57 @@ overflow: hidden;
         totalGamesPlayed++;
         
         const elapsedTime = Date.now() - sessionStartTime;
-        
-        if (elapsedTime >= SESSION_DURATION) {
-            clearInterval(timer);
-            clearInterval(sessionTimerInterval);
-            document.getElementById('session-timer').classList.add('hidden');
 
-            // MODIFIED: Build a categorized final score list
-            let finalScoreHTML = '';
-            difficultyLevels.forEach(level => {
-                const scoresForLevel = allSessionScores.filter(s => s.difficulty === level.name);
-                if (scoresForLevel.length > 0) {
-                    finalScoreHTML += `<h3>${level.name}</h3>`;
-                    scoresForLevel.forEach((s, i) => {
-                        const isBest = s.score === bestScores[level.name];
-                        finalScoreHTML += `<li class="${isBest ? 'best-score' : ''}">
-                            Round ${i + 1}: ${s.score} / ${s.total} ${isBest ? '(Best!)' : ''}
-                        </li>`;
-                    });
-                }
+    // In your endGame() function, find this 'if' block...
+if (elapsedTime >= SESSION_DURATION) {
+    // ... and replace its contents with this:
+
+    clearInterval(timer);
+    clearInterval(sessionTimerInterval);
+    document.getElementById('session-timer').classList.add('hidden');
+
+    // Build the categorized final score list (this part is the same)
+    let finalScoreHTML = '';
+    difficultyLevels.forEach(level => {
+        const scoresForLevel = allSessionScores.filter(s => s.difficulty === level.name);
+        if (scoresForLevel.length > 0) {
+            finalScoreHTML += `<h3>${level.name}</h3>`;
+            scoresForLevel.forEach((s, i) => {
+                const isBest = s.score === bestScores[level.name];
+                finalScoreHTML += `<li class="${isBest ? 'best-score' : ''}">
+                    Round ${i + 1}: ${s.score} / ${s.total} ${isBest ? '(Best!)' : ''}
+                </li>`;
             });
-
-            document.body.classList.add('no-scroll');
-            document.getElementById('result').innerHTML = `
-                <p style="font-size: 1.5em; font-weight: bold;">Session Ended!</p>
-                <hr>
-                <ul id="score-list">${finalScoreHTML}</ul>
-            `;
-        } else {
-            document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
-            setTimeout(() => {
-                resetGame();
-                startGame();
-            }, 5000);
         }
-	 finalResults.textContent = `🏆Rounds Completed🏆 = ${roundsCompleted}`;
-      switchScreen(gameScreen, finalScreen);
-      // Tell Qualtrics the game is done, so it can show the Next button
-  window.parent.postMessage("showNext", "*");   
-    }
+    });
+
+    document.body.classList.add('no-scroll');
+    document.getElementById('result').innerHTML = `
+        <p style="font-size: 1.5em; font-weight: bold;">Session Ended!</p>
+        <hr>
+        <ul id="score-list">${finalScoreHTML}</ul>
+    `;
+
+    // --- NEW LOGIC STARTS HERE ---
+    // After showing the final scores, wait 8 seconds, then show the end page.
+    setTimeout(() => {
+        // Hide the score screen
+        document.getElementById('result').classList.add('hidden');
+        // Show the new "Thank You" end page
+        document.getElementById('end-page-container').classList.remove('hidden');
+
+        // IMPORTANT: Tell the survey the game is completely over so it can show the "Next" button.
+        window.parent.postMessage("showNext", "*");
+    }, 8000); // 8000 milliseconds = 8 seconds. Adjust this time as you see fit.
+
+} else {
+    // This part for continuing to the next round remains the same.
+    document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
+    setTimeout(() => {
+        resetGame();
+        startGame();
+    }, 5000);
+}
 
     function resetGame() {
         score = 0;
