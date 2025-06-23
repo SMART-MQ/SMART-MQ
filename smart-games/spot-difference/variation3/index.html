@@ -117,6 +117,17 @@
       font-weight: bold;
       box-shadow: 0 0 10px #f48fb1;
     }
+    #extraMessage {
+      font-size: 1.5rem;
+      margin-top: 15px;
+      max-width: 320px;
+      color: #880e4f;
+      font-weight: normal;
+      background: linear-gradient(to right, #fce4ec, #f8bbd0);
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 0 8px #f48fb1;
+    }
     #countdownOverlay {
       display: none;
       position: fixed;
@@ -197,6 +208,7 @@
   <div id="end" style="display: none;">
     <h1>Well done!</h1>
     <p id="congratsMessage"></p>
+    <p id="extraMessage">Now, finish the survey and you will have earned an extra $2.50 for your SMART bank</p>
   </div>
 
   <div id="countdownOverlay"><div id="countdownText"></div></div>
@@ -236,6 +248,10 @@
     const countdownOverlay = document.getElementById('countdownOverlay');
     const countdownText = document.getElementById('countdownText');
     const congratsMessage = document.getElementById('congratsMessage');
+    const extraMessage = document.getElementById('extraMessage');
+
+    // Initially hide the extra message until end screen is shown
+    extraMessage.style.display = 'none';
 
     function showStartCountdown(callback) {
       const steps = ["3", "2", "1", "GO!"];
@@ -428,6 +444,7 @@
     function showCongratsMessage() {
       let totalCorrect = roundResults.reduce((sum, r) => sum + r.correct, 0);
       congratsMessage.textContent = `Congratulations, you correctly spotted ${totalCorrect} difference${totalCorrect !== 1 ? 's' : ''}!`;
+      extraMessage.style.display = 'block';
       
       // Notify Qualtrics that game is done and enable Next button:
       notifyQualtricsGameDone();
