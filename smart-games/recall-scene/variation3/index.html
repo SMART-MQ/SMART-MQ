@@ -1,1 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Word Memory Game</title>
+  <style>
+    body {
+      background-color: #fcefe3;
+      font-family: 'Arial', sans-serif;
+      color: black;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      margin-top: 20px;
+    }
+
+    .game-area {
+      margin: 20px auto;
+      max-width: 600px;
+      position: relative;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .cell {
+      width: 90px;
+      height: 90px;
+      border-radius: 10px;
+      background-color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .message {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    button {
+      background-color: #a8dadc;
+      border: none;
+      color: black;
+      padding: 10px 20px;
+      margin: 20px 10px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      font-size: 16px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 300px;
+    }
+
+    #roundCounter {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: #a8dadc;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      z-index: 1000;
+      user-select: none;
+      font-size: 16px;
+    }
+
+    #finalSummary {
+      margin-top: 40px;
+      font-size: 22px;
+      background: #e1f0f7;
+      border-radius: 10px;
+      padding: 30px;
+      display: none;
+    }
+
+    #correctDisplay {
+      font-size: 18px;
+      margin-top: 20px;
+      background: #f0f0f0;
+      border-radius: 10px;
+      padding: 15px;
+      display: none;
+    }
+
+    .display-words {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .word-box {
+      width: 60px;
+      height: 60px;
+      border-radius: 5px;
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧠 Word Memory Game 🧠</h1>
+  <p>Memorize the words in the grid! You'll be asked to recall a specific row or column.</p>
+
+  <div id="roundCounter" class="message">Round 0 of 5 — 5 rounds remaining</div>
+
+  <div class="game-area">
+    <div id="grid" class="grid"></div>
+    <p id="prompt" class="message hidden"></p>
+    <p id="countdown" class="message hidden">⏳ Time left to remember: <span id="timer">60</span> seconds</p>
+
+    <div id="input-area" class="hidden">
+      <p>Type the words in order (like "dog, cat, bird"):</p>
+      <input type="text" id="answer" placeholder="e.g. dog, cat, bird" autocomplete="off"/>
+      <button id="submit">Submit</button>
+    </div>
+
+    <div id="result" class="hidden"></div>
+    <div id="correctDisplay"></div>
+    <button id="start">Start Game</button>
+    <button id="next" class="hidden">Next Round</button>
+    <div id="finalSummary"></div>
+  </div>
+
+  <script>
+    // Updated simple words array suitable for primary school-aged children
+    const simpleWords = ["dog", "cat", "bird", "fish", "apple", "banana", "tree", "sun", "moon", "book", "ball", "star", "car", "hat", "shoe", "cloud"];
+    const totalRounds = 5;
+
+    const gridDiv = document.getElementById("grid");
+    const promptP = document.getElementById("prompt");
+    const countdownP = document.getElementById("countdown");
+    const timerSpan = document.getElementById("timer");
+    const inputArea = document.getElementById("input-area");
+    const answerInput = document.getElementById("answer");
+    const submitBtn = document.getElementById("submit");
+    const resultDiv = document.getElementById("result");
+    const correctDisplay = document.getElementById("correctDisplay");
+    const startBtn = document.getElementById("start");
+    const nextBtn = document.getElementById("next");
+    const roundCounter = document.getElementById("roundCounter");
+    const finalSummary = document.getElementById("finalSummary");
+
+    let currentRound = 0;
+    let grid = [];
+    let recallSet = [];
+    let promptText = "";
+    let timer = null;
+    let timeLeft = 60;
+    let score = 0;
+
+    function normalizeWord(input){
+      return input.toLowerCase().trim();
+    }
+
+    // Updated createGrid to use simple words instead of colors
+    function createGrid() {
+      // Create an array of 16 words cycling through all unique words before repeating
+      const chosenWords = [];
+      const totalCells = 16;
+      const wordsCount = simpleWords.length;
+
+      // Add words in order repeatedly until length = 16
+      while (chosenWords.length < totalCells) {
+        for (let word of simpleWords) {
+          if (chosenWords.length < totalCells) {
+            chosenWords.push(word);
+          } else {
+            break;
+          }
+        }
+      }
+
+      // Optional: shuffle chosenWords so the grid is randomized but all words appear equally before repeat
+      for (let i = chosenWords.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [chosenWords[i], chosenWords[j]] = [chosenWords[j], chosenWords[i]];
+      }
+
+      grid = [];
+      for (let i = 0; i < 4; i++) {
+        grid.push(chosenWords.slice(i * 4, i * 4 + 4));
+      }
+    }
+
+    function showGrid() {
+      gridDiv.innerHTML = "";
+      for (let row of grid) {
+        for (let c of row) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.textContent = c;  // Display the word instead of color
+          gridDiv.appendChild(cell);
+        }
+      }
+      gridDiv.classList.remove("hidden");
+    }
+
+    function startRound() {
+      currentRound++;
+      roundCounter.textContent = `Round ${currentRound} of ${totalRounds} — ${totalRounds - currentRound} rounds remaining`;
+      resultDiv.classList.add("hidden");
+      correctDisplay.style.display = "none";
+      inputArea.classList.add("hidden");
+      answerInput.value = "";
+      promptP.classList.remove("hidden");
+      countdownP.classList.remove("hidden");
+      nextBtn.classList.add("hidden");
+
+      createGrid();
+      showGrid();
+
+      // Pick a random row or column to recall
+      const isRow = Math.random() < 0.5;
+      const index = Math.floor(Math.random() * 4);
+      promptText = `${isRow ? "row" : "column"} ${index + 1}`;
+      recallSet = isRow ? grid[index] : grid.map(r => r[index]);
+
+      promptP.textContent = `Remember the words in ${promptText}`;
+      timeLeft = 60;
+      timerSpan.textContent = timeLeft;
+
+      // Start countdown timer
+      timer = setInterval(() => {
+        timeLeft--;
+        timerSpan.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          startRecall();
+        }
+      }, 1000);
+
+      startBtn.classList.add("hidden");
+    }
+
+    function startRecall() {
+      gridDiv.classList.add("hidden");
+      countdownP.classList.add("hidden");
+      promptP.textContent = `Enter the words in ${promptText}`;
+      inputArea.classList.remove("hidden");
+      answerInput.focus();
+    }
+
+    function checkAnswer() {
+      clearInterval(timer);
+      const userInputRaw = answerInput.value.split(",").map(s => s.trim());
+      const userInput = userInputRaw.map(normalizeWord);
+
+      let correctCount = 0;
+      for (let i = 0; i < 4; i++) {
+        if (normalizeWord(recallSet[i]) === userInput[i]) {
+          correctCount++;
+        }
+      }
+      score += correctCount;
+
+      resultDiv.textContent = `You got ${correctCount} out of 4 correct!`;
+      resultDiv.classList.remove("hidden");
+      inputArea.classList.add("hidden");
+
+      // Show correct and user answers visually
+      correctDisplay.style.display = "block";
+      correctDisplay.innerHTML = `
+        <strong>Correct sequence:</strong>
+        <div class="display-words">
+          ${recallSet.map(w => `<div class="word-box">${w}</div>`).join('')}
+        </div>
+        <strong>Your answer:</strong>
+        <div class="display-words">
+          ${userInput.map(w => `<div class="word-box">${w}</div>`).join('')}
+        </div>
+      `;
+
+      if (currentRound < totalRounds) {
+        nextBtn.classList.remove("hidden");
+      } else {
+        finalSummary.style.display = "block";
+        finalSummary.textContent = `Game over! Your total score: ${score} out of ${totalRounds * 4}`;
+        startBtn.textContent = "Play Again";
+        startBtn.classList.remove("hidden");
+      }
+    }
+
+    startBtn.addEventListener("click", () => {
+      finalSummary.style.display = "none";
+      currentRound = 0;
+      score = 0;
+      startRound();
+    });
+
+    submitBtn.addEventListener("click", () => {
+      if (answerInput.value.trim() === "") {
+        alert("Please enter your answer.");
+        return;
+      }
+      checkAnswer();
+    });
+
+    nextBtn.addEventListener("click", () => {
+      nextBtn.classList.add("hidden");
+      resultDiv.classList.add("hidden");
+      correctDisplay.style.display = "none";
+      gridDiv.classList.remove("hidden");
+      promptP.classList.remove("hidden");
+      countdownP.classList.remove("hidden");
+      inputArea.classList.add("hidden");
+      answerInput.value = "";
+      startRound();
+    });
+
+    // Allow Enter key to submit answer
+    answerInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        submitBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
 
