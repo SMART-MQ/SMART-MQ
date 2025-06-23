@@ -244,7 +244,11 @@
     // Function to start the game round
     function startRound() {
       currentRound++;
-      roundCounter.textContent = `Round ${currentRound} of ${totalRounds} — ${totalRounds - currentRound} rounds remaining`;
+      if (currentRound === totalRounds) {
+        roundCounter.textContent = "Last Round!";
+      } else {
+        roundCounter.textContent = `Round ${currentRound} of ${totalRounds} — ${totalRounds - currentRound} rounds remaining`;
+      }
       resultDiv.classList.add("hidden");
       correctDisplay.style.display = "none";
       inputArea.classList.add("hidden");
@@ -277,7 +281,7 @@
       startBtn.classList.add("hidden");
     }
 
-    // Function to show the input area for recalling words
+    // Function to start recalling the words
     function startRecall() {
       gridDiv.classList.add("hidden");
       countdownP.classList.add("hidden");
@@ -286,7 +290,7 @@
       answerInput.focus();
     }
 
-    // Function to check the user's answer
+    // Function to check the answer
     function checkAnswer() {
       clearInterval(timer);
       const userInputRaw = answerInput.value.split(",").map(s => s.trim());
@@ -321,6 +325,10 @@
       } else {
         finalSummary.style.display = "block";
         finalSummary.innerHTML = `Game over! Your total score: ${score} out of ${totalRounds * 4}<br>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.`;
+
+        // Tell Qualtrics the game is done, so it can show the Next button
+        window.parent.postMessage("showNext", "*");
+
         startBtn.textContent = "Play Again";
         startBtn.classList.remove("hidden");
       }
