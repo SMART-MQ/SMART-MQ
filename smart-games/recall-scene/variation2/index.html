@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Color Memory Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>SMART Colour Memory Game</title>
   <style>
     body {
       background-color: #fcefe3;
@@ -11,11 +11,34 @@
       color: black;
       text-align: center;
       margin: 0;
-      padding: 0;
+      padding: 0 10px;
+      -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none;   /* Safari */
+      -khtml-user-select: none;    /* Konqueror HTML */
+      -moz-user-select: none;      /* Old versions of Firefox */
+      -ms-user-select: none;       /* Internet Explorer/Edge */
+      user-select: none;           /* Non-prefixed version, currently
+                                     supported by Chrome, Edge, Opera and Firefox */
+    }
+
+    #banner {
+      background-color: #a8dadc;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #000;
+      margin-top: 10px;
+      border-radius: 10px;
     }
 
     h1 {
       margin-top: 20px;
+      font-size: 1.8rem;
+    }
+
+    p {
+      font-size: 1rem;
+      margin: 10px 0;
     }
 
     .game-area {
@@ -35,6 +58,7 @@
       width: 90px;
       height: 90px;
       border-radius: 10px;
+      touch-action: manipulation;
     }
 
     .hidden {
@@ -42,7 +66,7 @@
     }
 
     .message {
-      font-size: 18px;
+      font-size: 1.1rem;
       margin-top: 10px;
     }
 
@@ -50,20 +74,22 @@
       background-color: #a8dadc;
       border: none;
       color: black;
-      padding: 10px 20px;
+      padding: 12px 25px;
       margin: 20px 10px;
-      font-size: 16px;
+      font-size: 1.1rem;
       border-radius: 10px;
       cursor: pointer;
+      user-select: none;
     }
 
     input[type="text"] {
-      padding: 8px;
-      font-size: 16px;
+      padding: 10px;
+      font-size: 1rem;
       margin: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
-      width: 300px;
+      width: 90%;
+      max-width: 300px;
     }
 
     #roundCounter {
@@ -76,12 +102,13 @@
       font-weight: bold;
       z-index: 1000;
       user-select: none;
-      font-size: 16px;
+      font-size: 1rem;
+      min-width: 140px;
     }
 
     #finalSummary {
       margin-top: 40px;
-      font-size: 22px;
+      font-size: 1.25rem;
       background: #e1f0f7;
       border-radius: 10px;
       padding: 30px;
@@ -89,7 +116,7 @@
     }
 
     #correctDisplay {
-      font-size: 18px;
+      font-size: 1.1rem;
       margin-top: 20px;
       background: #f0f0f0;
       border-radius: 10px;
@@ -102,6 +129,7 @@
       display: flex;
       justify-content: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .color-box {
@@ -110,10 +138,37 @@
       border-radius: 5px;
       border: 1px solid #000;
     }
+
+    @media (max-width: 480px) {
+      .cell {
+        width: 60px;
+        height: 60px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        margin: 15px 5px;
+      }
+      #roundCounter {
+        font-size: 0.9rem;
+        padding: 6px 8px;
+        min-width: 120px;
+      }
+      #finalSummary {
+        font-size: 1rem;
+        padding: 20px;
+      }
+      input[type="text"] {
+        width: 95%;
+        max-width: none;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>🎨 Color Memory Game 🎨</h1>
+  <div id="banner">Welcome to the SMART memory game!</div>
+
+  <h1>🎨 SMART Colour Memory Game 🎨</h1>
   <p>Memorize the colors in the grid! You'll be asked to recall a specific row or column.</p>
 
   <div id="roundCounter" class="message">Round 0 of 5 — 5 rounds remaining</div>
@@ -125,7 +180,7 @@
 
     <div id="input-area" class="hidden">
       <p>Type the colors in order (like "red, blue, green"):</p>
-      <input type="text" id="answer" placeholder="e.g. red, yellow, blue" autocomplete="off"/>
+      <input type="text" id="answer" placeholder="e.g. red, yellow, blue" autocomplete="off" />
       <button id="submit">Submit</button>
     </div>
 
@@ -166,14 +221,11 @@
       return input.toLowerCase().trim();
     }
 
-    // Updated createGrid to use all unique colors before repeating
     function createGrid() {
-      // Create an array of 16 colors cycling through all unique colors before repeating
       const chosenColors = [];
       const totalCells = 16;
       const colorsCount = simpleColors.length;
 
-      // Add colors in order repeatedly until length = 16
       while (chosenColors.length < totalCells) {
         for (let color of simpleColors) {
           if (chosenColors.length < totalCells) {
@@ -184,7 +236,6 @@
         }
       }
 
-      // Optional: shuffle chosenColors so the grid is randomized but all colors appear equally before repeat
       for (let i = chosenColors.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [chosenColors[i], chosenColors[j]] = [chosenColors[j], chosenColors[i]];
@@ -211,7 +262,14 @@
 
     function startRound() {
       currentRound++;
-      roundCounter.textContent = `Round ${currentRound} of ${totalRounds} — ${totalRounds - currentRound} rounds remaining`;
+
+      // Show "Last Round!" on final round instead of default text
+      if(currentRound === totalRounds){
+        roundCounter.textContent = "Last Round!";
+      } else {
+        roundCounter.textContent = `Round ${currentRound} of ${totalRounds} — ${totalRounds - currentRound} rounds remaining`;
+      }
+
       resultDiv.classList.add("hidden");
       correctDisplay.style.display = "none";
       inputArea.classList.add("hidden");
@@ -223,7 +281,6 @@
       createGrid();
       showGrid();
 
-      // Pick a random row or column to recall
       const isRow = Math.random() < 0.5;
       const index = Math.floor(Math.random() * 4);
       promptText = `${isRow ? "row" : "column"} ${index + 1}`;
@@ -233,7 +290,6 @@
       timeLeft = 60;
       timerSpan.textContent = timeLeft;
 
-      // Start countdown timer
       timer = setInterval(() => {
         timeLeft--;
         timerSpan.textContent = timeLeft;
@@ -271,7 +327,6 @@
       resultDiv.classList.remove("hidden");
       inputArea.classList.add("hidden");
 
-      // Show correct and user answers visually
       correctDisplay.style.display = "block";
       correctDisplay.innerHTML = `
         <strong>Correct sequence:</strong>
@@ -288,9 +343,15 @@
         nextBtn.classList.remove("hidden");
       } else {
         finalSummary.style.display = "block";
-        finalSummary.textContent = `Game over! Your total score: ${score} out of ${totalRounds*4}`;
+        finalSummary.innerHTML = `
+          Game over! Your total score: ${score} out of ${totalRounds * 4}.<br><br>
+          Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.
+        `;
         startBtn.textContent = "Play Again";
         startBtn.classList.remove("hidden");
+
+        // Tell Qualtrics the game is done, so it can show the Next button
+        window.parent.postMessage("showNext", "*");
       }
     }
 
@@ -331,4 +392,3 @@
   </script>
 </body>
 </html>
-
