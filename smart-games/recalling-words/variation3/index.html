@@ -660,15 +660,15 @@ if (elapsedTime >= SESSION_DURATION) {
         window.parent.postMessage("showNext", "*");
     }, 8000); // 8000 milliseconds = 8 seconds. Adjust this time as you see fit.
 
-} else {
-    // This part for continuing to the next round remains the same.
-    document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
-    setTimeout(() => {
-        resetGame();
-        startGame();
-    }, 5000);
+	} else {
+	    // This part for continuing to the next round remains the same.
+	    document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
+	    setTimeout(() => {
+	        resetGame();
+	        startGame();
+	    }, 5000);
+	}
 }
-
     function resetGame() {
         score = 0;
         currentWordIndex = 0;
