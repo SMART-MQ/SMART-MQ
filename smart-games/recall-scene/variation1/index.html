@@ -14,9 +14,19 @@
       padding: 0;
     }
 
+    #welcomeBanner {
+      background-color: #a8dadc;
+      color: black;
+      font-weight: bold;
+      padding: 20px;
+      font-size: 1.5em;
+      border-bottom: 4px solid #457b9d;
+      user-select: none;
+    }
+
     h1 {
       margin-top: 20px;
-      font-size: 1.4em; /* decreased font size */
+      font-size: 1.4em;
     }
 
     .game-area {
@@ -69,7 +79,7 @@
     }
 
     .message, #countdown {
-      font-size: 0.9em; /* decreased font size */
+      font-size: 0.9em;
       margin-top: 10px;
       color: #333;
     }
@@ -80,14 +90,14 @@
       color: black;
       padding: 10px 20px;
       margin: 20px 10px;
-      font-size: 0.9em; /* decreased font size */
+      font-size: 0.9em;
       border-radius: 10px;
       cursor: pointer;
     }
 
     input[type="text"] {
       padding: 8px;
-      font-size: 0.9em; /* decreased font size */
+      font-size: 0.9em;
       margin: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
@@ -107,7 +117,7 @@
       font-weight: bold;
       z-index: 1000;
       user-select: none;
-      font-size: 0.9em; /* decreased font size */
+      font-size: 0.9em;
     }
 
     #finalSummary {
@@ -118,9 +128,39 @@
       padding: 30px;
       display: none;
     }
+
+    .answer-display {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    .answer-display img {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      border: 2px solid transparent;
+    }
+
+    .answer-label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 1em;
+      color: #333;
+    }
+
+    /* Highlight unknown answers with red border */
+    .answer-display img.unknown {
+      border-color: red;
+      opacity: 0.6;
+    }
   </style>
 </head>
 <body>
+
+  <div id="welcomeBanner">Welcome to the SMART Memory Game!</div>
 
   <h1>SMART memory game</h1>
   <p>Look carefully and remember the pictures! You'll be asked to remember a specific row or column.</p>
@@ -160,7 +200,6 @@
       hat: "https://img.icons8.com/emoji/96/top-hat-emoji.png",
       star: "https://img.icons8.com/color/96/star.png",
       fish: "https://img.icons8.com/color/96/fish.png",
-      // pen changed back to original pen emoji image
       pen: "https://img.icons8.com/emoji/96/pen-emoji.png",
       leaf: "https://img.icons8.com/color/96/leaf.png",
       cake: "https://img.icons8.com/color/96/birthday-cake.png",
@@ -171,6 +210,7 @@
       moon: "https://img.icons8.com/emoji/96/crescent-moon-emoji.png"
     };
 
+    // Acceptable answer variants (lowercase)
     const acceptableAnswers = {
       apple: ["apple"],
       book: ["book"],
@@ -202,6 +242,7 @@
 
     const roundCounterEl = document.getElementById('roundCounter');
     const finalSummaryDiv = document.getElementById('finalSummary');
+    const welcomeBanner = document.getElementById('welcomeBanner');
 
     const startBtn = document.getElementById('startBtn');
     const nextBtn = document.getElementById('nextBtn');
@@ -228,6 +269,9 @@
     }
 
     function startGame() {
+      // Hide welcome banner
+      welcomeBanner.style.display = 'none';
+
       score = 0;
       round = 0;
       roundScores = [];
@@ -311,26 +355,71 @@
       }, 1000);
     }
 
+    function findObjectByAnswer(ans) {
+      ans = ans.toLowerCase();
+      for (const [key, variants] of Object.entries(acceptableAnswers)) {
+        if (variants.includes(ans)) return key;
+      }
+      return null;
+    }
+
     function checkAnswer() {
       clearInterval(answerTimer);
 
       const input = document.getElementById('answer').value.toLowerCase();
       const answers = input.split(',').map(s => s.trim()).filter(s => s.length > 0);
 
-      let roundScore = 0;
+      // Track which recall objects have been matched already
+      const matchedObjects = new Set();
 
-      recallObjects.forEach(obj => {
-        const possibleAnswers = acceptableAnswers[obj];
-        if (answers.some(a => possibleAnswers.includes(a))) {
-          roundScore++;
+      answers.forEach(answer => {
+        for (const obj of recallObjects) {
+          const possibleAnswers = acceptableAnswers[obj];
+          if (possibleAnswers.includes(answer) && !matchedObjects.has(obj)) {
+            matchedObjects.add(obj);
+            break;
+          }
         }
       });
+
+      const roundScore = matchedObjects.size;
 
       score += roundScore;
       roundScores.push(roundScore);
 
       const result = document.getElementById('result');
-      result.innerHTML = `<p>You scored <strong>${roundScore}</strong> points this round.</p>`;
+
+      // Show correct answer images in order
+      const correctAnswerImages = recallObjects.map(obj => {
+        const src = objectLibrary[obj];
+        return `<img src="${src}" alt="${obj}" title="${obj}">`;
+      }).join("");
+
+      // Show player's answer images in typed order, with red border for unknown or unmatched
+      const playerAnswerImages = answers.map(ans => {
+        const objKey = findObjectByAnswer(ans);
+        if (objKey) {
+          const src = objectLibrary[objKey];
+          // Highlight if that object wasn't part of the correct recall set (optional)
+          const isInRecall = recallObjects.includes(objKey);
+          return `<img src="${src}" alt="${ans}" title="${ans}" ${isInRecall ? '' : 'class="unknown"'}>`;
+        } else {
+          // Unknown answer - use a placeholder or a red-bordered question mark icon
+          return `<img src="https://img.icons8.com/ios/50/ff0000/question-mark.png" alt="unknown" title="Unknown answer" class="unknown">`;
+        }
+      }).join("");
+
+      result.innerHTML = `
+        <p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""} this round.</p>
+        <div>
+          <div class="answer-label">Correct answer:</div>
+          <div class="answer-display">${correctAnswerImages}</div>
+        </div>
+        <div style="margin-top: 12px;">
+          <div class="answer-label">Your answer:</div>
+          <div class="answer-display">${playerAnswerImages}</div>
+        </div>
+      `;
       result.classList.remove('hidden');
 
       document.getElementById('input-area').classList.add('hidden');
@@ -351,39 +440,26 @@
       document.getElementById('scene').classList.add('hidden');
       document.getElementById('curtain').classList.remove('active');
       document.getElementById('input-area').classList.add('hidden');
-      document.getElementById('viewingMessage').classList.add('hidden');
       document.getElementById('result').classList.add('hidden');
       nextBtn.classList.add('hidden');
-      startBtn.classList.add('hidden');
 
-      let summaryHTML = `<h2>🎉 Game Complete! 🎉</h2>`;
-      summaryHTML += `<p>Your total score is: <strong>${score}</strong></p>`;
-      summaryHTML += `<h3>Round Scores:</h3><ul>`;
-
-      let highestScore = 0;
-      let highestRound = 1;
-
-      for (let i = 0; i < roundScores.length; i++) {
-        const roundScore = roundScores[i];
-        if (roundScore > highestScore) {
-          highestScore = roundScore;
-          highestRound = i + 1;
-        }
-        summaryHTML += `<li>Round ${i + 1}: ${roundScore} points</li>`;
-      }
-      summaryHTML += `</ul>`;
-      summaryHTML += `<p>Your best round was round ${highestRound} with ${highestScore} points!</p>`;
-
-      summaryHTML += `<p>Thank you for playing the SMART memory game!</p>`;
-      summaryHTML += `<p>If you participated in a study, you may now close this window.</p>`;
-
-      finalSummaryDiv.innerHTML = summaryHTML;
       finalSummaryDiv.style.display = 'block';
 
-      // Tell Qualtrics the game is done, so it can show the Next button 
-      if (window.parent && window.parent.postMessage) {
-        window.parent.postMessage("showNext", "*");
-      }
+      const totalScore = score;
+      const averageScore = (score / totalRounds).toFixed(2);
+
+      finalSummaryDiv.innerHTML = `
+        <h2>Game Over!</h2>
+        <p>Your total score: <strong>${totalScore}</strong></p>
+        <p>Your average score per round: <strong>${averageScore}</strong></p>
+        <p>Thanks for playing the SMART Memory Game! 🎉</p>
+        <button id="playAgainBtn">Play Again</button>
+      `;
+
+      document.getElementById('playAgainBtn').addEventListener('click', () => {
+        finalSummaryDiv.style.display = 'none';
+        startBtn.classList.remove('hidden');
+      });
     }
   </script>
 </body>
