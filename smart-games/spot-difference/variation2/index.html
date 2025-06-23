@@ -28,12 +28,11 @@
       font-size: 2.6rem;
       margin-bottom: 10px;
     }
-    /* Updated style for round number */
     #roundNumber {
       font-size: 2.2rem;
       margin-bottom: 20px;
       font-weight: bold;
-      color: #e91e63; /* pink */
+      color: #e91e63;
     }
     .grid {
       display: grid;
@@ -148,6 +147,75 @@
       -webkit-user-select: none;
       touch-action: manipulation;
     }
+    #transitionMessage {
+      display: none;
+      font-size: 4rem;
+      font-weight: bold;
+      color: #e91e63;
+      margin: 40px 0;
+    }
+    .game-elements {
+      display: block;
+    }
+    .hidden {
+      display: none !important;
+    }
+    #roundPopup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: #f48fb1;
+      color: white;
+      font-weight: bold;
+      font-size: 6rem;
+      padding: 40px 80px;
+      border-radius: 20px;
+      box-shadow: 0 0 30px #f48fb1;
+      z-index: 10000;
+      user-select: none;
+      opacity: 0;
+      animation-fill-mode: forwards;
+    }
+    @keyframes popInOut {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+      }
+      40% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+      }
+      60% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+      }
+    }
+    #summaryTable {
+      width: 100%;
+      max-width: 400px;
+      margin: 30px auto 0;
+      border-collapse: collapse;
+      background-color: #f8bbd0;
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 1.8rem;
+    }
+    #summaryTable th,
+    #summaryTable td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #f48fb1;
+    }
+    #summaryTable th {
+      background-color: #f48fb1;
+      color: white;
+      font-weight: bold;
+    }
     @media (max-width: 480px) {
       body {
         font-size: 2rem;
@@ -170,6 +238,20 @@
         font-size: 2rem;
         padding: 18px 36px;
       }
+      #transitionMessage {
+        font-size: 3.2rem;
+      }
+      #roundPopup {
+        font-size: 4rem;
+        padding: 25px 50px;
+      }
+      #summaryTable {
+        font-size: 1.6rem;
+      }
+      #summaryTable th,
+      #summaryTable td {
+        padding: 10px;
+      }
     }
   </style>
 </head>
@@ -189,16 +271,31 @@
 
   <div id="game" style="display: none;">
     <h1>Spot the Difference</h1>
-    <div id="roundNumber"></div>
-    <div id="roundInfo"></div>
-    <div class="grid" id="emojiGrid"></div>
-    <div id="timer"></div>
-    <div id="message"></div>
+    <div id="gameUI" class="game-elements">
+      <div id="roundNumber"></div>
+      <div id="roundInfo"></div>
+      <div id="emojiGrid" class="grid"></div>
+      <div id="timer"></div>
+      <div id="message"></div>
+    </div>
+    <div id="transitionMessage">Now, spot the difference!</div>
   </div>
+
+  <div id="roundPopup"></div>
 
   <div id="end" style="display: none;">
     <h1>Well done!</h1>
     <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
+    <table id="summaryTable">
+      <thead>
+        <tr>
+          <th>Round</th>
+          <th>Correct</th>
+          <th>Incorrect</th>
+        </tr>
+      </thead>
+      <tbody id="summaryBody"></tbody>
+    </table>
   </div>
 
   <div id="countdownOverlay">
@@ -214,60 +311,51 @@
       { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 90 },
       { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 70 },
       { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 70 },
-      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 90 }, // updated
-      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 90 }, // updated
-      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 70 }, // updated
-      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 70 }  // updated
+      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 90 },
+      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 90 },
+      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 70 },
+      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 70 }
     ];
 
     let currentRound = 0;
-    let originalGrid = [], modifiedGrid = [], selectedIndices = [], changedIndices = [];
-    let countdownInterval, lastDifferences = 0;
+    let originalGrid = [], modifiedGrid = [], changedIndices = [];
+    let foundDifferences = new Set();
+    const roundResults = [];
 
     const gridElement = document.getElementById('emojiGrid');
     const timerElement = document.getElementById('timer');
     const messageElement = document.getElementById('message');
     const roundInfoElement = document.getElementById('roundInfo');
     const roundNumberElement = document.getElementById('roundNumber');
+    const transitionMessage = document.getElementById('transitionMessage');
+    const gameUI = document.getElementById('gameUI');
+    const roundPopup = document.getElementById('roundPopup');
+    const summaryBody = document.getElementById('summaryBody');
 
     function renderGrid(grid, columns, cellSize, clickable = false) {
       gridElement.innerHTML = '';
       gridElement.className = 'grid';
       gridElement.style.justifyContent = 'center';
       gridElement.style.maxWidth = '';
-
       const gap = (currentRound >= 6) ? '15px 15px' : '25px 25px';
       gridElement.style.gap = gap;
-
+      gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
       if (currentRound === 6 || currentRound === 7) {
-        gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
         gridElement.style.gridAutoRows = `${cellSize + 30}px`;
-        grid.forEach((emoji, i) => {
-          const cell = document.createElement('div');
-          cell.className = 'cell';
-          cell.textContent = emoji;
-          cell.style.width = `${cellSize}px`;
-          cell.style.height = `${cellSize}px`;
-          cell.style.fontSize = `${cellSize * 0.6}px`;
-          if (clickable) cell.addEventListener('click', () => handleSelect(i, cell));
-          if (i === 9) cell.style.gridColumnStart = 2;
-          gridElement.appendChild(cell);
-        });
       } else {
-        gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
         gridElement.style.maxWidth = `${columns * (cellSize + 30)}px`;
-        grid.forEach((emoji, i) => {
-          const cell = document.createElement('div');
-          cell.className = 'cell';
-          cell.textContent = emoji;
-          cell.style.width = `${cellSize}px`;
-          cell.style.height = `${cellSize}px`;
-          cell.style.fontSize = `${cellSize * 0.6}px`;
-          if (clickable) cell.addEventListener('click', () => handleSelect(i, cell));
-          gridElement.appendChild(cell);
-        });
       }
-
+      grid.forEach((emoji, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.textContent = emoji;
+        cell.style.width = `${cellSize}px`;
+        cell.style.height = `${cellSize}px`;
+        cell.style.fontSize = `${cellSize * 0.6}px`;
+        if (clickable) cell.addEventListener('click', () => handleSelect(i, cell));
+        if ((currentRound === 6 || currentRound === 7) && i === 9) cell.style.gridColumnStart = 2;
+        gridElement.appendChild(cell);
+      });
       gridElement.classList.toggle('guessing', clickable);
     }
 
@@ -291,18 +379,15 @@
     function displayRoundIntro(round, callback) {
       gridElement.innerHTML = '';
       roundNumberElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`;
-      roundInfoElement.textContent = (round.differences !== lastDifferences)
-        ? `This time there will be ${round.differences} difference${round.differences > 1 ? 's' : ''} to spot.`
-        : '';
-      lastDifferences = round.differences;
+      roundInfoElement.textContent = `This time there will be ${round.differences} difference${round.differences > 1 ? 's' : ''} to spot.`;
       timerElement.textContent = '';
-      messageElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`;
+      messageElement.textContent = '';
       setTimeout(callback, 2000);
     }
 
     function startCountdown(seconds, onComplete) {
       timerElement.textContent = `Memorize this! ${seconds} seconds remaining`;
-      countdownInterval = setInterval(() => {
+      const countdownInterval = setInterval(() => {
         seconds--;
         timerElement.textContent = `Memorize this! ${seconds} seconds remaining`;
         if (seconds <= 0) {
@@ -312,85 +397,99 @@
       }, 1000);
     }
 
+    function showRoundPopup(text, callback) {
+      roundPopup.textContent = text;
+      roundPopup.style.animation = 'popInOut 2s forwards';
+      roundPopup.style.display = 'block';
+      roundPopup.addEventListener('animationend', () => {
+        roundPopup.style.display = 'none';
+        callback();
+      }, { once: true });
+    }
+
     function startRound() {
       const round = rounds[currentRound];
-      selectedIndices = [];
-      displayRoundIntro(round, () => {
-        messageElement.textContent = '';
-        originalGrid = Array.from({ length: round.gridSize }, () =>
-          animalEmojis[Math.floor(Math.random() * animalEmojis.length)]
-        );
-        renderGrid(originalGrid, round.columns, round.cellSize, false);
-        startCountdown(round.time, () => {
-          const result = modifyGrid(originalGrid, round.differences);
-          modifiedGrid = result.newGrid;
-          changedIndices = result.changedIndices;
-          // Updated spot difference message based on singular/plural
-          if (round.differences === 1) {
-            messageElement.textContent = 'Now, spot the difference!';
-          } else {
-            messageElement.textContent = `Now, spot the ${round.differences} differences!`;
-          }
-          setTimeout(() => {
-            messageElement.textContent = '';
-            renderGrid(modifiedGrid, round.columns, round.cellSize, true);
-            timerElement.textContent = `Find the difference${round.differences > 1 ? 's' : ''}!`;
-          }, 2000);
+      foundDifferences = new Set();
+      showRoundPopup(`Round ${currentRound + 1} of ${rounds.length}`, () => {
+        displayRoundIntro(round, () => {
+          messageElement.textContent = '';
+          originalGrid = Array.from({ length: round.gridSize }, () =>
+            animalEmojis[Math.floor(Math.random() * animalEmojis.length)]
+          );
+          renderGrid(originalGrid, round.columns, round.cellSize, false);
+          startCountdown(round.time, () => {
+            const result = modifyGrid(originalGrid, round.differences);
+            modifiedGrid = result.newGrid;
+            changedIndices = result.changedIndices;
+            gameUI.classList.add('hidden');
+            transitionMessage.style.display = 'block';
+            setTimeout(() => {
+              transitionMessage.style.display = 'none';
+              gameUI.classList.remove('hidden');
+              renderGrid(modifiedGrid, round.columns, round.cellSize, true);
+              timerElement.textContent = `Find the difference${round.differences > 1 ? 's' : ''}!`;
+              messageElement.textContent = '';
+            }, 3000);
+          });
         });
       });
     }
 
     function handleSelect(index, cell) {
-      if (selectedIndices.includes(index)) return;
-      selectedIndices.push(index);
-      const marker = document.createElement('div');
-      marker.className = 'marker';
-      marker.textContent = changedIndices.includes(index) ? '✅' : '❌';
-      cell.appendChild(marker);
-      if (selectedIndices.length === rounds[currentRound].differences) {
-        if (selectedIndices.every(i => changedIndices.includes(i))) {
-          messageElement.textContent = '🎉 Good job!';
-        }
-        setTimeout(() => {
-          currentRound++;
-          if (currentRound < rounds.length) {
-            startRound();
-          } else {
-            document.getElementById('game').style.display = 'none';
-            document.getElementById('end').style.display = 'flex';
-            // Tell Qualtrics the game is done, so it can show the Next button
-            window.parent.postMessage("showNext", "*");
+      if (cell.querySelector('.marker')) return;
+      if (changedIndices.includes(index)) {
+        if (!foundDifferences.has(index)) {
+          foundDifferences.add(index);
+          const marker = document.createElement('div');
+          marker.className = 'marker';
+          marker.textContent = '✅';
+          cell.appendChild(marker);
+          messageElement.textContent = `Correct! ${foundDifferences.size} of ${rounds[currentRound].differences} found.`;
+          if (foundDifferences.size === rounds[currentRound].differences) {
+            messageElement.textContent = '🎉 Great job! Moving to next round...';
+            const totalCorrect = foundDifferences.size;
+            const totalIncorrect = document.querySelectorAll('.marker').length - totalCorrect;
+            roundResults.push({ round: currentRound + 1, correct: totalCorrect, incorrect: totalIncorrect });
+            setTimeout(() => {
+              currentRound++;
+              if (currentRound < rounds.length) {
+                startRound();
+              } else {
+                showSummaryTable();
+                document.getElementById('game').style.display = 'none';
+                document.getElementById('end').style.display = 'flex';
+              }
+            }, 2000);
           }
-        }, 2000);
+        }
+      } else {
+        const marker = document.createElement('div');
+        marker.className = 'marker';
+        marker.textContent = '❌';
+        cell.appendChild(marker);
+        messageElement.textContent = 'Try again!';
       }
     }
 
-    function showCountdown(callback) {
-      const overlay = document.getElementById('countdownOverlay');
-      const text = document.getElementById('countdownText');
-      const sequence = ['3', '2', '1', 'GO!'];
-      let index = 0;
-      overlay.style.display = 'flex';
-      text.textContent = sequence[index];
-      const interval = setInterval(() => {
-        index++;
-        if (index < sequence.length) {
-          text.textContent = sequence[index];
-        } else {
-          clearInterval(interval);
-          overlay.style.display = 'none';
-          callback();
-        }
-      }, 1000);
+    function showSummaryTable() {
+      summaryBody.innerHTML = '';
+      roundResults.forEach(result => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>Round ${result.round}</td>
+          <td>${result.correct}</td>
+          <td>${result.incorrect}</td>
+        `;
+        summaryBody.appendChild(row);
+      });
     }
 
     function startGame() {
       document.getElementById('cover').style.display = 'none';
-      showCountdown(() => {
-        document.getElementById('game').style.display = 'block';
-        startRound();
-      });
+      document.getElementById('game').style.display = 'block';
+      startRound();
     }
   </script>
 </body>
 </html>
+
