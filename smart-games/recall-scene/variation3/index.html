@@ -17,7 +17,8 @@
 
     h1 {
       margin-top: 20px;
-      font-size: 24px; /* Slightly smaller font for mobile */
+      font-size: 22px; /* Adjusted font size for mobile */
+      padding: 0 10px;
     }
 
     .game-area {
@@ -26,11 +27,22 @@
       position: relative;
     }
 
+    /* Moved instructions and countdown to the top of the page */
+    #topInfo {
+      background-color: #a8dadc;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
       margin-top: 20px;
+      max-width: 100%;
     }
 
     .cell {
@@ -44,6 +56,7 @@
       font-size: 14px; /* Smaller text for mobile */
       font-weight: bold;
       overflow: hidden;
+      box-sizing: border-box;
     }
 
     .hidden {
@@ -51,7 +64,7 @@
     }
 
     .message {
-      font-size: 16px; /* Slightly smaller font size for mobile */
+      font-size: 16px; /* Adjusted font size for mobile */
       margin-top: 10px;
       line-height: 1.5;
     }
@@ -81,7 +94,7 @@
 
     #roundCounter {
       position: fixed;
-      bottom: 10px;
+      top: 10px;
       left: 10px;
       background: #a8dadc;
       padding: 8px 12px;
@@ -129,7 +142,7 @@
       font-size: 14px; /* Adjust font size to fit text on mobile */
     }
 
-    #welcomeMessage {
+    #infoBanner {
       font-size: 18px;
       margin-top: 20px;
       padding: 20px;
@@ -141,21 +154,18 @@
   </style>
 </head>
 <body>
-  <h1>🧠 Word Memory Game 🧠</h1>
-  <p>Memorize the words in the grid! You'll be asked to recall a specific row or column.</p>
-
-  <!-- Welcome Message Section -->
-  <div id="welcomeMessage">
+  <div id="infoBanner">
     Welcome to the SMART Memory Game! Let's test your memory skills.
   </div>
 
-  <div id="roundCounter" class="message">Round 0 of 5 — 5 rounds remaining</div>
+  <div id="topInfo" class="message">
+    <span id="roundCounter">Round 0 of 5 — 5 rounds remaining</span>
+    <p id="prompt" class="hidden">Remember the words in the row/column...</p>
+    <p id="countdown" class="hidden">⏳ Time left to remember: <span id="timer">60</span> seconds</p>
+  </div>
 
   <div class="game-area">
     <div id="grid" class="grid"></div>
-    <p id="prompt" class="message hidden"></p>
-    <p id="countdown" class="message hidden">⏳ Time left to remember: <span id="timer">60</span> seconds</p>
-
     <div id="input-area" class="hidden">
       <p>Type the words in order (like "dog, cat, bird"):</p>
       <input type="text" id="answer" placeholder="e.g. dog, cat, bird" autocomplete="off"/>
@@ -186,6 +196,8 @@
     const nextBtn = document.getElementById("next");
     const roundCounter = document.getElementById("roundCounter");
     const finalSummary = document.getElementById("finalSummary");
+    const infoBanner = document.getElementById("infoBanner");
+    const topInfo = document.getElementById("topInfo");
 
     let currentRound = 0;
     let grid = [];
@@ -247,20 +259,13 @@
       if (currentRound === totalRounds) {
         roundCounter.textContent = "Last Round!";
       } else {
-        roundCounter.textContent = `Round ${currentRound} of ${totalRounds} — ${totalRounds - currentRound} rounds remaining`;
+        roundCounter.textContent = `Round ${currentRound} of ${totalRounds}`;
       }
-      resultDiv.classList.add("hidden");
-      correctDisplay.style.display = "none";
-      inputArea.classList.add("hidden");
-      answerInput.value = "";
-      promptP.classList.remove("hidden");
-      countdownP.classList.remove("hidden");
-      nextBtn.classList.add("hidden");
 
       createGrid();
       showGrid();
 
-      const isRow = Math.random() < 0.5;
+      const isRow = Math.random() > 0.5;
       const index = Math.floor(Math.random() * 4);
       promptText = `${isRow ? "row" : "column"} ${index + 1}`;
       recallSet = isRow ? grid[index] : grid.map(r => r[index]);
@@ -278,6 +283,7 @@
         }
       }, 1000);
 
+      infoBanner.style.display = "none"; // Hide the initial banner after game starts
       startBtn.classList.add("hidden");
     }
 
