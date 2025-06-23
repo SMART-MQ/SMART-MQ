@@ -120,7 +120,7 @@
       align-items: center;
       font-size: 8rem;
       font-weight: bold;
-      color: #c2185b;
+      color: #e91e63;
     }
     #transitionMessage {
       display: none;
@@ -168,7 +168,6 @@
       background-color: #f48fb1;
       color: white;
     }
-
     @media (max-width: 480px) {
       .cell {
         width: 60px !important;
@@ -192,7 +191,7 @@
 
   <div id="game" style="display: none;">
     <h1>Spot the Difference</h1>
-    <div id="gameUI" class="game-elements">
+    <div id="gameUI">
       <div id="roundNumber"></div>
       <div id="roundInfo"></div>
       <div id="emojiGrid" class="grid"></div>
@@ -250,6 +249,28 @@
     const gameUI = document.getElementById('gameUI');
     const roundPopup = document.getElementById('roundPopup');
     const summaryBody = document.getElementById('summaryBody');
+    const cover = document.getElementById('cover');
+    const game = document.getElementById('game');
+    const end = document.getElementById('end');
+    const countdownOverlay = document.getElementById('countdownOverlay');
+    const countdownText = document.getElementById('countdownText');
+
+    function showStartCountdown(callback) {
+      const steps = ["3", "2", "1", "GO!"];
+      let i = 0;
+      countdownOverlay.style.display = "flex";
+      countdownText.textContent = steps[i];
+      const interval = setInterval(() => {
+        i++;
+        if (i < steps.length) {
+          countdownText.textContent = steps[i];
+        } else {
+          clearInterval(interval);
+          countdownOverlay.style.display = "none";
+          callback();
+        }
+      }, 800);
+    }
 
     function renderGrid(grid, columns, cellSize, clickable = false) {
       gridElement.innerHTML = '';
@@ -365,8 +386,8 @@
                 startRound();
               } else {
                 showSummaryTable();
-                document.getElementById('game').style.display = 'none';
-                document.getElementById('end').style.display = 'flex';
+                game.style.display = 'none';
+                end.style.display = 'flex';
               }
             }, 2000);
           }
@@ -384,19 +405,17 @@
       summaryBody.innerHTML = '';
       roundResults.forEach(result => {
         const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>Round ${result.round}</td>
-          <td>${result.correct}</td>
-          <td>${result.incorrect}</td>
-        `;
+        row.innerHTML = `<td>Round ${result.round}</td><td>${result.correct}</td><td>${result.incorrect}</td>`;
         summaryBody.appendChild(row);
       });
     }
 
     function startGame() {
-      document.getElementById('cover').style.display = 'none';
-      document.getElementById('game').style.display = 'block';
-      startRound();
+      cover.style.display = 'none';
+      showStartCountdown(() => {
+        game.style.display = 'block';
+        startRound();
+      });
     }
   </script>
 </body>
