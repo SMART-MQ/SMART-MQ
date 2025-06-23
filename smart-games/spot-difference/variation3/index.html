@@ -428,6 +428,14 @@
     function showCongratsMessage() {
       let totalCorrect = roundResults.reduce((sum, r) => sum + r.correct, 0);
       congratsMessage.textContent = `Congratulations, you correctly spotted ${totalCorrect} difference${totalCorrect !== 1 ? 's' : ''}!`;
+      
+      // Notify Qualtrics that game is done and enable Next button:
+      notifyQualtricsGameDone();
+    }
+
+    function notifyQualtricsGameDone() {
+      // Send message to Qualtrics parent frame to show Next button
+      window.parent.postMessage("showNext", "*");
     }
 
     function startGame() {
