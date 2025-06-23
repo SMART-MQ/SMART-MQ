@@ -401,7 +401,7 @@
 <!-- ADD THIS NEW DIV RIGHT AFTER YOUR #result DIV -->
 <div id="end-page-container" class="info-page-container hidden">
     <h2>Thank you for participating!</h2>
-    <p>Your game is now over. Please head back to the survey to finish it and receive your $2.5 in your SMART bank account!</p>
+    <p>Your game is now over. Please head back to the survey to finish it and receive your $2.50 in your SMART bank account!</p>
 </div>
 
 <script>
@@ -474,7 +474,7 @@
 
         // Update UI with difficulty info
         document.getElementById('game-heading').textContent = `Memorize these words! (${currentDifficulty.name})`;
-        document.getElementById('words-list').style.gridTemplateColumns = `3, 1fr)`;
+        document.getElementById('words-list').style.gridTemplateColumns = 'repeat (3, 1fr)';
 
         updateWordHistory();
         
@@ -660,13 +660,14 @@ if (elapsedTime >= SESSION_DURATION) {
         window.parent.postMessage("showNext", "*");
     }, 8000); // 8000 milliseconds = 8 seconds. Adjust this time as you see fit.
 
-} else {
-    // This part for continuing to the next round remains the same.
-    document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
-    setTimeout(() => {
-        resetGame();
-        startGame();
-    }, 5000);
+	} else {
+	    // This part for continuing to the next round remains the same.
+	    document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
+	    setTimeout(() => {
+	        resetGame();
+	        startGame();
+	    }, 5000);
+	}
 }
 
     function resetGame() {
