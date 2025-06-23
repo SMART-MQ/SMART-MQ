@@ -27,6 +27,7 @@
       max-width: 100%;
       width: 100%;
       box-sizing: border-box;
+      margin-bottom: 10px;
     }
     h1 {
       font-size: 6vw;
@@ -136,6 +137,12 @@
       color: #333;
       margin-top: 20px;
     }
+    #gameInstructionLine {
+      font-size: 4vw;
+      margin: 10px 0 30px;
+      color: #333;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -169,6 +176,8 @@
     <div class="button-container" id="buttonContainer"></div>
   </div>
 
+  <p id="gameInstructionLine">Repeat the pattern shown.</p>
+
   <div id="timerBox">10:00</div>
 
   <div id="finalPopup">
@@ -184,13 +193,8 @@
 
   <script>
     const colors = ["#ffb3ba", "#bae1ff", "#ffffba", "#baffc9"];
-    let sequence = [];
-    let userSequence = [];
-    let buttons = [];
-    let score = 0;
-    let best = 0;
-    let timeLeft = 600;
-    let timer;
+    let sequence = [], userSequence = [], buttons = [];
+    let score = 0, best = 0, timeLeft = 600, timer;
 
     function showInstructions() {
       document.getElementById("startScreen").style.display = "none";
@@ -200,6 +204,7 @@
     function startGame() {
       document.getElementById("instructionModal").style.display = "none";
       document.getElementById("gameArea").style.display = "block";
+      document.getElementById("gameInstructionLine").style.display = "block";
       score = 0;
       sequence = [];
       userSequence = [];
@@ -293,7 +298,10 @@
     function showFinalPopup() {
       document.getElementById("finalMessage").textContent = `Your personal best was: ${best}`;
       document.getElementById("finalPopup").style.display = "flex";
+      // ✅ Notify Qualtrics that the game is finished
+      window.parent.postMessage("showNext", "*");
     }
   </script>
 </body>
 </html>
+
