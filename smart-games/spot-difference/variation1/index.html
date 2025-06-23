@@ -116,6 +116,13 @@
       font-weight: bold;
       box-shadow: 0 0 10px #f48fb1;
     }
+    #end #extraMessage {
+      font-size: 1.6rem;
+      max-width: 320px;
+      margin-top: 10px;
+      color: #880e4f;
+      font-weight: bold;
+    }
     #countdownOverlay {
       display: none;
       position: fixed;
@@ -196,6 +203,7 @@
   <div id="end" style="display: none;">
     <h1>Well done!</h1>
     <p id="congratsMessage"></p>
+    <p id="extraMessage">Now, finish the survey and you will have earned an extra $2.50 for your SMART bank</p>
   </div>
 
   <div id="countdownOverlay"><div id="countdownText"></div></div>
@@ -397,7 +405,7 @@
                 showCongratsMessage();
                 game.style.display = 'none';
                 end.style.display = 'flex';
-                window.parent.postMessage("showNext", "*"); // ✅ Let Qualtrics know the game is done
+                window.parent.postMessage("showNext", "*"); // Tell Qualtrics game is done
               }
             }, 2000);
           }
