@@ -39,6 +39,8 @@
       justify-content: center;
       margin: 0 auto 20px;
       user-select: none;
+      /* Ensure grid container is centered */
+      max-width: max-content;
     }
     .grid.guessing .cell:hover {
       transform: scale(1.05);
@@ -277,26 +279,21 @@
       gridElement.innerHTML = '';
       gridElement.className = 'grid';
       gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+      gridElement.style.justifyContent = 'center';
+      gridElement.style.margin = '0 auto';
+      gridElement.style.columnGap = '15px';
 
-      // Fix alignment for rounds 1 and 2: bring columns closer and center properly
+      // Adjust column gap and ensure centering for specific rounds
       if (currentRound === 0 || currentRound === 1) {
-        gridElement.style.justifyContent = 'center';
-        gridElement.style.columnGap = '20px';  // reduced gap to bring columns closer
-        gridElement.style.marginLeft = 'auto';
-        gridElement.style.marginRight = 'auto';
+        gridElement.style.columnGap = '20px'; // bring columns closer
       }
-      // Fix alignment for rounds 3 and 4: center properly with default gap
-      else if (currentRound === 2 || currentRound === 3) {
+      if (currentRound === 6 || currentRound === 7) {
         gridElement.style.justifyContent = 'center';
+        gridElement.style.margin = '0 auto';
         gridElement.style.columnGap = '15px';
-        gridElement.style.marginLeft = 'auto';
-        gridElement.style.marginRight = 'auto';
       }
-      else {
-        gridElement.style.justifyContent = 'center';
+      if (currentRound === 2 || currentRound === 3) {
         gridElement.style.columnGap = '15px';
-        gridElement.style.marginLeft = '';
-        gridElement.style.marginRight = '';
       }
 
       grid.forEach((emoji, i) => {
