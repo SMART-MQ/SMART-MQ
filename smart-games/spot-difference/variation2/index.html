@@ -120,7 +120,14 @@
       font-weight: bold;
       max-width: 320px;
       box-shadow: 0 0 20px #f48fb1;
+      margin: 0 auto 20px;
+    }
+    #finishMessage {
+      font-size: 1.6rem;
+      color: #c2185b;
+      max-width: 320px;
       margin: 0 auto;
+      font-weight: 600;
     }
     #countdownOverlay {
       display: none;
@@ -201,8 +208,8 @@
 
   <div id="end" style="display: none;">
     <h1>Well done!</h1>
-    <p>Now, finish the survey to earn $2.50 for your SMART bank.</p>
     <div id="congratsBox"></div>
+    <p id="finishMessage">Now, finish the survey and you will have earned an extra $2.50 for your SMART bank</p>
   </div>
 
   <div id="countdownOverlay"><div id="countdownText"></div></div>
