@@ -33,14 +33,17 @@
       font-weight: bold;
       color: #e91e63;
     }
+    /* New wrapper for emoji grid centering */
+    #emojiGridWrapper {
+      display: flex;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
     .grid {
       display: grid;
       gap: 15px 15px;
-      justify-content: center;
-      margin: 0 auto 20px;
+      /* Remove margin and width here for better centering */
       user-select: none;
-      /* added to help centering */
-      /* width will be set dynamically per round in JS */
     }
     .grid.guessing .cell:hover {
       transform: scale(1.05);
@@ -197,7 +200,10 @@
     <div id="gameUI">
       <div id="roundNumber"></div>
       <div id="roundInfo"></div>
-      <div id="emojiGrid" class="grid"></div>
+      <!-- Wrapper added to center grid -->
+      <div id="emojiGridWrapper">
+        <div id="emojiGrid" class="grid"></div>
+      </div>
       <div id="timer"></div>
       <div id="message"></div>
     </div>
@@ -279,20 +285,9 @@
       gridElement.innerHTML = '';
       gridElement.className = 'grid';
       gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-
-      // Center the grid container width precisely for specific rounds
-      const centerRounds = [0,1,2,3,6,7]; // zero-based indices for rounds 1,2,3,4,7,8
-      if (centerRounds.includes(currentRound)) {
-        // Calculate width = columns * (cellSize + gap) - gap
-        const gap = 15; // as per CSS
-        const width = columns * cellSize + (columns -1)*gap;
-        gridElement.style.width = `${width}px`;
-        gridElement.style.margin = '0 auto 20px';
-      } else {
-        // For other rounds, remove fixed width so it can expand naturally
-        gridElement.style.width = '';
-        gridElement.style.margin = '0 auto 20px';
-      }
+      // Remove fixed width and margin to allow natural centering via wrapper flexbox
+      gridElement.style.width = '';
+      gridElement.style.margin = '';
 
       grid.forEach((emoji, i) => {
         const cell = document.createElement('div');
@@ -438,3 +433,4 @@
   </script>
 </body>
 </html>
+
