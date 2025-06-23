@@ -107,9 +107,20 @@
     }
     #end p {
       font-size: 1.4rem;
-      margin: 10px 0;
+      margin: 10px 0 20px 0;
       max-width: 280px;
       line-height: 1.3;
+    }
+    #congratsBox {
+      background-color: #f48fb1;
+      color: white;
+      border-radius: 15px;
+      padding: 25px 40px;
+      font-size: 2rem;
+      font-weight: bold;
+      max-width: 320px;
+      box-shadow: 0 0 20px #f48fb1;
+      margin: 0 auto;
     }
     #countdownOverlay {
       display: none;
@@ -153,24 +164,6 @@
       60% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
       100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
     }
-    #summaryTable {
-      width: 100%;
-      max-width: 300px;
-      border-collapse: collapse;
-      background-color: #f8bbd0;
-      border-radius: 10px;
-      overflow: hidden;
-      font-size: 1.4rem;
-    }
-    #summaryTable th, #summaryTable td {
-      padding: 8px;
-      text-align: center;
-      border-bottom: 1px solid #f48fb1;
-    }
-    #summaryTable th {
-      background-color: #f48fb1;
-      color: white;
-    }
     @media (max-width: 480px) {
       .cell {
         width: 60px !important;
@@ -209,16 +202,7 @@
   <div id="end" style="display: none;">
     <h1>Well done!</h1>
     <p>Now, finish the survey to earn $2.50 for your SMART bank.</p>
-    <table id="summaryTable">
-      <thead>
-        <tr>
-          <th>Round</th>
-          <th>Correct</th>
-          <th>Incorrect</th>
-        </tr>
-      </thead>
-      <tbody id="summaryBody"></tbody>
-    </table>
+    <div id="congratsBox"></div>
   </div>
 
   <div id="countdownOverlay"><div id="countdownText"></div></div>
@@ -228,14 +212,14 @@
     const rounds = [
       { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 },
       { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 },
-      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 90 },
-      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 90 },
-      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 70 },
-      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 70 },
-      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 90 },
-      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 90 },
-      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 70 },
-      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 70 }
+      { gridSize: 6, time: 30, differences: 2, columns: 3, cellSize: 90 },
+      { gridSize: 6, time: 30, differences: 2, columns: 3, cellSize: 90 },
+      { gridSize: 8, time: 45, differences: 3, columns: 4, cellSize: 70 },
+      { gridSize: 8, time: 45, differences: 3, columns: 4, cellSize: 70 },
+      { gridSize: 10, time: 60, differences: 3, columns: 3, cellSize: 90 },
+      { gridSize: 10, time: 60, differences: 3, columns: 3, cellSize: 90 },
+      { gridSize: 12, time: 60, differences: 4, columns: 4, cellSize: 70 },
+      { gridSize: 12, time: 60, differences: 4, columns: 4, cellSize: 70 }
     ];
 
     let currentRound = 0;
@@ -257,6 +241,7 @@
     const end = document.getElementById('end');
     const countdownOverlay = document.getElementById('countdownOverlay');
     const countdownText = document.getElementById('countdownText');
+    const congratsBox = document.getElementById('congratsBox');
 
     function showStartCountdown(callback) {
       const steps = ["3", "2", "1", "GO!"];
@@ -421,7 +406,7 @@
               if (currentRound < rounds.length) {
                 startRound();
               } else {
-                showSummaryTable();
+                showCongratsMessage();
                 game.style.display = 'none';
                 end.style.display = 'flex';
               }
@@ -437,13 +422,9 @@
       }
     }
 
-    function showSummaryTable() {
-      summaryBody.innerHTML = '';
-      roundResults.forEach(result => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>Round ${result.round}</td><td>${result.correct}</td><td>${result.incorrect}</td>`;
-        summaryBody.appendChild(row);
-      });
+    function showCongratsMessage() {
+      let totalCorrectDifferences = roundResults.reduce((acc, r) => acc + r.correct, 0);
+      congratsBox.textContent = `Congratulations, you correctly spotted ${totalCorrectDifferences} difference${totalCorrectDifferences !== 1 ? 's' : ''}!`;
     }
 
     function startGame() {
