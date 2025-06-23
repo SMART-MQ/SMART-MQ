@@ -369,11 +369,11 @@
     <h2>How to Play</h2>
     <ul>
         <!-- MODIFIED: Updated instructions -->
-        <li>The game has three difficulties: Easy, Medium, and Hard. You will play 3 rounds of each before moving to the next.</li>
-        <li>In each round, memorize the words you see.</li>
-        <li>You will then be shown a series of words, one by one.</li>
+        <li>The game has three difficulties: Easy, Medium, and Hard. You get to play 3 rounds of each before moving to the next.</li>
+        <li>In each round, memorise the words you see.</li>
+        <li>You will then begin to see a series of words, one by one.</li>
     <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
-        <li>The session lasts for 10 minutes. Try to get the best score in each difficulty!</li>
+        <li>You get 10 minutes to play. Try to get the best score in each difficulty!</li>
     </ul>
     <div class="info-button-group">
         <button class="recall-button" onclick="showWelcomePage()">Back</button>
@@ -382,7 +382,7 @@
 </div>
 
 <div id="game-container" class="hidden">
-    <h2 id="game-heading">Memorize these words!</h2>
+    <h2 id="game-heading">Memorise these words!</h2>
     <div id="words-list"></div>
     <p id="timer">Time left: <span id="time-left">15</span> seconds</p>
 </div>
@@ -472,7 +472,7 @@
         }
 
         // Update UI with difficulty info
-        document.getElementById('game-heading').textContent = `Memorize these words! (${currentDifficulty.name})`;
+        document.getElementById('game-heading').textContent = `Memorise these words! (${currentDifficulty.name})`;
         document.getElementById('words-list').style.gridTemplateColumns = `repeat(3, 1fr)`;
 
         updateWordHistory();
