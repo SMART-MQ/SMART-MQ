@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Word Memory Game</title>
   <style>
     body {
@@ -12,15 +12,17 @@
       text-align: center;
       margin: 0;
       padding: 0;
+      overflow-x: hidden;
     }
 
     h1 {
       margin-top: 20px;
+      font-size: 24px; /* Slightly smaller font for mobile */
     }
 
     .game-area {
       margin: 20px auto;
-      max-width: 600px;
+      max-width: 90%; /* Max width to ensure it's not too wide on small screens */
       position: relative;
     }
 
@@ -32,15 +34,16 @@
     }
 
     .cell {
-      width: 90px;
-      height: 90px;
+      width: 100%;
+      padding-top: 100%; /* Maintain square aspect ratio */
       border-radius: 10px;
       background-color: #ffffff;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 18px;
+      font-size: 14px; /* Smaller text for mobile */
       font-weight: bold;
+      overflow: hidden;
     }
 
     .hidden {
@@ -48,28 +51,32 @@
     }
 
     .message {
-      font-size: 18px;
+      font-size: 16px; /* Slightly smaller font size for mobile */
       margin-top: 10px;
+      line-height: 1.5;
     }
 
     button {
       background-color: #a8dadc;
       border: none;
       color: black;
-      padding: 10px 20px;
-      margin: 20px 10px;
+      padding: 12px 20px;
+      margin: 15px 10px;
       font-size: 16px;
       border-radius: 10px;
       cursor: pointer;
+      width: 80%; /* Ensure buttons are wide enough on mobile */
+      max-width: 300px; /* Limit max button size */
     }
 
     input[type="text"] {
-      padding: 8px;
+      padding: 12px;
       font-size: 16px;
       margin: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
-      width: 300px;
+      width: 80%; /* Ensure input fits well on mobile */
+      max-width: 300px;
     }
 
     #roundCounter {
@@ -82,7 +89,7 @@
       font-weight: bold;
       z-index: 1000;
       user-select: none;
-      font-size: 16px;
+      font-size: 14px;
     }
 
     #finalSummary {
@@ -95,7 +102,7 @@
     }
 
     #correctDisplay {
-      font-size: 18px;
+      font-size: 16px;
       margin-top: 20px;
       background: #f0f0f0;
       border-radius: 10px;
@@ -108,6 +115,7 @@
       display: flex;
       justify-content: center;
       gap: 10px;
+      flex-wrap: wrap; /* Allow wrapping on smaller screens */
     }
 
     .word-box {
@@ -118,13 +126,28 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 16px;
+      font-size: 14px; /* Adjust font size to fit text on mobile */
+    }
+
+    #welcomeMessage {
+      font-size: 18px;
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #ffcc00;
+      border-radius: 10px;
+      display: block;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <h1>🧠 Word Memory Game 🧠</h1>
   <p>Memorize the words in the grid! You'll be asked to recall a specific row or column.</p>
+
+  <!-- Welcome Message Section -->
+  <div id="welcomeMessage">
+    Welcome to the SMART Memory Game! Let's test your memory skills.
+  </div>
 
   <div id="roundCounter" class="message">Round 0 of 5 — 5 rounds remaining</div>
 
@@ -147,7 +170,6 @@
   </div>
 
   <script>
-    // Updated simple words array suitable for primary school-aged children
     const simpleWords = ["dog", "cat", "bird", "fish", "apple", "banana", "tree", "sun", "moon", "book", "ball", "star", "car", "hat", "shoe", "cloud"];
     const totalRounds = 5;
 
@@ -173,18 +195,17 @@
     let timeLeft = 60;
     let score = 0;
 
-    function normalizeWord(input){
+    // Function to normalize input (remove spaces and lowercase the words)
+    function normalizeWord(input) {
       return input.toLowerCase().trim();
     }
 
-    // Updated createGrid to use simple words instead of colors
+    // Function to create a grid of words
     function createGrid() {
-      // Create an array of 16 words cycling through all unique words before repeating
       const chosenWords = [];
       const totalCells = 16;
       const wordsCount = simpleWords.length;
 
-      // Add words in order repeatedly until length = 16
       while (chosenWords.length < totalCells) {
         for (let word of simpleWords) {
           if (chosenWords.length < totalCells) {
@@ -195,7 +216,6 @@
         }
       }
 
-      // Optional: shuffle chosenWords so the grid is randomized but all words appear equally before repeat
       for (let i = chosenWords.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [chosenWords[i], chosenWords[j]] = [chosenWords[j], chosenWords[i]];
@@ -207,19 +227,21 @@
       }
     }
 
+    // Function to display the grid
     function showGrid() {
       gridDiv.innerHTML = "";
       for (let row of grid) {
         for (let c of row) {
           const cell = document.createElement("div");
           cell.className = "cell";
-          cell.textContent = c;  // Display the word instead of color
+          cell.textContent = c;
           gridDiv.appendChild(cell);
         }
       }
       gridDiv.classList.remove("hidden");
     }
 
+    // Function to start the game round
     function startRound() {
       currentRound++;
       roundCounter.textContent = `Round ${currentRound} of ${totalRounds} — ${totalRounds - currentRound} rounds remaining`;
@@ -234,7 +256,6 @@
       createGrid();
       showGrid();
 
-      // Pick a random row or column to recall
       const isRow = Math.random() < 0.5;
       const index = Math.floor(Math.random() * 4);
       promptText = `${isRow ? "row" : "column"} ${index + 1}`;
@@ -244,7 +265,6 @@
       timeLeft = 60;
       timerSpan.textContent = timeLeft;
 
-      // Start countdown timer
       timer = setInterval(() => {
         timeLeft--;
         timerSpan.textContent = timeLeft;
@@ -257,6 +277,7 @@
       startBtn.classList.add("hidden");
     }
 
+    // Function to show the input area for recalling words
     function startRecall() {
       gridDiv.classList.add("hidden");
       countdownP.classList.add("hidden");
@@ -265,6 +286,7 @@
       answerInput.focus();
     }
 
+    // Function to check the user's answer
     function checkAnswer() {
       clearInterval(timer);
       const userInputRaw = answerInput.value.split(",").map(s => s.trim());
@@ -282,7 +304,6 @@
       resultDiv.classList.remove("hidden");
       inputArea.classList.add("hidden");
 
-      // Show correct and user answers visually
       correctDisplay.style.display = "block";
       correctDisplay.innerHTML = `
         <strong>Correct sequence:</strong>
@@ -299,7 +320,7 @@
         nextBtn.classList.remove("hidden");
       } else {
         finalSummary.style.display = "block";
-        finalSummary.textContent = `Game over! Your total score: ${score} out of ${totalRounds * 4}`;
+        finalSummary.innerHTML = `Game over! Your total score: ${score} out of ${totalRounds * 4}<br>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.`;
         startBtn.textContent = "Play Again";
         startBtn.classList.remove("hidden");
       }
@@ -332,7 +353,6 @@
       startRound();
     });
 
-    // Allow Enter key to submit answer
     answerInput.addEventListener("keydown", e => {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -342,4 +362,3 @@
   </script>
 </body>
 </html>
-
