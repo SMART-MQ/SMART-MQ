@@ -491,6 +491,8 @@
       summaryHtml += '<p><strong>Your Best Performance: Level ' + personalBest + '</strong></p>';
       summaryHtml += '<p>Thanks for playing! Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>';
       finalSummary.innerHTML = summaryHtml;
+      // Tell Qualtrics the game is done, so it can show the Next button
+      window.parent.postMessage("showNext", "*");
     }
     
     function startGame() {
