@@ -78,7 +78,7 @@
   }
   .scoreboard {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 4vw;
     margin-bottom: 10px;
@@ -173,9 +173,7 @@
       <p class="score" id="bestScore">Personal Best: 0</p>
     </div>
     <div id="countdownBox"></div>
-    <div class="button-container" id="buttonContainer">
-      <!-- Buttons will be generated dynamically -->
-    </div>
+    <div class="button-container" id="buttonContainer"></div>
     <p id="message"></p>
     <div id="timerBox">10:00</div>
   </div>
@@ -192,7 +190,6 @@
   <script>
     let sequence = [], userSequence = [], score = 0, best = 0, timer, timeLeft = 600;
     const colors = ["#ffb3ba", "#ffdfba", "#ffffba", "#baffc9", "#bae1ff", "#e0bbff", "#d5f4e6", "#ffc4d6", "#fdfd96", "#a0e7e5", "#c2f0c2", "#ffb347"];
-
     const flashSound = document.getElementById("flashSound"), wrongSound = document.getElementById("wrongSound");
 
     function showInstructions() {
@@ -303,3 +300,4 @@
   </script>
 </body>
 </html>
+
