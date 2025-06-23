@@ -398,6 +398,12 @@
     <p id="score-text"></p>
 </div>
 
+<!-- ADD THIS NEW DIV RIGHT AFTER YOUR #result DIV -->
+<div id="end-page-container" class="info-page-container hidden">
+    <h2>Thank you for participating!</h2>
+    <p>Your game is now over. Please head back to the survey to finish it and receive your $2.5 in your SMART bank account!</p>
+</div>
+
 <script>
     document.body.classList.add('no-scroll');
 
@@ -407,9 +413,9 @@
 
     // NEW: Define the parameters for each difficulty level
     const difficultyLevels = [
-        { name: 'Easy', memorizeCount: 6, distractorCount: 6 },
-        { name: 'Medium', memorizeCount: 9, distractorCount: 7 },
-        { name: 'Hard', memorizeCount: 15, distractorCount: 5 }
+        { name: 'Easy', memorizeCount: 6, distractorCount: 6, gridCols: 3 },
+        { name: 'Medium', memorizeCount: 9, distractorCount: 7, gridCols: 4 },
+        { name: 'Hard', memorizeCount: 15, distractorCount: 5, gridCols: 5 }
     ];
 
     let sessionStartTime = null;
@@ -468,7 +474,7 @@
 
         // Update UI with difficulty info
         document.getElementById('game-heading').textContent = `Memorize these words! (${currentDifficulty.name})`;
-        document.getElementById('words-list').style.gridTemplateColumns = `repeat(3, 1fr)`;
+        document.getElementById('words-list').style.gridTemplateColumns = `repeat(${currentDifficulty.gridCols}, 1fr)`;
 
         updateWordHistory();
         
@@ -591,65 +597,56 @@
         }, 800);
     }
 
-    function endGame() {
-        document.getElementById('recall-container').classList.add('hidden');
-        document.getElementById('result').classList.remove('hidden');
+    // In your endGame() function, find this 'if' block...
+if (elapsedTime >= SESSION_DURATION) {
+    // ... and replace its contents with this:
 
-        // MODIFIED: Get difficulty name for the round that just ended
-        let currentDifficulty;
-        if (totalGamesPlayed < 3) currentDifficulty = difficultyLevels[0];
-        else if (totalGamesPlayed < 6) currentDifficulty = difficultyLevels[1];
-        else currentDifficulty = difficultyLevels[2];
-        const difficultyName = currentDifficulty.name;
+    clearInterval(timer);
+    clearInterval(sessionTimerInterval);
+    document.getElementById('session-timer').classList.add('hidden');
 
-        // MODIFIED: Update score tracking objects
-        if (score > bestScores[difficultyName]) {
-            bestScores[difficultyName] = score;
-        }
-        allSessionScores.push({ score: score, total: allWordsToRecall.length, difficulty: difficultyName });
-        
-        totalGamesPlayed++;
-        
-        const elapsedTime = Date.now() - sessionStartTime;
-        
-        if (elapsedTime >= SESSION_DURATION) {
-            clearInterval(timer);
-            clearInterval(sessionTimerInterval);
-            document.getElementById('session-timer').classList.add('hidden');
-
-            // MODIFIED: Build a categorized final score list
-            let finalScoreHTML = '';
-            difficultyLevels.forEach(level => {
-                const scoresForLevel = allSessionScores.filter(s => s.difficulty === level.name);
-                if (scoresForLevel.length > 0) {
-                    finalScoreHTML += `<h3>${level.name}</h3>`;
-                    scoresForLevel.forEach((s, i) => {
-                        const isBest = s.score === bestScores[level.name];
-                        finalScoreHTML += `<li class="${isBest ? 'best-score' : ''}">
-                            Round ${i + 1}: ${s.score} / ${s.total} ${isBest ? '(Best!)' : ''}
-                        </li>`;
-                    });
-                }
+    // Build the categorized final score list (this part is the same)
+    let finalScoreHTML = '';
+    difficultyLevels.forEach(level => {
+        const scoresForLevel = allSessionScores.filter(s => s.difficulty === level.name);
+        if (scoresForLevel.length > 0) {
+            finalScoreHTML += `<h3>${level.name}</h3>`;
+            scoresForLevel.forEach((s, i) => {
+                const isBest = s.score === bestScores[level.name];
+                finalScoreHTML += `<li class="${isBest ? 'best-score' : ''}">
+                    Round ${i + 1}: ${s.score} / ${s.total} ${isBest ? '(Best!)' : ''}
+                </li>`;
             });
-
-            document.body.classList.add('no-scroll');
-            document.getElementById('result').innerHTML = `
-                <p style="font-size: 1.5em; font-weight: bold;">Session Ended!</p>
-                <hr>
-                <ul id="score-list">${finalScoreHTML}</ul>
-            `;
-        } else {
-            document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
-            setTimeout(() => {
-                resetGame();
-                startGame();
-            }, 5000);
         }
-	 finalResults.textContent = `🏆Rounds Completed🏆 = ${roundsCompleted}`;
-      switchScreen(gameScreen, finalScreen);
-      // Tell Qualtrics the game is done, so it can show the Next button
-  window.parent.postMessage("showNext", "*");   
-    }
+    });
+
+    document.body.classList.add('no-scroll');
+    document.getElementById('result').innerHTML = `
+        <p style="font-size: 1.5em; font-weight: bold;">Session Ended!</p>
+        <hr>
+        <ul id="score-list">${finalScoreHTML}</ul>
+    `;
+
+    // --- NEW LOGIC STARTS HERE ---
+    // After showing the final scores, wait 8 seconds, then show the end page.
+    setTimeout(() => {
+        // Hide the score screen
+        document.getElementById('result').classList.add('hidden');
+        // Show the new "Thank You" end page
+        document.getElementById('end-page-container').classList.remove('hidden');
+
+        // IMPORTANT: Tell the survey the game is completely over so it can show the "Next" button.
+        window.parent.postMessage("showNext", "*");
+    }, 8000); // 8000 milliseconds = 8 seconds. Adjust this time as you see fit.
+
+} else {
+    // This part for continuing to the next round remains the same.
+    document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
+    setTimeout(() => {
+        resetGame();
+        startGame();
+    }, 5000);
+}
 
     function resetGame() {
         score = 0;
