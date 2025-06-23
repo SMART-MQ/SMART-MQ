@@ -7,127 +7,106 @@
   <style>
     body {
       font-family: "Calibri", sans-serif;
-      font-size: 2.4rem;
+      font-size: 2rem;
       background-color: #fff9c4;
       margin: 0;
-      padding: 25px 15px;
+      padding: 10px;
       text-align: center;
       -webkit-tap-highlight-color: transparent;
     }
     #game {
-      max-width: 420px;
+      max-width: 100%;
       margin: 0 auto;
-      font-size: 2.8rem;
+      font-size: 2.2rem;
     }
     h1 {
-      font-size: 4.5rem;
-      margin-bottom: 25px;
-      line-height: 1.1;
+      font-size: 3rem;
+      margin: 15px 0;
     }
     #game h1 {
-      font-size: 2.6rem;
+      font-size: 2.2rem;
       margin-bottom: 10px;
     }
     #roundNumber {
-      font-size: 2.2rem;
-      margin-bottom: 20px;
+      font-size: 1.8rem;
+      margin-bottom: 15px;
       font-weight: bold;
       color: #e91e63;
     }
     .grid {
       display: grid;
-      gap: 25px 25px;
+      gap: 15px 15px;
       justify-content: center;
-      margin: 0 auto 35px;
+      margin: 0 auto 20px;
       user-select: none;
     }
     .grid.guessing .cell:hover {
-      transform: scale(1.1);
+      transform: scale(1.05);
       border-color: #f48fb1;
-      box-shadow: 2px 6px 14px rgba(244, 143, 177, 0.5);
+      box-shadow: 1px 4px 10px rgba(244, 143, 177, 0.4);
     }
     .cell {
       cursor: pointer;
       position: relative;
       background-color: #fff;
       border: 2px solid #ccc;
-      border-radius: 12px;
-      box-shadow: 1px 1px 8px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
       display: flex;
       align-items: center;
       justify-content: center;
-      user-select: none;
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.2s ease;
     }
     .marker {
       position: absolute;
-      bottom: 8px;
-      right: 8px;
-      font-size: 3.2rem;
-      user-select: none;
-      pointer-events: none;
+      bottom: 6px;
+      right: 6px;
+      font-size: 2.4rem;
     }
     #message, #timer, #roundInfo {
-      font-size: 2.2rem;
-      margin: 18px 0;
-      min-height: 3rem;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
+      font-size: 1.8rem;
+      margin: 12px 0;
     }
     #cover, #end {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 25px 15px;
+      padding: 10px;
       min-height: 100vh;
-      box-sizing: border-box;
       text-align: center;
     }
-    #cover h1 {
-      font-size: 4rem;
+    #cover h1, #end h1 {
+      font-size: 2.8rem;
+      margin-bottom: 15px;
       color: #c2185b;
-      font-weight: bold;
-      margin-bottom: 30px;
     }
     .instruction-box {
       background: linear-gradient(to right, #f8bbd0, #f48fb1);
-      padding: 30px;
-      border-radius: 12px;
-      max-width: 400px;
+      padding: 15px;
+      border-radius: 10px;
       width: 100%;
-      margin-bottom: 30px;
-      font-size: 1.8rem;
-      line-height: 1.5;
-      text-align: center;
-    }
-    #cover button {
-      font-size: 2.4rem;
-      padding: 20px 40px;
-      border: none;
-      background-color: #ffd54f;
-      border-radius: 14px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      box-shadow: 1px 1px 8px rgba(0,0,0,0.1);
-      -webkit-tap-highlight-color: transparent;
-    }
-    #cover button:hover,
-    #cover button:focus {
-      background-color: #ffca28;
-      outline: none;
-    }
-    #end h1 {
-      font-size: 4rem;
+      font-size: 1.6rem;
+      line-height: 1.4;
       margin-bottom: 20px;
     }
+    #cover button {
+      font-size: 2rem;
+      padding: 14px 28px;
+      border: none;
+      background-color: #ffd54f;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 1px 1px 6px rgba(0,0,0,0.1);
+    }
+    #cover button:hover {
+      background-color: #ffca28;
+    }
     #end p {
-      font-size: 2.2rem;
-      margin: 25px 0;
-      max-width: 400px;
-      line-height: 1.4;
+      font-size: 1.6rem;
+      margin: 20px 0;
+      max-width: 320px;
+      line-height: 1.3;
     }
     #countdownOverlay {
       display: none;
@@ -139,26 +118,16 @@
       z-index: 9999;
       justify-content: center;
       align-items: center;
-      font-size: 10rem;
+      font-size: 8rem;
       font-weight: bold;
       color: #c2185b;
-      font-family: 'Calibri', sans-serif;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
     }
     #transitionMessage {
       display: none;
-      font-size: 4rem;
+      font-size: 3rem;
       font-weight: bold;
       color: #e91e63;
-      margin: 40px 0;
-    }
-    .game-elements {
-      display: block;
-    }
-    .hidden {
-      display: none !important;
+      margin: 20px 0;
     }
     #roundPopup {
       position: fixed;
@@ -168,103 +137,55 @@
       background: #f48fb1;
       color: white;
       font-weight: bold;
-      font-size: 6rem;
-      padding: 40px 80px;
+      font-size: 4rem;
+      padding: 25px 50px;
       border-radius: 20px;
-      box-shadow: 0 0 30px #f48fb1;
+      box-shadow: 0 0 20px #f48fb1;
       z-index: 10000;
-      user-select: none;
-      opacity: 0;
       animation-fill-mode: forwards;
     }
     @keyframes popInOut {
-      0% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 0;
-      }
-      40% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 1;
-      }
-      60% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 0;
-      }
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      40% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      60% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
     }
     #summaryTable {
       width: 100%;
-      max-width: 400px;
-      margin: 30px auto 0;
+      max-width: 300px;
       border-collapse: collapse;
       background-color: #f8bbd0;
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
-      font-size: 1.8rem;
+      font-size: 1.4rem;
     }
-    #summaryTable th,
-    #summaryTable td {
-      padding: 12px;
+    #summaryTable th, #summaryTable td {
+      padding: 8px;
       text-align: center;
       border-bottom: 1px solid #f48fb1;
     }
     #summaryTable th {
       background-color: #f48fb1;
       color: white;
-      font-weight: bold;
     }
+
     @media (max-width: 480px) {
-      body {
-        font-size: 2rem;
-      }
-      #game {
-        max-width: 360px;
-        font-size: 2.4rem;
-      }
-      #game h1 {
-        font-size: 2.2rem;
-      }
-      .instruction-box, #end p {
-        font-size: 1.6rem;
-        max-width: 320px;
-      }
-      #cover h1, #end h1 {
-        font-size: 3.2rem;
-      }
-      #cover button {
-        font-size: 2rem;
-        padding: 18px 36px;
-      }
-      #transitionMessage {
-        font-size: 3.2rem;
-      }
-      #roundPopup {
-        font-size: 4rem;
-        padding: 25px 50px;
-      }
-      #summaryTable {
-        font-size: 1.6rem;
-      }
-      #summaryTable th,
-      #summaryTable td {
-        padding: 10px;
+      .cell {
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 2.2rem !important;
       }
     }
   </style>
 </head>
 <body>
   <div id="cover">
-    <h1>Welcome to the SMART Memory Game!</h1>
+    <h1>SMART Memory Game</h1>
     <div class="instruction-box">
       <p><strong>How to play:</strong></p>
-      <p>You will be presented with a grid of animal emojis for a set amount of time.</p>
-      <p>Memorise the grid as best as you can.</p>
-      <p>Next, you will be presented with another grid of animal emojis.</p>
-      <p>To succeed, spot the difference between the two grids!</p>
-      <p>The game will get harder as you go on.</p>
+      <p>You will be shown a grid of animal emojis. Memorise it!</p>
+      <p>Then, you’ll see a new grid with some differences.</p>
+      <p>Spot the changes to progress through each round!</p>
     </div>
     <button onclick="startGame()">Play</button>
   </div>
@@ -285,7 +206,7 @@
 
   <div id="end" style="display: none;">
     <h1>Well done!</h1>
-    <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
+    <p>Now, finish the survey to earn $2.50 for your SMART bank.</p>
     <table id="summaryTable">
       <thead>
         <tr>
@@ -298,9 +219,7 @@
     </table>
   </div>
 
-  <div id="countdownOverlay">
-    <div id="countdownText"></div>
-  </div>
+  <div id="countdownOverlay"><div id="countdownText"></div></div>
 
   <script>
     const animalEmojis = [...'🐶🐱🐭🐹🐰🦊🐻🐼🐨🐯🦁🐮🐷🐸🐵🐔🐧🐦🐤🦆🦉🐴🦄🐝🐛🦋🐌🐞🐜🦂🐢🐍🦎🦖🦕🐙🦑🦐🦞🦀🐡🐠🐟🐬🐳🐋🦈'];
@@ -335,16 +254,7 @@
     function renderGrid(grid, columns, cellSize, clickable = false) {
       gridElement.innerHTML = '';
       gridElement.className = 'grid';
-      gridElement.style.justifyContent = 'center';
-      gridElement.style.maxWidth = '';
-      const gap = (currentRound >= 6) ? '15px 15px' : '25px 25px';
-      gridElement.style.gap = gap;
       gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-      if (currentRound === 6 || currentRound === 7) {
-        gridElement.style.gridAutoRows = `${cellSize + 30}px`;
-      } else {
-        gridElement.style.maxWidth = `${columns * (cellSize + 30)}px`;
-      }
       grid.forEach((emoji, i) => {
         const cell = document.createElement('div');
         cell.className = 'cell';
@@ -353,7 +263,6 @@
         cell.style.height = `${cellSize}px`;
         cell.style.fontSize = `${cellSize * 0.6}px`;
         if (clickable) cell.addEventListener('click', () => handleSelect(i, cell));
-        if ((currentRound === 6 || currentRound === 7) && i === 9) cell.style.gridColumnStart = 2;
         gridElement.appendChild(cell);
       });
       gridElement.classList.toggle('guessing', clickable);
