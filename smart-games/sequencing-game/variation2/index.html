@@ -145,6 +145,7 @@
     font-size: 4vw;
     margin-top: 20px;
     color: #333;
+    display: none;
   }
 </style>
 </head>
@@ -172,12 +173,12 @@
       <p class="score" id="currentScore">Current Score: 0</p>
       <p class="score" id="bestScore">Personal Best: 0</p>
     </div>
+    <p id="gameInstructionLine" style="display:block">Repeat the pattern shown.</p>
     <div id="countdownBox"></div>
     <div class="button-container" id="buttonContainer"></div>
     <p id="message"></p>
     <div id="timerBox">10:00</div>
   </div>
-  <p id="gameInstructionLine">Repeat the pattern shown.</p>
   <div id="finalPopup">
     <div>
       <h2>Congratulations!</h2>
@@ -200,6 +201,7 @@
     function startCountdown() {
       document.getElementById("instructionModal").style.display = "none";
       document.getElementById("gameArea").style.display = "block";
+      document.getElementById("gameInstructionLine").style.display = "block";
       createButtons();
       let countdown = 3;
       const countdownBox = document.getElementById("countdownBox");
