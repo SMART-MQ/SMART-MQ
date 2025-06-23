@@ -235,13 +235,17 @@
     const transitionMessage = document.getElementById('transitionMessage');
     const gameUI = document.getElementById('gameUI');
     const roundPopup = document.getElementById('roundPopup');
-    const summaryBody = document.getElementById('summaryBody');
     const cover = document.getElementById('cover');
     const game = document.getElementById('game');
     const end = document.getElementById('end');
     const countdownOverlay = document.getElementById('countdownOverlay');
     const countdownText = document.getElementById('countdownText');
     const congratsBox = document.getElementById('congratsBox');
+
+    // Notify Qualtrics parent frame that game is complete and Next button can be enabled
+    function notifyQualtricsGameDone() {
+      window.parent.postMessage("showNext", "*");
+    }
 
     function showStartCountdown(callback) {
       const steps = ["3", "2", "1", "GO!"];
@@ -268,7 +272,6 @@
       gridElement.style.margin = '0 auto';
       gridElement.style.columnGap = '15px';
 
-      // Adjust column gap and ensure centering for specific rounds
       if (currentRound === 0 || currentRound === 1) {
         gridElement.style.columnGap = '20px'; // bring columns closer
       }
@@ -357,7 +360,6 @@
             modifiedGrid = result.newGrid;
             changedIndices = result.changedIndices;
 
-            // Hide the game UI elements during the 3-second transition "Now, spot the difference!"
             gameUI.style.display = 'none';
             messageElement.textContent = '';
             timerElement.textContent = '';
@@ -368,10 +370,8 @@
             transitionMessage.style.display = 'block';
 
             setTimeout(() => {
-              // After 3 seconds, hide transition message and show game UI
               transitionMessage.style.display = 'none';
 
-              // Show game UI elements again
               gameUI.style.display = 'block';
               gridElement.style.display = 'grid';
               roundNumberElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`;
@@ -409,6 +409,7 @@
                 showCongratsMessage();
                 game.style.display = 'none';
                 end.style.display = 'flex';
+                notifyQualtricsGameDone(); // Notify Qualtrics here!
               }
             }, 2000);
           }
