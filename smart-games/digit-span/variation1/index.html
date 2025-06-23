@@ -44,7 +44,7 @@
       border: 1px solid rgba(0, 183, 255, 0.3); 
       backdrop-filter: blur(10px);
       border-radius: 20px; 
-      padding: 20px;
+      padding: 15px; /* --- CHANGE: Reduced padding --- */
       box-shadow: 0 0 30px rgba(0,0,0,0.4);
       display: flex; 
       flex-direction: column; 
@@ -57,30 +57,33 @@
       margin-bottom: 20px; 
       width: 100%;
     }
-
+    
+    /* --- CHANGE: Reduced font size --- */
     .main-title { 
-      font-size: clamp(28px, 8vw, 42px);
+      font-size: clamp(24px, 7vw, 36px);
       font-weight: 600; 
       color: #fff; 
       text-shadow: 0 0 10px rgba(0, 183, 255, 0.7); 
       margin-bottom: 10px; 
     }
+    /* --- CHANGE: Reduced font size --- */
     #info-bar { 
-      font-size: clamp(18px, 5vw, 24px);
+      font-size: clamp(16px, 4.5vw, 22px);
       font-weight: 600; 
       text-shadow: 0 0 5px #fff; 
       margin-bottom: 10px; 
     }
     
+    /* --- CHANGE: Reduced font size and height --- */
     .digit-display, #answer-display {
-      font-size: clamp(36px, 10vw, 50px);
+      font-size: clamp(32px, 9vw, 46px);
       font-weight: 600; 
       color: #fff; 
       text-shadow: 0 0 5px #fff, 0 0 10px #0ff;
       background-color: rgba(0,0,0,0.4); 
       border-radius: 10px; 
       margin: 15px 0;
-      min-height: 70px;
+      min-height: 65px;
       letter-spacing: 0.3em; 
       display: flex; 
       align-items: center; 
@@ -90,19 +93,21 @@
       padding: 0 10px;
     }
     
+    /* --- CHANGE: Reduced gap and margin --- */
     .option-buttons { 
       display: grid; 
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(4, auto);
-      gap: 10px; 
-      margin-top: 20px; 
+      gap: 8px; 
+      margin-top: 15px; 
     }
+    /* --- CHANGE: Reduced font size and height --- */
     .option-buttons button { 
       font-family: 'Poppins', sans-serif; 
-      font-size: 32px; 
+      font-size: 28px; 
       width: 100%;
       min-width: 0;
-      height: 70px;
+      height: 65px;
       background-color: #0077b6; 
       color: #fff; 
       border: 2px solid #00b7ff; 
@@ -132,17 +137,15 @@
       grid-column: 2 / 3;
     }
     
-    /* --- START: FINAL, DEFINITIVE SUBMIT BUTTON FIX --- */
+    /* --- CHANGE: Reduced font size --- */
     .option-buttons button#submit-btn { 
       background-color: #27ae60; 
       border-color: #2ecc71; 
       border-radius: 12px;
       grid-row: 4;
       grid-column: 3 / 4;
-      /* The fix: A smaller font-size ONLY for this icon to guarantee it fits. */
-      font-size: 28px; 
+      font-size: 24px; 
     }
-    /* --- END: FINAL, DEFINITIVE SUBMIT BUTTON FIX --- */
     .option-buttons button#submit-btn:hover { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
     
     .hidden { display: none; }
@@ -487,11 +490,15 @@
       optionButtons.classList.add('hidden');
       streakTracker.classList.add('hidden');
       finalSummary.classList.remove('hidden');
+
+      // --- CHANGE: Updated the summary message as requested ---
       var summaryHtml = '<h2>Time\'s Up!</h2>';
-      summaryHtml += '<p><strong>Your Best Performance: Level ' + personalBest + '</strong></p>';
+      summaryHtml += '<p><strong>🏆 Level Reached: ' + personalBest + ' 🏆</strong></p>';
       summaryHtml += '<p>Thanks for playing! Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>';
       finalSummary.innerHTML = summaryHtml;
-      // Tell Qualtrics the game is done, so it can show the Next button
+
+      // This line was already present in your code and is correct.
+      // It tells Qualtrics the game is done, so it can show the Next button.
       window.parent.postMessage("showNext", "*");
     }
     
