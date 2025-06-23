@@ -1,10 +1,378 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Variation 1</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Memory Challenge Game</title>
+  <style>
+    body {
+      background-color: #fcefe3;
+      font-family: 'Arial', sans-serif;
+      color: black;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      margin-top: 20px;
+    }
+
+    .game-area {
+      margin: 20px auto;
+      max-width: 600px;
+      position: relative;
+    }
+
+    .scene {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+      min-height: 300px;
+    }
+
+    .object {
+      width: 90px;
+      height: 90px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+    }
+
+    .object img {
+      width: 80px;
+      height: 80px;
+    }
+
+    .curtain {
+      position: relative;
+      width: 100%;
+      height: 0;
+      overflow: hidden;
+      background-color: #d3cce3;
+      font-size: 24px;
+      padding: 0;
+      transition: height 1s ease;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .curtain.active {
+      height: 200px;
+      padding: 20px;
+    }
+
+    .message, #countdown {
+      font-size: 18px;
+      margin-top: 10px;
+      color: #333;
+    }
+
+    button {
+      background-color: #a8dadc;
+      border: none;
+      color: black;
+      padding: 10px 20px;
+      margin: 20px 10px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      font-size: 16px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #roundCounter {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: #a8dadc;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      z-index: 1000;
+      user-select: none;
+      font-size: 16px;
+    }
+
+    #finalSummary {
+      margin-top: 40px;
+      font-size: 22px;
+      background: #e1f0f7;
+      border-radius: 10px;
+      padding: 30px;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to Variation 1</h1>
+
+  <h1>🎉 Memory Challenge Game 🎉</h1>
+  <p>Look carefully and remember the pictures! You'll be asked to remember a specific row or column.</p>
+
+  <div id="roundCounter" class="message">Round 0 of 5 — 5 rounds remaining</div>
+
+  <div class="game-area">
+    <div id="scene" class="scene"></div>
+    <p id="viewingMessage" class="message hidden">⏳ Time left to view: <span id="viewingCountdown">60</span> seconds</p>
+
+    <div id="curtain" class="curtain">
+      <p><strong>🎭 The curtain is down.</strong></p>
+      <p class="message" id="recallInstruction">Now think carefully... what did you see in the selected row/column?</p>
+    </div>
+
+    <div id="input-area" class="hidden">
+      <p>Type the names of the images you remember (like "apple", "car", "cat"):</p>
+      <input type="text" id="answer" placeholder="e.g. apple, book, ball"/>
+      <p id="countdown" class="message">⏳ Time left to answer: <span id="answerCountdown">60</span> seconds</p>
+      <button id="submitAnswerBtn">Submit Answer</button>
+    </div>
+
+    <div id="result" class="hidden"></div>
+    <button id="startBtn">Start Game</button>
+    <button id="nextBtn" class="hidden">Next Round</button>
+
+    <div id="finalSummary"></div>
+  </div>
+
+  <script>
+    const objectLibrary = {
+      apple: "https://img.icons8.com/color/96/apple.png",
+      book: "https://img.icons8.com/color/96/book.png",
+      ball: "https://img.icons8.com/emoji/96/soccer-ball-emoji.png",
+      cat: "https://img.icons8.com/color/96/cat.png",
+      car: "https://img.icons8.com/color/96/car.png",
+      hat: "https://img.icons8.com/emoji/96/top-hat-emoji.png",
+      star: "https://img.icons8.com/color/96/star.png",
+      fish: "https://img.icons8.com/color/96/fish.png",
+      pen: "https://img.icons8.com/color/96/pen.png",
+      leaf: "https://img.icons8.com/color/96/leaf.png",
+      cake: "https://img.icons8.com/color/96/birthday-cake.png",
+      dog: "https://img.icons8.com/color/96/dog.png",
+      flower: "https://img.icons8.com/color/96/flower.png",
+      globe: "https://img.icons8.com/color/96/globe.png",
+      kite: "https://img.icons8.com/color/96/kite.png",
+      moon: "https://img.icons8.com/emoji/96/crescent-moon-emoji.png"
+    };
+
+    const acceptableAnswers = {
+      apple: ["apple"],
+      book: ["book"],
+      ball: ["ball", "soccer ball", "football"],
+      cat: ["cat"],
+      car: ["car"],
+      hat: ["hat", "top hat"],
+      star: ["star"],
+      fish: ["fish"],
+      pen: ["pen"],
+      leaf: ["leaf"],
+      cake: ["cake", "birthday cake"],
+      dog: ["dog"],
+      flower: ["flower"],
+      globe: ["globe", "world", "earth"],
+      kite: ["kite"],
+      moon: ["moon", "crescent moon"]
+    };
+
+    const allObjects = Object.keys(objectLibrary);
+    let gridObjects = [];
+    let currentPrompt = "";
+    let recallObjects = [];
+    let round = 0;
+    let score = 0;
+    let roundScores = [];
+    const totalRounds = 5;
+    let viewTimer, answerTimer;
+
+    const roundCounterEl = document.getElementById('roundCounter');
+    const finalSummaryDiv = document.getElementById('finalSummary');
+
+    const startBtn = document.getElementById('startBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitAnswerBtn = document.getElementById('submitAnswerBtn');
+
+    startBtn.addEventListener('click', startGame);
+    nextBtn.addEventListener('click', nextRound);
+    submitAnswerBtn.addEventListener('click', checkAnswer);
+
+    function getRandomGrid() {
+      const shuffled = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16);
+      const grid = [];
+      while (shuffled.length) grid.push(shuffled.splice(0, 4));
+      return grid;
+    }
+
+    function updateRoundCounter() {
+      const roundsLeft = totalRounds - round;
+      roundCounterEl.textContent = `Round ${round + 1} of ${totalRounds} — ${roundsLeft} rounds remaining`;
+    }
+
+    function startGame() {
+      score = 0;
+      round = 0;
+      roundScores = [];
+      finalSummaryDiv.style.display = 'none';
+      startBtn.classList.add('hidden');
+      nextBtn.classList.add('hidden');
+      roundCounterEl.style.display = 'block';
+      updateRoundCounter();
+      nextRound();
+    }
+
+    function nextRound() {
+      resetTimers();
+      document.getElementById('scene').innerHTML = '';
+      document.getElementById('result').classList.add('hidden');
+      document.getElementById('curtain').classList.remove('active');
+      document.getElementById('input-area').classList.add('hidden');
+      document.getElementById('answer').value = '';
+      document.getElementById('viewingMessage').classList.remove('hidden');
+      nextBtn.classList.add('hidden');
+
+      gridObjects = getRandomGrid();
+      const sceneDiv = document.getElementById('scene');
+      sceneDiv.classList.remove('hidden');
+
+      for (const row of gridObjects) {
+        for (const item of row) {
+          const div = document.createElement('div');
+          div.className = 'object';
+          const img = document.createElement('img');
+          img.src = objectLibrary[item];
+          img.alt = item;
+          div.appendChild(img);
+          sceneDiv.appendChild(div);
+        }
+      }
+
+      const rowOrCol = Math.random() < 0.5 ? "row" : "column";
+      const index = Math.floor(Math.random() * 4);
+      currentPrompt = `${rowOrCol} ${index + 1}`;
+      document.getElementById('viewingMessage').innerHTML = `🔍 Memorize the pictures! Focus on <strong>${currentPrompt}</strong> - <span id="viewingCountdown">60</span> seconds`;
+
+      recallObjects = rowOrCol === "row" ? gridObjects[index] : gridObjects.map(r => r[index]);
+
+      let viewTime = 60;
+      viewTimer = setInterval(() => {
+        viewTime--;
+        document.getElementById('viewingCountdown').textContent = viewTime;
+        if (viewTime <= 0) {
+          clearInterval(viewTimer);
+          hideSceneShowCurtain();
+        }
+      }, 1000);
+
+      updateRoundCounter();
+    }
+
+    function resetTimers() {
+      clearInterval(viewTimer);
+      clearInterval(answerTimer);
+    }
+
+    function hideSceneShowCurtain() {
+      document.getElementById('scene').classList.add('hidden');
+      document.getElementById('curtain').classList.add('active');
+      document.getElementById('viewingMessage').classList.add('hidden');
+
+      setTimeout(() => {
+        document.getElementById('input-area').classList.remove('hidden');
+        document.getElementById('recallInstruction').textContent = `Now think carefully... what did you see in ${currentPrompt}?`;
+        startAnswerCountdown();
+      }, 2000);
+    }
+
+    function startAnswerCountdown() {
+      let time = 60;
+      document.getElementById('answerCountdown').textContent = time;
+      answerTimer = setInterval(() => {
+        time--;
+        document.getElementById('answerCountdown').textContent = time;
+        if (time <= 0) {
+          clearInterval(answerTimer);
+          checkAnswer();
+        }
+      }, 1000);
+    }
+
+    function checkAnswer() {
+      resetTimers();
+      const userInput = document.getElementById('answer').value.toLowerCase().split(',').map(s => s.trim());
+      let correctCount = 0;
+
+      recallObjects.forEach(obj => {
+        const acceptable = acceptableAnswers[obj] || [obj];
+        if (userInput.some(input => acceptable.includes(input))) {
+          correctCount++;
+        }
+      });
+
+      score += correctCount;
+      roundScores.push(correctCount);
+
+      document.getElementById('result').classList.remove('hidden');
+      document.getElementById('result').innerHTML = `
+        <p>You remembered <strong>${correctCount}</strong> out of <strong>4</strong> from ${currentPrompt}!</p>
+        <p>Your current total score: <strong>${score}</strong></p>
+      `;
+
+      document.getElementById('input-area').classList.add('hidden');
+
+      round++;
+      if (round >= totalRounds) {
+        showFinalSummary();
+      } else {
+        nextBtn.classList.remove('hidden');
+      }
+    }
+
+    function showFinalSummary() {
+      roundCounterEl.style.display = 'none';
+      document.getElementById('scene').classList.add('hidden');
+      document.getElementById('curtain').classList.remove('active');
+      document.getElementById('input-area').classList.add('hidden');
+      document.getElementById('viewingMessage').classList.add('hidden');
+      document.getElementById('result').classList.add('hidden');
+      nextBtn.classList.add('hidden');
+      startBtn.classList.add('hidden');
+
+      let summaryHTML = `<h2>🎉 Game Complete! 🎉</h2>`;
+      summaryHTML += `<p>Your total score is: <strong>${score}</strong></p>`;
+      summaryHTML += `<h3>Round Scores:</h3><ul>`;
+
+      let highestScore = 0;
+      let highestRound = 1;
+
+      for (let i = 0; i < roundScores.length; i++) {
+        const roundScore = roundScores[i];
+        if (roundScore > highestScore) {
+          highestScore = roundScore;
+          highestRound = i + 1;
+        }
+        summaryHTML += `<li>Round ${i + 1}: ${roundScore} point(s)</li>`;
+      }
+
+      summaryHTML += `</ul><p>🏆 Your highest score was in <strong>Round ${highestRound}</strong> with <strong>${highestScore}</strong> point(s).</p>`;
+      summaryHTML += `<p>Thanks for playing!</p>`;
+
+      finalSummaryDiv.innerHTML = summaryHTML;
+      finalSummaryDiv.style.display = 'block';
+    }
+  </script>
 </body>
 </html>
+
