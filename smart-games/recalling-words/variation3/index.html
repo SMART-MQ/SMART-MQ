@@ -597,6 +597,27 @@
         }, 800);
     }
 
+ function endGame() {
+        document.getElementById('recall-container').classList.add('hidden');
+        document.getElementById('result').classList.remove('hidden');
+
+        // MODIFIED: Get difficulty name for the round that just ended
+        let currentDifficulty;
+        if (totalGamesPlayed < 3) currentDifficulty = difficultyLevels[0];
+        else if (totalGamesPlayed < 6) currentDifficulty = difficultyLevels[1];
+        else currentDifficulty = difficultyLevels[2];
+        const difficultyName = currentDifficulty.name;
+
+        // MODIFIED: Update score tracking objects
+        if (score > bestScores[difficultyName]) {
+            bestScores[difficultyName] = score;
+        }
+        allSessionScores.push({ score: score, total: allWordsToRecall.length, difficulty: difficultyName });
+        
+        totalGamesPlayed++;
+        
+        const elapsedTime = Date.now() - sessionStartTime;
+
     // In your endGame() function, find this 'if' block...
 if (elapsedTime >= SESSION_DURATION) {
     // ... and replace its contents with this:
