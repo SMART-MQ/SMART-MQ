@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Memory Challenge Game</title>
+  <title>SMART memory game</title>
   <style>
     body {
       background-color: #fcefe3;
@@ -16,39 +16,26 @@
 
     h1 {
       margin-top: 20px;
-      font-size: 1.8em;
-    }
-
-    /* Welcome banner styles */
-    #welcomeBanner {
-      background-color: #a8dadc;
-      color: black;
-      padding: 15px 10px;
-      font-size: 1.3em;
-      font-weight: bold;
-      border-radius: 0 0 10px 10px;
-      margin: 0 auto 15px;
-      max-width: 600px;
+      font-size: 1.4em; /* decreased font size */
     }
 
     .game-area {
       margin: 20px auto;
-      max-width: 95%;
+      max-width: 600px;
       position: relative;
-      padding: 10px;
     }
 
     .scene {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 15px;
       margin-top: 20px;
-      min-height: 240px;
+      min-height: 300px;
     }
 
     .object {
-      width: 100%;
-      aspect-ratio: 1 / 1;
+      width: 90px;
+      height: 90px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -56,8 +43,8 @@
     }
 
     .object img {
-      width: 70%;
-      height: auto;
+      width: 80px;
+      height: 80px;
     }
 
     .curtain {
@@ -66,7 +53,7 @@
       height: 0;
       overflow: hidden;
       background-color: #d3cce3;
-      font-size: 1.2em;
+      font-size: 24px;
       padding: 0;
       transition: height 1s ease;
       border-radius: 10px;
@@ -82,7 +69,7 @@
     }
 
     .message, #countdown {
-      font-size: 1em;
+      font-size: 0.9em; /* decreased font size */
       margin-top: 10px;
       color: #333;
     }
@@ -93,19 +80,17 @@
       color: black;
       padding: 10px 20px;
       margin: 20px 10px;
-      font-size: 1em;
+      font-size: 0.9em; /* decreased font size */
       border-radius: 10px;
       cursor: pointer;
     }
 
     input[type="text"] {
       padding: 8px;
-      font-size: 1em;
+      font-size: 0.9em; /* decreased font size */
       margin: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
-      width: 90%;
-      max-width: 400px;
     }
 
     .hidden {
@@ -122,27 +107,22 @@
       font-weight: bold;
       z-index: 1000;
       user-select: none;
-      font-size: 1em;
+      font-size: 0.9em; /* decreased font size */
     }
 
     #finalSummary {
       margin-top: 40px;
-      font-size: 1.2em;
+      font-size: 22px;
       background: #e1f0f7;
       border-radius: 10px;
       padding: 30px;
       display: none;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
     }
   </style>
 </head>
 <body>
 
-  <h1>🎉 Memory Challenge Game 🎉</h1>
-  <div id="welcomeBanner">Welcome to the SMART memory game!</div>  <!-- Added banner -->
-
+  <h1>SMART memory game</h1>
   <p>Look carefully and remember the pictures! You'll be asked to remember a specific row or column.</p>
 
   <div id="roundCounter" class="message">Round 0 of 5 — 5 rounds remaining</div>
@@ -221,7 +201,6 @@
 
     const roundCounterEl = document.getElementById('roundCounter');
     const finalSummaryDiv = document.getElementById('finalSummary');
-    const welcomeBanner = document.getElementById('welcomeBanner');
 
     const startBtn = document.getElementById('startBtn');
     const nextBtn = document.getElementById('nextBtn');
@@ -251,10 +230,6 @@
       startBtn.classList.add('hidden');
       nextBtn.classList.add('hidden');
       roundCounterEl.style.display = 'block';
-
-      // Hide welcome banner when game starts
-      if(welcomeBanner) welcomeBanner.style.display = 'none';
-
       updateRoundCounter();
       nextRound();
     }
@@ -305,6 +280,11 @@
       updateRoundCounter();
     }
 
+    function resetTimers() {
+      clearInterval(viewTimer);
+      clearInterval(answerTimer);
+    }
+
     function hideSceneShowCurtain() {
       document.getElementById('scene').classList.add('hidden');
       document.getElementById('viewingMessage').classList.add('hidden');
@@ -351,13 +331,14 @@
       document.getElementById('input-area').classList.add('hidden');
       document.getElementById('curtain').classList.remove('active');
 
-      if (round + 1 >= totalRounds) {
+      round++;
+      updateRoundCounter();
+
+      if (round >= totalRounds) {
         showFinalSummary();
       } else {
         nextBtn.classList.remove('hidden');
       }
-      round++;
-      updateRoundCounter();
     }
 
     function showFinalSummary() {
@@ -383,23 +364,21 @@
           highestScore = roundScore;
           highestRound = i + 1;
         }
-        summaryHTML += `<li>Round ${i + 1}: ${roundScore} point(s)</li>`;
+        summaryHTML += `<li>Round ${i + 1}: ${roundScore} points</li>`;
       }
+      summaryHTML += `</ul>`;
+      summaryHTML += `<p>Your best round was round ${highestRound} with ${highestScore} points!</p>`;
 
-      summaryHTML += `</ul><p>🏆 Your highest score was in <strong>Round ${highestRound}</strong> with <strong>${highestScore}</strong> point(s).</p>`;
-      summaryHTML += `<p><strong>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</strong></p>`;
-      summaryHTML += `<p>Thanks for playing!</p>`;
+      summaryHTML += `<p>Thank you for playing the SMART memory game!</p>`;
+      summaryHTML += `<p>If you participated in a study, you may now close this window.</p>`;
 
       finalSummaryDiv.innerHTML = summaryHTML;
       finalSummaryDiv.style.display = 'block';
 
-      // Notify Qualtrics survey parent frame to proceed
-      window.parent.postMessage("showNext", "*");
-    }
-
-    function resetTimers() {
-      clearInterval(viewTimer);
-      clearInterval(answerTimer);
+      // Post message to Qualtrics iframe if present
+      if (window.parent && window.parent.postMessage) {
+        window.parent.postMessage({type: "qualtrics-memory-score", score: score}, "*");
+      }
     }
   </script>
 </body>
