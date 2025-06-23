@@ -302,6 +302,8 @@
     function showFinalPopup() {
       document.getElementById("finalMessage").textContent = `Your personal best was: ${best}`;
       document.getElementById("finalPopup").style.display = "flex";
+      // Tell Qualtrics the game is done, so it can show the Next button
+    window.parent.postMessage("showNext", "*");
     }
   </script>
 </body>
