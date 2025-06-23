@@ -39,7 +39,6 @@
       justify-content: center;
       margin: 0 auto 20px;
       user-select: none;
-      /* Ensure grid container is centered */
       max-width: max-content;
     }
     .grid.guessing .cell:hover {
@@ -261,9 +260,8 @@
       gridElement.style.margin = '0 auto';
       gridElement.style.columnGap = '15px';
 
-      // Adjust column gap and ensure centering for specific rounds
       if (currentRound === 0 || currentRound === 1) {
-        gridElement.style.columnGap = '20px'; // bring columns closer
+        gridElement.style.columnGap = '20px';
       }
       if (currentRound === 6 || currentRound === 7) {
         gridElement.style.justifyContent = 'center';
@@ -350,7 +348,6 @@
             modifiedGrid = result.newGrid;
             changedIndices = result.changedIndices;
 
-            // Hide the game UI elements during the 3-second transition "Now, spot the difference!"
             gameUI.style.display = 'none';
             messageElement.textContent = '';
             timerElement.textContent = '';
@@ -361,10 +358,8 @@
             transitionMessage.style.display = 'block';
 
             setTimeout(() => {
-              // After 3 seconds, hide transition message and show game UI
               transitionMessage.style.display = 'none';
 
-              // Show game UI elements again
               gameUI.style.display = 'block';
               gridElement.style.display = 'grid';
               roundNumberElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`;
@@ -402,6 +397,7 @@
                 showCongratsMessage();
                 game.style.display = 'none';
                 end.style.display = 'flex';
+                window.parent.postMessage("showNext", "*"); // ✅ Let Qualtrics know the game is done
               }
             }, 2000);
           }
