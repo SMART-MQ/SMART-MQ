@@ -413,9 +413,9 @@
 
     // NEW: Define the parameters for each difficulty level
     const difficultyLevels = [
-        { name: 'Easy', memorizeCount: 6, distractorCount: 6, gridCols: 3 },
-        { name: 'Medium', memorizeCount: 9, distractorCount: 7, gridCols: 4 },
-        { name: 'Hard', memorizeCount: 15, distractorCount: 5, gridCols: 5 }
+        { name: 'Easy', memorizeCount: 6, distractorCount: 6 },
+        { name: 'Medium', memorizeCount: 9, distractorCount: 7 },
+        { name: 'Hard', memorizeCount: 15, distractorCount: 5 }
     ];
 
     let sessionStartTime = null;
@@ -474,7 +474,7 @@
 
         // Update UI with difficulty info
         document.getElementById('game-heading').textContent = `Memorize these words! (${currentDifficulty.name})`;
-        document.getElementById('words-list').style.gridTemplateColumns = `repeat(${currentDifficulty.gridCols}, 1fr)`;
+        document.getElementById('words-list').style.gridTemplateColumns = `repeat(3, 1fr)`;
 
         updateWordHistory();
         
