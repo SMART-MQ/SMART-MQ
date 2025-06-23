@@ -39,6 +39,8 @@
       justify-content: center;
       margin: 0 auto 20px;
       user-select: none;
+      /* added to help centering */
+      /* width will be set dynamically per round in JS */
     }
     .grid.guessing .cell:hover {
       transform: scale(1.05);
@@ -72,28 +74,28 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 5px 8px;  /* reduced padding */
+      padding: 5px 8px;
       min-height: 100vh;
       text-align: center;
     }
     #cover h1, #end h1 {
-      font-size: 2.4rem;  /* smaller font */
+      font-size: 2.4rem;
       margin-bottom: 10px;
       color: #c2185b;
     }
     .instruction-box {
       background: linear-gradient(to right, #f8bbd0, #f48fb1);
-      padding: 8px 12px;   /* reduced padding */
+      padding: 8px 12px;
       border-radius: 10px;
       width: 100%;
-      max-width: 260px;    /* reduced max width */
-      font-size: 1.3rem;   /* smaller font */
-      line-height: 1.3;    /* tighter line height */
-      margin-bottom: 15px; /* smaller margin */
+      max-width: 260px;
+      font-size: 1.3rem;
+      line-height: 1.3;
+      margin-bottom: 15px;
     }
     #cover button {
-      font-size: 1.8rem;  /* smaller button font */
-      padding: 10px 24px; /* less padding */
+      font-size: 1.8rem;
+      padding: 10px 24px;
       border: none;
       background-color: #ffd54f;
       border-radius: 12px;
@@ -104,10 +106,10 @@
       background-color: #ffca28;
     }
     #end p {
-      font-size: 1.3rem;     /* smaller font */
-      margin: 10px 0 15px;   /* smaller margin */
-      max-width: 260px;      /* narrower max width */
-      line-height: 1.25;     /* tighter line height */
+      font-size: 1.3rem;
+      margin: 10px 0 15px;
+      max-width: 260px;
+      line-height: 1.25;
     }
     #countdownOverlay {
       display: none;
@@ -153,12 +155,12 @@
     }
     #summaryTable {
       width: 100%;
-      max-width: 260px;   /* narrower max width */
+      max-width: 260px;
       border-collapse: collapse;
       background-color: #f8bbd0;
       border-radius: 10px;
       overflow: hidden;
-      font-size: 1.3rem;  /* smaller font */
+      font-size: 1.3rem;
     }
     #summaryTable th, #summaryTable td {
       padding: 6px;
@@ -277,6 +279,21 @@
       gridElement.innerHTML = '';
       gridElement.className = 'grid';
       gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+      // Center the grid container width precisely for specific rounds
+      const centerRounds = [0,1,2,3,6,7]; // zero-based indices for rounds 1,2,3,4,7,8
+      if (centerRounds.includes(currentRound)) {
+        // Calculate width = columns * (cellSize + gap) - gap
+        const gap = 15; // as per CSS
+        const width = columns * cellSize + (columns -1)*gap;
+        gridElement.style.width = `${width}px`;
+        gridElement.style.margin = '0 auto 20px';
+      } else {
+        // For other rounds, remove fixed width so it can expand naturally
+        gridElement.style.width = '';
+        gridElement.style.margin = '0 auto 20px';
+      }
+
       grid.forEach((emoji, i) => {
         const cell = document.createElement('div');
         cell.className = 'cell';
@@ -360,7 +377,7 @@
               renderGrid(modifiedGrid, round.columns, round.cellSize, true);
               timerElement.textContent = `Find the difference${round.differences > 1 ? 's' : ''}!`;
               messageElement.textContent = '';
-            }, 5000);  // 5 seconds delay for "Now, spot the difference!" per previous instructions
+            }, 5000);
           });
         });
       });
