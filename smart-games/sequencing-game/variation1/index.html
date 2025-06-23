@@ -21,14 +21,14 @@
       justify-content: flex-start;
       min-height: 100vh;
       overflow-x: hidden;
-      padding-top: 10vh; /* Moves content lower on the screen */
+      padding-top: 10vh;
     }
 
     .content {
       width: 90vw;
       max-width: 600px;
       padding: 5vw;
-      margin-top: 5vh; /* Moves white box lower */
+      margin-top: 5vh;
       background: white;
       border-radius: 20px;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
@@ -156,6 +156,12 @@
       font-weight: bold;
       display: none;
     }
+
+    #gameInstructionText {
+      font-size: 4vw;
+      margin-top: 20px;
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -195,6 +201,9 @@
     <div id="timerBox">10:00</div>
   </div>
 
+  <!-- New instruction line under game -->
+  <p id="gameInstructionText" style="display: none;">Repeat the pattern shown.</p>
+
   <div id="finalPopup">
     <div>
       <h2>Congratulations!</h2>
@@ -228,6 +237,7 @@
     function startCountdown() {
       document.getElementById("instructionModal").style.display = "none";
       document.getElementById("gameArea").style.display = "block";
+      document.getElementById("gameInstructionText").style.display = "block";
       let countdown = 3;
       const box = document.getElementById("countdownBox");
       box.style.display = "block";
@@ -308,6 +318,7 @@
   </script>
 </body>
 </html>
+
 
 
 
