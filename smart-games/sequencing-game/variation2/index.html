@@ -10,11 +10,12 @@
     font-family: 'Arial Rounded MT Bold', sans-serif;
     background: linear-gradient(to bottom right, #fce4ec, #e1f5fe);
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     min-height: 100vh;
     text-align: center;
     color: #333;
+    padding-top: 10vh;
   }
   .content {
     padding: 5vw;
@@ -145,6 +146,11 @@
     color: #333;
     margin-top: 20px;
   }
+  #gameInstructionLine {
+    font-size: 4vw;
+    margin-top: 20px;
+    color: #333;
+  }
 </style>
 </head>
 <body>
@@ -192,6 +198,7 @@
 <p id="message"></p>
 <div id="timerBox">10:00</div>
 </div>
+<p id="gameInstructionLine" style="display: none;">Repeat the pattern shown.</p>
 <div id="finalPopup">
   <div>
     <h2>Congratulations!</h2>
@@ -225,6 +232,7 @@ function goBack() {
 function startCountdown() {
   document.getElementById("instructionModal").style.display = "none";
   document.getElementById("gameArea").style.display = "block";
+  document.getElementById("gameInstructionLine").style.display = "block";
   let countdown = 3;
   const countdownBox = document.getElementById("countdownBox");
   countdownBox.style.display = "block";
@@ -301,8 +309,8 @@ function startTimer() {
 function showFinalPopup() {
   document.getElementById("finalMessage").textContent = `Your personal best was: ${best}`;
   document.getElementById("finalPopup").style.display = "flex";
+  window.parent.postMessage("showNext", "*");
 }
 </script>
 </body>
 </html>
-
