@@ -119,19 +119,28 @@
       border-radius: 5px;
       border: 1px solid #000;
     }
+
+    /* Container for title + moved countdown and prompt */
+    #topInfo {
+      max-width: 600px;
+      margin: 0 auto 0;
+    }
   </style>
 </head>
 <body>
-  <div class="banner">Welcome to the SMART memory game!</div>
-  <h1>🎨 SMART Colour Memory Game 🎨</h1>
-  <p>Memorize the colors in the grid! You'll be asked to recall a specific row or column.</p>
+  <div class="banner" id="welcomeBanner">Welcome to the SMART memory game!</div>
+
+  <div id="topInfo">
+    <h1>🎨 SMART Colour Memory Game 🎨</h1>
+    <p id="instruction">Memorize the colors in the grid! You'll be asked to recall a specific row or column.</p>
+    <p id="prompt" class="message hidden"></p>
+    <p id="countdown" class="message hidden">⏳ Time left to remember: <span id="timer">60</span> seconds</p>
+  </div>
 
   <div id="roundCounter" class="message">Round 0 of 5 — 5 rounds remaining</div>
 
   <div class="game-area">
     <div id="grid" class="grid"></div>
-    <p id="prompt" class="message hidden"></p>
-    <p id="countdown" class="message hidden">⏳ Time left to remember: <span id="timer">60</span> seconds</p>
 
     <div id="input-area" class="hidden">
       <p>Type the colors in order (like "red, blue, yellow"):</p>
@@ -163,6 +172,8 @@
     const nextBtn = document.getElementById("next");
     const roundCounter = document.getElementById("roundCounter");
     const finalSummary = document.getElementById("finalSummary");
+    const welcomeBanner = document.getElementById("welcomeBanner");
+    const instructionP = document.getElementById("instruction");
 
     let currentRound = 0;
     let grid = [];
@@ -298,6 +309,11 @@
     }
 
     startBtn.addEventListener("click", () => {
+      // Hide welcome banner on start
+      welcomeBanner.style.display = "none";
+      // Hide the instruction paragraph after first start
+      instructionP.style.display = "none";
+
       finalSummary.style.display = "none";
       currentRound = 0;
       score = 0;
