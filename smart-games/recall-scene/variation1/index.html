@@ -56,7 +56,30 @@
     #finalSummary ul { list-style-type: none; padding: 0; margin: 20px 0; text-align: left; display: inline-block; }
     #finalSummary li { font-size: 0.9em; margin-bottom: 8px; }
     
-    #result { background-color: #e9f5ff; padding: 15px; border-radius: 10px; margin-top: 20px; border: 2px solid #0077b6; }
+    /* --- NEW: Styles for the Results Overlay --- */
+    #results-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.6);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+    }
+    #result { 
+        background-color: #e9f5ff; 
+        padding: 15px; 
+        border-radius: 15px; 
+        border: 3px solid #0077b6; 
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh; /* Prevent it from being too tall */
+        overflow-y: auto; /* Add scrollbar only if needed */
+    }
     
     @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .celebrate { animation: celebrate 0.5s ease-in-out; }
@@ -100,11 +123,15 @@
             <input type="text" id="answer" placeholder="e.g. apple book ball"/>
             <button id="submitAnswerBtn">Submit</button>
         </div>
-        <div id="result" class="fadeable is-faded-out">
-            <div id="result-content"></div>
-            <button id="nextBtn" class="hidden">Next Round</button>
-        </div>
       </div>
+  </div>
+  
+  <!-- --- NEW: Results Overlay Container --- -->
+  <div id="results-overlay" class="fadeable is-faded-out">
+    <div id="result">
+        <div id="result-content"></div>
+        <button id="nextBtn" class="hidden">Next Round</button>
+    </div>
   </div>
   
   <div id="round-fanfare" class="hidden"></div>
@@ -118,11 +145,12 @@
     const allObjects = Object.keys(objectLibrary);
     let recallObjects = [], roundScores = [];
     let round = 0, score = 0;
+    let viewTimer, answerTimer, mainGameTimer;
+    let isGameOver = false;
     
-    // --- NEW: Simplified state management ---
-    let gameState = 'IDLE'; // Can be VIEWING, ANSWERING, RESULTS
-    let mainTimer, roundTimer;
-    let mainTimeLeft = 600, roundTimeLeft = 0;
+    const VIEWING_TIME = 60;
+    const ANSWERING_TIME = 60;
+    const TOTAL_GAME_TIME = 600;
 
     const allElements = {
         instructions: document.getElementById('instructions-container'), game: document.getElementById('game-container'),
@@ -133,67 +161,79 @@
         resultContent: document.getElementById('result-content'), viewingCountdown: document.getElementById('viewingCountdown'),
         answerCountdown: document.getElementById('answerCountdown'), viewingPhase: document.getElementById('viewing-phase'),
         answeringPhase: document.getElementById('answering-phase'), roundFanfare: document.getElementById('round-fanfare'),
-        mainTimerBar: document.getElementById('main-timer-bar')
+        mainTimerBar: document.getElementById('main-timer-bar'),
+        resultsOverlay: document.getElementById('results-overlay') // New element reference
     };
 
     allElements.startBtn.addEventListener('click', startGame);
-    allElements.nextBtn.addEventListener('click', setupNextRound);
+    allElements.nextBtn.addEventListener('click', nextRound);
     allElements.submitBtn.addEventListener('click', checkAnswer);
     allElements.answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
 
-    function startGame() {
-        allElements.instructions.classList.add('hidden');
-        allElements.game.classList.remove('hidden');
-        
-        score = 0;
-        round = 0;
-        roundScores = [];
-        
-        mainTimeLeft = 600;
-        mainTimer = setInterval(gameHeartbeat, 1000);
-        
-        setupNextRound();
+    function resetAllTimers() {
+      clearInterval(viewTimer);
+      clearInterval(answerTimer);
+      clearInterval(mainGameTimer);
     }
     
-    function gameHeartbeat() {
-        mainTimeLeft--;
-        allElements.mainTimerBar.style.width = (mainTimeLeft / 600) * 100 + '%';
+    function startGame() {
+      allElements.instructions.classList.add('hidden');
+      allElements.game.classList.remove('hidden');
+      isGameOver = false;
+      score = 0; round = 0;
+      roundScores = [];
+      allElements.finalSummary.classList.add('hidden');
+      allElements.resultsOverlay.classList.add('is-faded-out');
+      
+      let mainTimeLeft = TOTAL_GAME_TIME;
+      mainGameTimer = setInterval(() => {
+          mainTimeLeft--;
+          allElements.mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
+          if (mainTimeLeft <= 0 && !isGameOver) {
+              showFinalSummary();
+          }
+      }, 1000);
 
-        if (gameState === 'VIEWING' || gameState === 'ANSWERING') {
-            roundTimeLeft--;
-            if (gameState === 'VIEWING') allElements.viewingCountdown.textContent = roundTimeLeft;
-            if (gameState === 'ANSWERING') allElements.answerCountdown.textContent = roundTimeLeft;
-
-            if (roundTimeLeft <= 0) {
-                if (gameState === 'VIEWING') showAnsweringPhase();
-                else if (gameState === 'ANSWERING') checkAnswer();
-            }
-        }
-        
-        if (mainTimeLeft <= 0) {
-            showFinalSummary();
-        }
+      nextRound();
+    }
+    
+    function triggerFanfare() {
+        allElements.roundFanfare.textContent = `Round ${round}!`;
+        allElements.roundFanfare.classList.remove('hidden', 'fanfare-animate');
+        setTimeout(() => allElements.roundFanfare.classList.add('fanfare-animate'), 10);
+        setTimeout(() => allElements.roundFanfare.classList.add('hidden'), 1500);
     }
 
-    function setupNextRound() {
-        if (gameState === 'GAMEOVER') return;
-        
-        round++;
-        allElements.roundCounter.textContent = `Round ${round}`;
-        
-        allElements.result.classList.add('is-faded-out');
-        allElements.nextBtn.classList.add('hidden');
-        allElements.answeringPhase.classList.add('is-faded-out');
-        
-        triggerFanfare();
-        
-        setTimeout(() => {
-            if (gameState === 'GAMEOVER') return;
-            buildScene();
-            allElements.viewingPhase.classList.remove('is-faded-out');
-            gameState = 'VIEWING';
-            roundTimeLeft = 60;
-        }, 1500);
+    function nextRound() {
+      if (isGameOver) return;
+      round++;
+      allElements.roundCounter.textContent = `Round ${round}`;
+      
+      clearInterval(viewTimer);
+      clearInterval(answerTimer);
+      allElements.resultsOverlay.classList.add('is-faded-out'); // Hide results overlay
+      allElements.nextBtn.classList.add('hidden');
+      allElements.answeringPhase.classList.add('is-faded-out');
+      
+      triggerFanfare();
+      
+      setTimeout(() => {
+          if (isGameOver) return;
+          buildScene();
+          allElements.viewingPhase.classList.remove('is-faded-out');
+          
+          let timeLeft = VIEWING_TIME;
+          allElements.viewingCountdown.textContent = timeLeft;
+          viewTimer = setInterval(() => {
+              if(isGameOver) { clearInterval(viewTimer); return; }
+              timeLeft--;
+              allElements.viewingCountdown.textContent = timeLeft;
+              if (timeLeft <= 0) {
+                  clearInterval(viewTimer);
+                  showAnsweringPhase();
+              }
+          }, 1000);
+      }, 1500);
     }
     
     function buildScene() {
@@ -204,41 +244,48 @@
       const index = Math.floor(Math.random() * 4);
       
       let currentRecallObjects = [];
-      gridItems.forEach((item) => {
+      gridItems.forEach((item, i) => {
         const div = document.createElement('div');
         div.className = 'object';
+        
+        const shouldHighlight = (isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index);
+        if (shouldHighlight) {
+          div.classList.add('highlight-border');
+          currentRecallObjects.push(item);
+        }
+        
         const img = document.createElement('img');
         img.src = objectLibrary[item];
         img.alt = item;
         div.appendChild(img);
         allElements.scene.appendChild(div);
       });
-
-      // Highlight the correct row/column after all images are in the DOM
-      const objectsInDom = allElements.scene.children;
-      for (let i = 0; i < objectsInDom.length; i++) {
-          const shouldHighlight = (isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index);
-          if (shouldHighlight) {
-              objectsInDom[i].classList.add('highlight-border');
-              currentRecallObjects.push(gridItems[i]);
-          }
-      }
       recallObjects = currentRecallObjects;
     }
 
     function showAnsweringPhase() {
-        if (gameState === 'GAMEOVER') return;
+        if (isGameOver) return;
         allElements.viewingPhase.classList.add('is-faded-out');
         allElements.answeringPhase.classList.remove('is-faded-out');
         allElements.answerInput.value = '';
         allElements.answerInput.focus();
-        gameState = 'ANSWERING';
-        roundTimeLeft = 60;
+        
+        let timeLeft = ANSWERING_TIME;
+        allElements.answerCountdown.textContent = timeLeft;
+        answerTimer = setInterval(() => {
+            if(isGameOver) { clearInterval(answerTimer); return; }
+            timeLeft--;
+            allElements.answerCountdown.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(answerTimer);
+                checkAnswer();
+            }
+        }, 1000);
     }
 
     function checkAnswer() {
-      if (gameState !== 'ANSWERING') return;
-      gameState = 'RESULTS';
+      if (isGameOver) return;
+      clearInterval(answerTimer);
       
       const userInputText = allElements.answerInput.value.toLowerCase();
       const userAnswersProvided = userInputText.replace(/,/g, ' ').split(' ').filter(s => s.trim().length > 0);
@@ -287,23 +334,25 @@
       allElements.resultContent.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
                             (playerAnswerImages ? `<div style="margin-top:12px;"><div class="answer-label">Your answer:</div><div class="answer-display">${playerAnswerImages}</div></div>` : '');
       
-      allElements.result.classList.remove('celebrate', 'is-faded-out');
+      allElements.result.classList.remove('celebrate');
       if (roundScore >= 3) {
           setTimeout(() => allElements.result.classList.add('celebrate'), 10);
       }
       
       allElements.answeringPhase.classList.add('is-faded-out');
-      if (gameState !== 'GAMEOVER') {
+      allElements.resultsOverlay.classList.remove('is-faded-out'); // Show the overlay
+      if (!isGameOver) {
         allElements.nextBtn.classList.remove('hidden');
       }
     }
     
     function showFinalSummary() {
-      if (gameState === 'GAMEOVER') return;
-      gameState = 'GAMEOVER';
-      clearInterval(mainTimer);
+      if (isGameOver) return;
+      isGameOver = true;
+      resetAllTimers();
       
       allElements.game.classList.add('hidden');
+      allElements.resultsOverlay.classList.add('is-faded-out'); // Hide results if they are showing
       allElements.finalSummary.classList.remove('hidden');
       
       const averageScore = roundScores.length > 0 ? (score / roundScores.length).toFixed(2) : "0.00";
@@ -325,13 +374,6 @@
       `;
 
       window.parent.postMessage("showNext", "*");
-    }
-    
-    function triggerFanfare() {
-        allElements.roundFanfare.textContent = `Round ${round}!`;
-        allElements.roundFanfare.classList.remove('hidden', 'fanfare-animate');
-        setTimeout(() => allElements.roundFanfare.classList.add('fanfare-animate'), 10);
-        setTimeout(() => allElements.roundFanfare.classList.add('hidden'), 1500);
     }
   </script>
 </body>
