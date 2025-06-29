@@ -111,7 +111,6 @@
   <div id="finalSummary" class="hidden"></div>
 
   <script>
-    // --- THIS IS THE CRITICAL FIX: The complete and correct data libraries are now here. ---
     const objectLibrary = { apple: "https://img.icons8.com/color/96/apple.png", book: "https://img.icons8.com/color/96/book.png", ball: "https://img.icons8.com/emoji/96/soccer-ball-emoji.png", cat: "https://img.icons8.com/color/96/cat.png", car: "https://img.icons8.com/color/96/car.png", hat: "https://img.icons8.com/emoji/96/top-hat-emoji.png", star: "https://img.icons8.com/color/96/star.png", fish: "https://img.icons8.com/color/96/fish.png", pen: "https://img.icons8.com/emoji/96/pen-emoji.png", leaf: "https://img.icons8.com/color/96/leaf.png", cake: "https://img.icons8.com/color/96/birthday-cake.png", dog: "https://img.icons8.com/color/96/dog.png", flower: "https://img.icons8.com/color/96/flower.png", globe: "https://img.icons8.com/color/96/globe.png", kite: "https://img.icons8.com/color/96/kite.png", moon: "https://img.icons8.com/emoji/96/crescent-moon-emoji.png" };
     const acceptableAnswers = { apple: ["apple"], book: ["book"], ball: ["ball", "soccer ball", "football"], cat: ["cat"], car: ["car"], hat: ["hat", "top hat"], star: ["star"], fish: ["fish"], pen: ["pen", "pencil"], leaf: ["leaf"], cake: ["cake", "birthday cake"], dog: ["dog"], flower: ["flower"], globe: ["globe", "world", "earth"], kite: ["kite"], moon: ["moon", "crescent moon"] };
     for (const key of Object.keys(objectLibrary)) { if (!acceptableAnswers[key]) acceptableAnswers[key] = [key]; }
@@ -183,6 +182,7 @@
       
       clearInterval(viewTimer);
       clearInterval(answerTimer);
+
       allElements.result.classList.add('is-faded-out');
       allElements.nextBtn.classList.add('hidden');
       allElements.answeringPhase.classList.add('is-faded-out');
@@ -197,6 +197,7 @@
           let timeLeft = VIEWING_TIME;
           allElements.viewingCountdown.textContent = timeLeft;
           viewTimer = setInterval(() => {
+              if(isGameOver) { clearInterval(viewTimer); return; }
               timeLeft--;
               allElements.viewingCountdown.textContent = timeLeft;
               if (timeLeft <= 0) {
@@ -208,27 +209,30 @@
     }
     
     function buildScene() {
-      const gridObjects = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16).reduce((rows, key, index) => { 
-        (index % 4 === 0 ? rows.push([key]) : rows[rows.length-1].push(key)); return rows;
-      }, []);
-
+      const gridItems = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16);
+      
       allElements.scene.innerHTML = '';
       const isRow = Math.random() < 0.5;
       const index = Math.floor(Math.random() * 4);
       
-      gridObjects.flat().forEach((item, i) => {
+      let currentRecallObjects = [];
+      gridItems.forEach((item, i) => {
         const div = document.createElement('div');
         div.className = 'object';
-        if ((isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index)) {
+        
+        const shouldHighlight = (isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index);
+        if (shouldHighlight) {
           div.classList.add('highlight-border');
+          currentRecallObjects.push(item);
         }
+        
         const img = document.createElement('img');
         img.src = objectLibrary[item];
         img.alt = item;
         div.appendChild(img);
         allElements.scene.appendChild(div);
       });
-      recallObjects = isRow ? gridObjects[index] : gridObjects.map(r => r[index]);
+      recallObjects = currentRecallObjects;
     }
 
     function showAnsweringPhase() {
@@ -241,6 +245,7 @@
         let timeLeft = ANSWERING_TIME;
         allElements.answerCountdown.textContent = timeLeft;
         answerTimer = setInterval(() => {
+            if(isGameOver) { clearInterval(answerTimer); return; }
             timeLeft--;
             allElements.answerCountdown.textContent = timeLeft;
             if (timeLeft <= 0) {
