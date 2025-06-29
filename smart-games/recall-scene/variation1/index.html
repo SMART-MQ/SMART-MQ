@@ -17,7 +17,6 @@
       padding: 15px;
     }
 
-    /* --- NEW: Instructions Container for clean start --- */
     #instructions-container {
         padding: 20px;
         max-width: 550px;
@@ -66,7 +65,7 @@
     
     .object.highlight-border {
         border: 4px solid #EF476F; /* Punchy Pink */
-        box-shadow: 0 0 15px #EF476F;
+        box-shadow: 0 0 15px rgba(239, 71, 111, 0.6);
     }
 
     .object img {
@@ -83,7 +82,6 @@
       background: #FFD166; /* Cheerful Yellow */
       box-shadow: 0 5px 15px rgba(0,0,0,0.2);
       color: #262626;
-      font-size: 20px;
       padding: 20px;
       border-radius: 12px;
       display: flex;
@@ -99,11 +97,6 @@
       transform: translateY(0);
     }
     
-    .curtain-text {
-        font-weight: 600;
-        font-size: 1.2em;
-    }
-
     .message {
       font-size: 1em;
       margin-top: 15px;
@@ -112,7 +105,7 @@
     }
 
     button {
-      background-color: #FFD166; /* Cheerful Yellow */
+      background-color: #FFD166;
       border: none;
       color: #262626;
       padding: 12px 25px;
@@ -123,7 +116,7 @@
       border-radius: 12px;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 0 #E5A000; /* Darker yellow for depth */
+      box-shadow: 0 4px 0 #E5A000;
     }
     
     button:hover {
@@ -181,7 +174,6 @@
       border: 3px solid #06D6A0;
       border-radius: 15px;
       padding: 30px;
-      display: none;
     }
     
     #result {
@@ -223,7 +215,6 @@
 </head>
 <body>
 
-  <!-- --- NEW: Dedicated Instructions Screen --- -->
   <div id="instructions-container">
     <h1>Picture Perfect Memory</h1>
     <p class="intro-text">Look carefully at all the pictures. Your mission is to remember the ones in the <strong>highlighted</strong> row or column!</p>
@@ -235,22 +226,21 @@
       <div class="game-area">
         <div id="scene" class="scene"></div>
         <div id="curtain" class="curtain">
-          <p class="curtain-text">What did you see in the highlighted line?</p>
-        </div>
-        
-        <div id="viewingMessage" class="message hidden"></div>
-        <div id="input-area" class="hidden">
-          <p>Type the names of the images you remember. Separate them with a space.</p>
-          <input type="text" id="answer" placeholder="e.g. apple book ball"/>
-          <p id="countdown" class="message">⏳ Time left to answer: <span id="answerCountdown">60</span> seconds</p>
-          <button id="submitAnswerBtn">Submit Answer</button>
+          <!-- The input area is now INSIDE the curtain -->
+          <div id="input-area">
+            <p>What did you see in the highlighted line?</p>
+            <input type="text" id="answer" placeholder="e.g. apple book ball"/>
+            <p id="countdown" class="message">⏳ Time left: <span id="answerCountdown">60</span>s</p>
+            <button id="submitAnswerBtn">Submit Answer</button>
+          </div>
         </div>
         <div id="result" class="hidden"></div>
       </div>
+      <div id="viewingMessage" class="message hidden"></div>
       <button id="nextBtn" class="hidden">Next Round</button>
   </div>
 
-  <div id="finalSummary"></div>
+  <div id="finalSummary" class="hidden"></div>
 
   <script>
     const objectLibrary = {
@@ -283,7 +273,6 @@
     const submitAnswerBtn = document.getElementById('submitAnswerBtn');
     const sceneDiv = document.getElementById('scene');
     const curtainEl = document.getElementById('curtain');
-    const inputAreaEl = document.getElementById('input-area');
     const answerInput = document.getElementById('answer');
     const resultDiv = document.getElementById('result');
     const viewingMessageEl = document.getElementById('viewingMessage');
@@ -294,7 +283,7 @@
     submitAnswerBtn.addEventListener('click', checkAnswer);
     answerInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-            e.preventDefault(); // Prevents form submission if it's in a form
+            e.preventDefault();
             checkAnswer();
         }
     });
@@ -328,22 +317,19 @@
     function startGame() {
       instructionsContainer.classList.add('hidden');
       gameContainer.classList.remove('hidden');
-      
       score = 0; round = 0;
-      finalSummaryDiv.style.display = 'none';
+      finalSummaryDiv.classList.add('hidden');
       nextRound();
     }
 
     function nextRound() {
       resetTimers();
       sceneDiv.innerHTML = '';
+      sceneDiv.classList.remove('hidden');
       resultDiv.classList.add('hidden');
       curtainEl.classList.remove('active');
-      inputAreaEl.classList.add('hidden');
-      answerInput.value = '';
       viewingMessageEl.classList.remove('hidden');
       nextBtn.classList.add('hidden');
-      sceneDiv.classList.remove('hidden');
       updateRoundCounter();
 
       gridObjects = getRandomGrid();
@@ -359,8 +345,6 @@
         div.className = 'object';
         const img = document.createElement('img');
         img.src = objectLibrary[item];
-        img.alt = item;
-        
         const rowIndex = Math.floor(i / 4);
         const colIndex = i % 4;
         if ((isRow && rowIndex === index) || (!isRow && colIndex === index)) {
@@ -371,16 +355,14 @@
       });
 
       recallObjects = isRow ? gridObjects[index] : gridObjects.map(r => r[index]);
-      
       viewTimer = startTimer(60, viewingCountdownEl, hideSceneShowCurtain);
     }
 
     function hideSceneShowCurtain() {
-      curtainEl.classList.add('active');
+      sceneDiv.classList.add('hidden');
       viewingMessageEl.classList.add('hidden');
-      inputAreaEl.classList.remove('hidden');
+      curtainEl.classList.add('active');
       answerInput.focus();
-
       answerTimer = startTimer(60, answerCountdownEl, checkAnswer);
     }
 
@@ -447,13 +429,13 @@
         </div>
       `;
       resultDiv.classList.remove('hidden');
-      inputAreaEl.classList.add('hidden');
       curtainEl.classList.remove('active');
       
       round++;
       
       if (round >= totalRounds) {
-        setTimeout(showFinalSummary, 3500); // Increased delay to see final results
+        nextBtn.classList.add('hidden');
+        setTimeout(showFinalSummary, 3500);
       } else {
         nextBtn.classList.remove('hidden');
       }
@@ -466,7 +448,7 @@
 
     function showFinalSummary() {
       gameContainer.classList.add('hidden');
-      finalSummaryDiv.style.display = 'block';
+      finalSummaryDiv.classList.remove('hidden');
 
       const averageScore = (score / totalRounds).toFixed(2);
       finalSummaryDiv.innerHTML = `
@@ -477,9 +459,7 @@
         <button id="playAgainBtn">Play Again</button>
       `;
 
-      document.getElementById('playAgainBtn').addEventListener('click', () => {
-        location.reload(); // Simple way to reset everything
-      });
+      document.getElementById('playAgainBtn').addEventListener('click', () => location.reload());
       
       window.parent.postMessage("showNext", "*");
     }
