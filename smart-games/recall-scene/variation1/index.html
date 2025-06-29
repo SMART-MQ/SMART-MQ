@@ -35,29 +35,15 @@
     .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #0077b6; margin: 10px auto 15px auto; overflow: hidden; }
     .timer-bar { height: 100%; width: 100%; background-color: #f94144; border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
-    #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #0077b6; margin-bottom: 15px; }
-    #answering-phase .message { margin-top: 0; }
+    #viewing-phase .message { font-size: 1.1em; font-weight: 700; color: #0077b6; margin-bottom: 15px; }
 
     .scene { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
     .object { width: 100%; aspect-ratio: 1 / 1; display: flex; justify-content: center; align-items: center; border-radius: 12px; background-color: white; border: 3px solid #caf0f8; box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
     .object.highlight-border { border: 4px solid #f94144; }
     .object img { width: 85%; height: 85%; }
     
-    #answering-phase { background: #e9f5ff; padding: 20px; border-radius: 12px; border: 3px dashed #0077b6; }
-    
-    button { background-color: #ffc300; border: none; color: #333; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Balsamiq Sans', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e0a800; text-transform: uppercase; }
-    button:hover:not(:disabled) { background-color: #ffd60a; transform: translateY(-2px); box-shadow: 0 7px 0 #e0a800; }
-    #submitAnswerBtn { background-color: #f94144; color: white; box-shadow: 0 5px 0 #c22528; }
-
-    input[type="text"] { padding: 10px; font-size: 1em; font-family: 'Balsamiq Sans', cursive; margin: 10px; border-radius: 8px; border: 2px solid #ccc; width: 80%; max-width: 300px; }
-
-    #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
-    #finalSummary { margin-top: 40px; font-size: 1.2em; background: #ffffff; border: 3px solid #0077b6; border-radius: 15px; padding: 30px; }
-    #finalSummary ul { list-style-type: none; padding: 0; margin: 20px 0; text-align: left; display: inline-block; }
-    #finalSummary li { font-size: 0.9em; margin-bottom: 8px; }
-    
-    /* --- NEW: Styles for the Results Overlay --- */
-    #results-overlay {
+    /* --- NEW: Overlay styles for both Answering and Results --- */
+    .overlay {
         position: fixed;
         top: 0;
         left: 0;
@@ -70,16 +56,30 @@
         align-items: center;
         padding: 15px;
     }
-    #result { 
+    
+    .overlay-content {
         background-color: #e9f5ff; 
-        padding: 15px; 
+        padding: 20px; 
         border-radius: 15px; 
         border: 3px solid #0077b6; 
         width: 100%;
         max-width: 500px;
-        max-height: 90vh; /* Prevent it from being too tall */
-        overflow-y: auto; /* Add scrollbar only if needed */
+        max-height: 90vh;
+        overflow-y: auto;
     }
+    
+    #answering-phase p { font-weight: 700; font-size: 1.1em; }
+    
+    button { background-color: #ffc300; border: none; color: #333; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Balsamiq Sans', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e0a800; text-transform: uppercase; }
+    button:hover:not(:disabled) { background-color: #ffd60a; transform: translateY(-2px); box-shadow: 0 7px 0 #e0a800; }
+    #submitAnswerBtn { background-color: #f94144; color: white; box-shadow: 0 5px 0 #c22528; }
+
+    input[type="text"] { padding: 10px; font-size: 1em; font-family: 'Balsamiq Sans', cursive; margin: 10px; border-radius: 8px; border: 2px solid #ccc; width: 80%; max-width: 300px; }
+
+    #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
+    #finalSummary { margin-top: 40px; font-size: 1.2em; background: #ffffff; border: 3px solid #0077b6; border-radius: 15px; padding: 30px; }
+    #finalSummary ul { list-style-type: none; padding: 0; margin: 20px 0; text-align: left; display: inline-block; }
+    #finalSummary li { font-size: 0.9em; margin-bottom: 8px; }
     
     @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .celebrate { animation: celebrate 0.5s ease-in-out; }
@@ -117,18 +117,22 @@
             <div class="message">Memorize the highlighted items! You have <span id="viewingCountdown">60</span>s</div>
             <div id="scene" class="scene"></div>
         </div>
-        <div id="answering-phase" class="fadeable is-faded-out">
-            <p>What did you see in the highlighted line?</p>
-            <p class="message">⏳ Time left: <span id="answerCountdown">60</span>s</p>
-            <input type="text" id="answer" placeholder="e.g. apple book ball"/>
-            <button id="submitAnswerBtn">Submit</button>
-        </div>
       </div>
   </div>
   
-  <!-- --- NEW: Results Overlay Container --- -->
-  <div id="results-overlay" class="fadeable is-faded-out">
-    <div id="result">
+  <!-- --- NEW: Overlay for Answering Phase --- -->
+  <div id="answering-overlay" class="overlay fadeable is-faded-out">
+      <div id="answering-phase" class="overlay-content">
+          <p>What did you see in the highlighted line?</p>
+          <p class="message">⏳ Time left: <span id="answerCountdown">60</span>s</p>
+          <input type="text" id="answer" placeholder="e.g. apple book ball"/>
+          <button id="submitAnswerBtn">Submit</button>
+      </div>
+  </div>
+
+  <!-- --- NEW: Overlay for Results Phase --- -->
+  <div id="results-overlay" class="overlay fadeable is-faded-out">
+    <div id="result" class="overlay-content">
         <div id="result-content"></div>
         <button id="nextBtn" class="hidden">Next Round</button>
     </div>
@@ -160,9 +164,9 @@
         answerInput: document.getElementById('answer'), result: document.getElementById('result'),
         resultContent: document.getElementById('result-content'), viewingCountdown: document.getElementById('viewingCountdown'),
         answerCountdown: document.getElementById('answerCountdown'), viewingPhase: document.getElementById('viewing-phase'),
-        answeringPhase: document.getElementById('answering-phase'), roundFanfare: document.getElementById('round-fanfare'),
-        mainTimerBar: document.getElementById('main-timer-bar'),
-        resultsOverlay: document.getElementById('results-overlay') // New element reference
+        answeringOverlay: document.getElementById('answering-overlay'),
+        roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
+        resultsOverlay: document.getElementById('results-overlay')
     };
 
     allElements.startBtn.addEventListener('click', startGame);
@@ -183,7 +187,6 @@
       score = 0; round = 0;
       roundScores = [];
       allElements.finalSummary.classList.add('hidden');
-      allElements.resultsOverlay.classList.add('is-faded-out');
       
       let mainTimeLeft = TOTAL_GAME_TIME;
       mainGameTimer = setInterval(() => {
@@ -211,9 +214,9 @@
       
       clearInterval(viewTimer);
       clearInterval(answerTimer);
-      allElements.resultsOverlay.classList.add('is-faded-out'); // Hide results overlay
+      allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.nextBtn.classList.add('hidden');
-      allElements.answeringPhase.classList.add('is-faded-out');
+      allElements.answeringOverlay.classList.add('is-faded-out');
       
       triggerFanfare();
       
@@ -237,14 +240,14 @@
     }
     
     function buildScene() {
-      const gridItems = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16);
+      const gridObjects = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16);
       
       allElements.scene.innerHTML = '';
       const isRow = Math.random() < 0.5;
       const index = Math.floor(Math.random() * 4);
       
       let currentRecallObjects = [];
-      gridItems.forEach((item, i) => {
+      gridObjects.forEach((item, i) => {
         const div = document.createElement('div');
         div.className = 'object';
         
@@ -266,7 +269,7 @@
     function showAnsweringPhase() {
         if (isGameOver) return;
         allElements.viewingPhase.classList.add('is-faded-out');
-        allElements.answeringPhase.classList.remove('is-faded-out');
+        allElements.answeringOverlay.classList.remove('is-faded-out');
         allElements.answerInput.value = '';
         allElements.answerInput.focus();
         
@@ -339,8 +342,8 @@
           setTimeout(() => allElements.result.classList.add('celebrate'), 10);
       }
       
-      allElements.answeringPhase.classList.add('is-faded-out');
-      allElements.resultsOverlay.classList.remove('is-faded-out'); // Show the overlay
+      allElements.answeringOverlay.classList.add('is-faded-out');
+      allElements.resultsOverlay.classList.remove('is-faded-out');
       if (!isGameOver) {
         allElements.nextBtn.classList.remove('hidden');
       }
@@ -352,7 +355,7 @@
       resetAllTimers();
       
       allElements.game.classList.add('hidden');
-      allElements.resultsOverlay.classList.add('is-faded-out'); // Hide results if they are showing
+      allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.finalSummary.classList.remove('hidden');
       
       const averageScore = roundScores.length > 0 ? (score / roundScores.length).toFixed(2) : "0.00";
