@@ -4,114 +4,169 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SMART memory game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      background-color: #fcefe3;
-      font-family: 'Arial', sans-serif;
-      color: black;
+      background-color: #f0f4f8;
+      font-family: 'Poppins', sans-serif;
+      color: #333;
       text-align: center;
       margin: 0;
-      padding: 0;
+      padding: 15px;
     }
 
     #welcomeBanner {
-      background-color: #a8dadc;
-      color: black;
-      font-weight: bold;
+      background-color: #457b9d;
+      color: white;
+      font-weight: 600;
       padding: 20px;
       font-size: 1.5em;
-      border-bottom: 4px solid #457b9d;
+      border-bottom: 4px solid #1d3557;
       user-select: none;
     }
 
     h1 {
       margin-top: 20px;
-      font-size: 1.4em;
+      font-size: 1.8em;
+      color: #1d3557;
+    }
+    
+    p {
+        line-height: 1.5;
+        max-width: 500px;
+        margin: 10px auto;
     }
 
     .game-area {
       margin: 20px auto;
-      max-width: 600px;
+      max-width: 500px;
       position: relative;
     }
 
     .scene {
       display: grid;
+      /* --- CHANGE: Responsive grid columns --- */
       grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
+      gap: 10px;
       margin-top: 20px;
-      min-height: 300px;
+      position: relative;
     }
 
     .object {
-      width: 90px;
-      height: 90px;
+      width: 100%;
+      aspect-ratio: 1 / 1; /* --- CHANGE: Maintain square shape --- */
       display: flex;
       justify-content: center;
       align-items: center;
       border-radius: 10px;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+    
+    .object:hover {
+        transform: scale(1.05);
+    }
+    
+    .object.highlight-border {
+        border: 4px solid #e63946;
+        box-shadow: 0 0 15px #e63946;
     }
 
     .object img {
-      width: 80px;
-      height: 80px;
+      width: 85%; /* --- CHANGE: Responsive image size --- */
+      height: 85%;
     }
 
     .curtain {
-      position: relative;
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      height: 0;
+      height: 100%;
       overflow: hidden;
-      background-color: #d3cce3;
-      font-size: 24px;
-      padding: 0;
-      transition: height 1s ease;
+      background: linear-gradient(to bottom, #457b9d, #355c7d);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      color: white;
+      font-size: 20px;
+      padding: 20px;
       border-radius: 10px;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
+      z-index: 10;
+      /* --- CHANGE: Animate transform instead of height for slide-down effect --- */
+      transform: translateY(-110%);
+      transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
     }
 
     .curtain.active {
-      height: 200px;
-      padding: 20px;
+      transform: translateY(0);
     }
 
     .message, #countdown {
-      font-size: 0.9em;
+      font-size: 1em;
       margin-top: 10px;
       color: #333;
     }
+    
+    #viewingMessage {
+        font-weight: 600;
+    }
 
     button {
-      background-color: #a8dadc;
+      background-color: #457b9d;
       border: none;
-      color: black;
-      padding: 10px 20px;
+      color: white;
+      padding: 12px 25px;
       margin: 20px 10px;
-      font-size: 0.9em;
+      font-size: 1em;
+      font-weight: 600;
       border-radius: 10px;
       cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      border-bottom: 3px solid #1d3557;
+    }
+    
+    button:hover {
+        background-color: #a8dadc;
+        color: #1d3557;
+        transform: translateY(-2px);
+    }
+    
+    button:active {
+        transform: translateY(0);
+    }
+    
+    button.hidden {
+      display: none;
     }
 
     input[type="text"] {
-      padding: 8px;
-      font-size: 0.9em;
+      padding: 10px;
+      font-size: 1em;
       margin: 10px;
       border-radius: 5px;
-      border: 1px solid #ccc;
+      border: 2px solid #ccc;
+      width: 80%;
+      max-width: 300px;
+      transition: border-color 0.3s ease;
     }
-
-    .hidden {
-      display: none;
+    
+    input[type="text"]:focus {
+        border-color: #457b9d;
+        outline: none;
     }
 
     #roundCounter {
       position: fixed;
       bottom: 10px;
       left: 10px;
-      background: #a8dadc;
+      background: #1d3557;
+      color: white;
       padding: 8px 12px;
       border-radius: 8px;
       font-weight: bold;
@@ -122,39 +177,47 @@
 
     #finalSummary {
       margin-top: 40px;
-      font-size: 22px;
-      background: #e1f0f7;
+      font-size: 1.2em;
+      background: #ffffff;
+      border: 2px solid #a8dadc;
       border-radius: 10px;
       padding: 30px;
       display: none;
     }
+    
+    #result {
+        background-color: #f1faee;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
 
     .answer-display {
-      margin-top: 15px;
+      margin-top: 10px;
       display: flex;
       justify-content: center;
+      flex-wrap: wrap;
       gap: 10px;
       user-select: none;
     }
 
     .answer-display img {
-      width: 60px;
-      height: 60px;
+      width: 50px;
+      height: 50px;
       border-radius: 10px;
-      border: 2px solid transparent;
+      border: 2px solid #a8dadc;
     }
 
     .answer-label {
-      font-weight: bold;
+      font-weight: 600;
       margin-bottom: 5px;
       font-size: 1em;
-      color: #333;
+      color: #1d3557;
     }
-
-    /* Highlight unknown answers with red border */
+    
     .answer-display img.unknown {
-      border-color: red;
-      opacity: 0.6;
+      border-color: #e63946;
+      opacity: 0.7;
     }
   </style>
 </head>
@@ -162,10 +225,10 @@
 
   <div id="welcomeBanner">Welcome to the SMART Memory Game!</div>
 
-  <h1>SMART memory game</h1>
-  <p>Look carefully and remember the pictures! You'll be asked to remember a specific row or column.</p>
+  <h1>Picture Perfect Memory</h1>
+  <p>Look carefully at all the pictures. Your mission is to remember the ones in the <strong>highlighted</strong> row or column!</p>
 
-  <div id="roundCounter" class="message">Round 0 of 5 — 5 rounds remaining</div>
+  <div id="roundCounter" class="message">Round 0 of 5</div>
 
   <div class="game-area">
     <div id="scene" class="scene"></div>
@@ -173,12 +236,12 @@
 
     <div id="curtain" class="curtain">
       <p><strong>🎭 The curtain is down.</strong></p>
-      <p class="message" id="recallInstruction">Now think carefully... what did you see in the selected row/column?</p>
+      <p class="message" id="recallInstruction">What did you see in the highlighted line?</p>
     </div>
 
     <div id="input-area" class="hidden">
-      <p>Type the names of the images you remember (like "apple", "car", "cat"):</p>
-      <input type="text" id="answer" placeholder="e.g. apple, book, ball"/>
+      <p>Type the names of the images you remember. Separate them with a space.</p>
+      <input type="text" id="answer" placeholder="e.g. apple book ball"/>
       <p id="countdown" class="message">⏳ Time left to answer: <span id="answerCountdown">60</span> seconds</p>
       <button id="submitAnswerBtn">Submit Answer</button>
     </div>
@@ -209,25 +272,12 @@
       kite: "https://img.icons8.com/color/96/kite.png",
       moon: "https://img.icons8.com/emoji/96/crescent-moon-emoji.png"
     };
-
-    // Acceptable answer variants (lowercase)
     const acceptableAnswers = {
-      apple: ["apple"],
-      book: ["book"],
-      ball: ["ball", "soccer ball", "football"],
-      cat: ["cat"],
-      car: ["car"],
-      hat: ["hat", "top hat"],
-      star: ["star"],
-      fish: ["fish"],
-      pen: ["pen", "pencil"],
-      leaf: ["leaf"],
-      cake: ["cake", "birthday cake"],
-      dog: ["dog"],
-      flower: ["flower"],
-      globe: ["globe", "world", "earth"],
-      kite: ["kite"],
-      moon: ["moon", "crescent moon"]
+      apple: ["apple"], book: ["book"], ball: ["ball", "soccer ball", "football"],
+      cat: ["cat"], car: ["car"], hat: ["hat", "top hat"], star: ["star"],
+      fish: ["fish"], pen: ["pen", "pencil"], leaf: ["leaf"],
+      cake: ["cake", "birthday cake"], dog: ["dog"], flower: ["flower"],
+      globe: ["globe", "world", "earth"], kite: ["kite"], moon: ["moon", "crescent moon"]
     };
 
     const allObjects = Object.keys(objectLibrary);
@@ -236,17 +286,23 @@
     let recallObjects = [];
     let round = 0;
     let score = 0;
-    let roundScores = [];
     const totalRounds = 5;
     let viewTimer, answerTimer;
 
     const roundCounterEl = document.getElementById('roundCounter');
     const finalSummaryDiv = document.getElementById('finalSummary');
     const welcomeBanner = document.getElementById('welcomeBanner');
-
     const startBtn = document.getElementById('startBtn');
     const nextBtn = document.getElementById('nextBtn');
     const submitAnswerBtn = document.getElementById('submitAnswerBtn');
+    const sceneDiv = document.getElementById('scene');
+    const curtainEl = document.getElementById('curtain');
+    const inputAreaEl = document.getElementById('input-area');
+    const answerInput = document.getElementById('answer');
+    const resultDiv = document.getElementById('result');
+    const viewingMessageEl = document.getElementById('viewingMessage');
+    const viewingCountdownEl = document.getElementById('viewingCountdown');
+    const answerCountdownEl = document.getElementById('answerCountdown');
 
     startBtn.addEventListener('click', startGame);
     nextBtn.addEventListener('click', nextRound);
@@ -261,20 +317,14 @@
 
     function updateRoundCounter() {
       const roundsLeft = totalRounds - round;
-      if (round === totalRounds - 1) {
-        roundCounterEl.textContent = "Last Round!";
-      } else {
-        roundCounterEl.textContent = `Round ${round + 1} of ${totalRounds} — ${roundsLeft} rounds remaining`;
-      }
+      if (round + 1 > totalRounds) return;
+      roundCounterEl.textContent = `Round ${round + 1} of ${totalRounds}`;
     }
 
     function startGame() {
-      // Hide welcome banner
       welcomeBanner.style.display = 'none';
-
       score = 0;
       round = 0;
-      roundScores = [];
       finalSummaryDiv.style.display = 'none';
       startBtn.classList.add('hidden');
       nextBtn.classList.add('hidden');
@@ -285,78 +335,78 @@
 
     function nextRound() {
       resetTimers();
-      document.getElementById('scene').innerHTML = '';
-      document.getElementById('result').classList.add('hidden');
-      document.getElementById('curtain').classList.remove('active');
-      document.getElementById('input-area').classList.add('hidden');
-      document.getElementById('answer').value = '';
-      document.getElementById('viewingMessage').classList.remove('hidden');
+      sceneDiv.innerHTML = '';
+      resultDiv.classList.add('hidden');
+      curtainEl.classList.remove('active');
+      inputAreaEl.classList.add('hidden');
+      answerInput.value = '';
+      viewingMessageEl.classList.remove('hidden');
       nextBtn.classList.add('hidden');
-
-      gridObjects = getRandomGrid();
-      const sceneDiv = document.getElementById('scene');
       sceneDiv.classList.remove('hidden');
 
-      for (const row of gridObjects) {
-        for (const item of row) {
-          const div = document.createElement('div');
-          div.className = 'object';
-          const img = document.createElement('img');
-          img.src = objectLibrary[item];
-          img.alt = item;
-          div.appendChild(img);
-          sceneDiv.appendChild(div);
-        }
-      }
-
-      const rowOrCol = Math.random() < 0.5 ? "row" : "column";
+      gridObjects = getRandomGrid();
+      const isRow = Math.random() < 0.5;
       const index = Math.floor(Math.random() * 4);
-      currentPrompt = `${rowOrCol} ${index + 1}`;
-      document.getElementById('viewingMessage').innerHTML = `🔍 Memorize the pictures! Focus on <strong>${currentPrompt}</strong> - <span id="viewingCountdown">60</span> seconds`;
+      currentPrompt = `${isRow ? "row" : "column"} ${index + 1}`;
+      
+      viewingMessageEl.innerHTML = `🔍 Memorize the pictures in the <strong>highlighted ${isRow ? "row" : "column"}</strong>! Time left: <span id="viewingCountdown">60</span>s`;
 
-      recallObjects = rowOrCol === "row" ? gridObjects[index] : gridObjects.map(r => r[index]);
+      gridObjects.flat().forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'object';
+        const img = document.createElement('img');
+        img.src = objectLibrary[item];
+        img.alt = item;
+        
+        const rowIndex = Math.floor(i / 4);
+        const colIndex = i % 4;
 
-      let viewTime = 60;
-      viewTimer = setInterval(() => {
-        viewTime--;
-        document.getElementById('viewingCountdown').textContent = viewTime;
-        if (viewTime <= 0) {
-          clearInterval(viewTimer);
-          hideSceneShowCurtain();
+        if ((isRow && rowIndex === index) || (!isRow && colIndex === index)) {
+          div.classList.add('highlight-border');
         }
-      }, 1000);
 
-      updateRoundCounter();
+        div.appendChild(img);
+        sceneDiv.appendChild(div);
+      });
+
+      recallObjects = isRow ? gridObjects[index] : gridObjects.map(r => r[index]);
+      
+      startTimer(60, document.getElementById('viewingCountdown'), () => {
+        hideSceneShowCurtain();
+      });
     }
 
+    function startTimer(duration, displayElement, onEnd) {
+        let timer = duration;
+        displayElement.textContent = timer;
+        viewTimer = setInterval(() => {
+            timer--;
+            displayElement.textContent = timer;
+            if (timer <= 0) {
+                clearInterval(viewTimer);
+                onEnd();
+            }
+        }, 1000);
+    }
+    
     function resetTimers() {
       clearInterval(viewTimer);
       clearInterval(answerTimer);
     }
 
     function hideSceneShowCurtain() {
-      document.getElementById('scene').classList.add('hidden');
-      document.getElementById('viewingMessage').classList.add('hidden');
-      const curtain = document.getElementById('curtain');
-      curtain.classList.add('active');
+      curtainEl.classList.add('active');
+      viewingMessageEl.classList.add('hidden');
+      inputAreaEl.classList.remove('hidden');
 
-      document.getElementById('input-area').classList.remove('hidden');
-
-      let answerTime = 60;
-      document.getElementById('answerCountdown').textContent = answerTime;
-
-      answerTimer = setInterval(() => {
-        answerTime--;
-        document.getElementById('answerCountdown').textContent = answerTime;
-        if (answerTime <= 0) {
-          clearInterval(answerTimer);
-          checkAnswer();
-        }
-      }, 1000);
+      startTimer(60, answerCountdownEl, () => {
+        checkAnswer();
+      });
     }
 
     function findObjectByAnswer(ans) {
-      ans = ans.toLowerCase();
+      ans = ans.trim().toLowerCase();
+      if (!ans) return null;
       for (const [key, variants] of Object.entries(acceptableAnswers)) {
         if (variants.includes(ans)) return key;
       }
@@ -364,53 +414,54 @@
     }
 
     function checkAnswer() {
-      clearInterval(answerTimer);
+      resetTimers();
 
-      const input = document.getElementById('answer').value.toLowerCase();
-      const answers = input.split(',').map(s => s.trim()).filter(s => s.length > 0);
+      const userInput = answerInput.value.toLowerCase().replace(/,/g, ' ');
+      const userAnswers = userInput.split(' ').filter(s => s.trim().length > 0);
+      
+      let matchedObjects = new Set();
+      let usedRecallIndices = new Set();
 
-      // Track which recall objects have been matched already
-      const matchedObjects = new Set();
-
-      answers.forEach(answer => {
-        for (const obj of recallObjects) {
-          const possibleAnswers = acceptableAnswers[obj];
-          if (possibleAnswers.includes(answer) && !matchedObjects.has(obj)) {
-            matchedObjects.add(obj);
-            break;
+      userAnswers.forEach(answer => {
+        for (let i = 0; i < recallObjects.length; i++) {
+          if (usedRecallIndices.has(i)) continue;
+          
+          const correctObjectName = recallObjects[i];
+          const possibleAnswers = acceptableAnswers[correctObjectName];
+          
+          if (possibleAnswers.includes(answer)) {
+            matchedObjects.add(correctObjectName);
+            usedRecallIndices.add(i);
+            break; 
           }
         }
       });
-
+      
       const roundScore = matchedObjects.size;
-
       score += roundScore;
-      roundScores.push(roundScore);
 
-      const result = document.getElementById('result');
+      const correctAnswerImages = recallObjects.map(obj => `<img src="${objectLibrary[obj]}" alt="${obj}" title="${obj}">`).join("");
+      
+      let playerAnswerImages = '';
+      if(userAnswers.length > 0) {
+          playerAnswerImages = userAnswers.map(ans => {
+            const objKey = findObjectByAnswer(ans);
+            return objKey ? `<img src="${objectLibrary[objKey]}" alt="${ans}" title="${ans}">` 
+                         : `<img src="https://img.icons8.com/ios-filled/50/e63946/question-mark.png" alt="unknown" title="Unknown: ${ans}" class="unknown">`;
+          }).join("");
+      } else {
+          playerAnswerImages = `<p>No answer submitted.</p>`;
+      }
 
-      // Show correct answer images in order
-      const correctAnswerImages = recallObjects.map(obj => {
-        const src = objectLibrary[obj];
-        return `<img src="${src}" alt="${obj}" title="${obj}">`;
-      }).join("");
+      let feedbackHTML;
+      if (roundScore > 0) {
+        feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""} this round!</p>`;
+      } else {
+        feedbackHTML = `<p>Almost! Let's try the next one.</p>`;
+      }
 
-      // Show player's answer images in typed order, with red border for unknown or unmatched
-      const playerAnswerImages = answers.map(ans => {
-        const objKey = findObjectByAnswer(ans);
-        if (objKey) {
-          const src = objectLibrary[objKey];
-          // Highlight if that object wasn't part of the correct recall set (optional)
-          const isInRecall = recallObjects.includes(objKey);
-          return `<img src="${src}" alt="${ans}" title="${ans}" ${isInRecall ? '' : 'class="unknown"'}>`;
-        } else {
-          // Unknown answer - use a placeholder or a red-bordered question mark icon
-          return `<img src="https://img.icons8.com/ios/50/ff0000/question-mark.png" alt="unknown" title="Unknown answer" class="unknown">`;
-        }
-      }).join("");
-
-      result.innerHTML = `
-        <p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""} this round.</p>
+      resultDiv.innerHTML = `
+        ${feedbackHTML}
         <div>
           <div class="answer-label">Correct answer:</div>
           <div class="answer-display">${correctAnswerImages}</div>
@@ -420,46 +471,43 @@
           <div class="answer-display">${playerAnswerImages}</div>
         </div>
       `;
-      result.classList.remove('hidden');
-
-      document.getElementById('input-area').classList.add('hidden');
-      document.getElementById('curtain').classList.remove('active');
+      resultDiv.classList.remove('hidden');
+      inputAreaEl.classList.add('hidden');
+      curtainEl.classList.remove('active');
 
       round++;
-      updateRoundCounter();
-
+      
       if (round >= totalRounds) {
-        showFinalSummary();
+        setTimeout(showFinalSummary, 3000);
       } else {
         nextBtn.classList.remove('hidden');
+        updateRoundCounter();
       }
     }
 
     function showFinalSummary() {
       roundCounterEl.style.display = 'none';
-      document.getElementById('scene').classList.add('hidden');
-      document.getElementById('curtain').classList.remove('active');
-      document.getElementById('input-area').classList.add('hidden');
-      document.getElementById('result').classList.add('hidden');
+      sceneDiv.classList.add('hidden');
+      curtainEl.classList.remove('active');
+      inputAreaEl.classList.add('hidden');
+      resultDiv.classList.add('hidden');
       nextBtn.classList.add('hidden');
 
       finalSummaryDiv.style.display = 'block';
-
-      const totalScore = score;
       const averageScore = (score / totalRounds).toFixed(2);
 
       finalSummaryDiv.innerHTML = `
         <h2>Game Over!</h2>
-        <p>Your total score: <strong>${totalScore}</strong></p>
+        <p>Your total score: <strong>${score}</strong></p>
         <p>Your average score per round: <strong>${averageScore}</strong></p>
         <p>Thanks for playing the SMART Memory Game! 🎉</p>
         <button id="playAgainBtn">Play Again</button>
       `;
 
-      document.getElementById('playAgainBtn').addEventListener('click', () => {
-        finalSummaryDiv.style.display = 'none';
-        startBtn.classList.remove('hidden');
-      });
+      document.getElementById('playAgainBtn').addEventListener('click', startGame);
+      
+      // Tell Qualtrics the game is done, so it can show the Next button
+      window.parent.postMessage("showNext", "*");
     }
   </script>
 </body>
