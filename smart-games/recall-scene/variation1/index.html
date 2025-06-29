@@ -43,11 +43,11 @@
       margin: 20px auto;
       max-width: 500px;
       position: relative;
+      overflow: hidden; /* Helps contain absolute elements */
     }
 
     .scene {
       display: grid;
-      /* --- CHANGE: Responsive grid columns --- */
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
       margin-top: 20px;
@@ -56,7 +56,7 @@
 
     .object {
       width: 100%;
-      aspect-ratio: 1 / 1; /* --- CHANGE: Maintain square shape --- */
+      aspect-ratio: 1 / 1;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -66,17 +66,13 @@
       transition: transform 0.2s ease;
     }
     
-    .object:hover {
-        transform: scale(1.05);
-    }
-    
     .object.highlight-border {
         border: 4px solid #e63946;
-        box-shadow: 0 0 15px #e63946;
+        box-shadow: 0 0 10px #e63946;
     }
 
     .object img {
-      width: 85%; /* --- CHANGE: Responsive image size --- */
+      width: 85%;
       height: 85%;
     }
 
@@ -86,7 +82,6 @@
       left: 0;
       width: 100%;
       height: 100%;
-      overflow: hidden;
       background: linear-gradient(to bottom, #457b9d, #355c7d);
       box-shadow: 0 5px 15px rgba(0,0,0,0.3);
       color: white;
@@ -98,7 +93,6 @@
       align-items: center;
       flex-direction: column;
       z-index: 10;
-      /* --- CHANGE: Animate transform instead of height for slide-down effect --- */
       transform: translateY(-110%);
       transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
     }
@@ -141,7 +135,7 @@
         transform: translateY(0);
     }
     
-    button.hidden {
+    .hidden {
       display: none;
     }
 
@@ -228,16 +222,16 @@
   <h1>Picture Perfect Memory</h1>
   <p>Look carefully at all the pictures. Your mission is to remember the ones in the <strong>highlighted</strong> row or column!</p>
 
-  <div id="roundCounter" class="message">Round 0 of 5</div>
+  <div id="roundCounter" class="message hidden">Round 0 of 5</div>
 
   <div class="game-area">
     <div id="scene" class="scene"></div>
-    <p id="viewingMessage" class="message hidden">⏳ Time left to view: <span id="viewingCountdown">60</span> seconds</p>
-
     <div id="curtain" class="curtain">
       <p><strong>🎭 The curtain is down.</strong></p>
       <p class="message" id="recallInstruction">What did you see in the highlighted line?</p>
     </div>
+    
+    <div id="viewingMessage" class="message hidden">⏳ Time left to view: <span id="viewingCountdown">60</span> seconds</div>
 
     <div id="input-area" class="hidden">
       <p>Type the names of the images you remember. Separate them with a space.</p>
@@ -247,29 +241,20 @@
     </div>
 
     <div id="result" class="hidden"></div>
-    <button id="startBtn">Start Game</button>
-    <button id="nextBtn" class="hidden">Next Round</button>
-
-    <div id="finalSummary"></div>
   </div>
+
+  <button id="startBtn">Start Game</button>
+  <button id="nextBtn" class="hidden">Next Round</button>
+
+  <div id="finalSummary"></div>
 
   <script>
     const objectLibrary = {
-      apple: "https://img.icons8.com/color/96/apple.png",
-      book: "https://img.icons8.com/color/96/book.png",
-      ball: "https://img.icons8.com/emoji/96/soccer-ball-emoji.png",
-      cat: "https://img.icons8.com/color/96/cat.png",
-      car: "https://img.icons8.com/color/96/car.png",
-      hat: "https://img.icons8.com/emoji/96/top-hat-emoji.png",
-      star: "https://img.icons8.com/color/96/star.png",
-      fish: "https://img.icons8.com/color/96/fish.png",
-      pen: "https://img.icons8.com/emoji/96/pen-emoji.png",
-      leaf: "https://img.icons8.com/color/96/leaf.png",
-      cake: "https://img.icons8.com/color/96/birthday-cake.png",
-      dog: "https://img.icons8.com/color/96/dog.png",
-      flower: "https://img.icons8.com/color/96/flower.png",
-      globe: "https://img.icons8.com/color/96/globe.png",
-      kite: "https://img.icons8.com/color/96/kite.png",
+      apple: "https://img.icons8.com/color/96/apple.png", book: "https://img.icons8.com/color/96/book.png", ball: "https://img.icons8.com/emoji/96/soccer-ball-emoji.png",
+      cat: "https://img.icons8.com/color/96/cat.png", car: "https://img.icons8.com/color/96/car.png", hat: "https://img.icons8.com/emoji/96/top-hat-emoji.png",
+      star: "https://img.icons8.com/color/96/star.png", fish: "https://img.icons8.com/color/96/fish.png", pen: "https://img.icons8.com/emoji/96/pen-emoji.png",
+      leaf: "https://img.icons8.com/color/96/leaf.png", cake: "https://img.icons8.com/color/96/birthday-cake.png", dog: "https://img.icons8.com/color/96/dog.png",
+      flower: "https://img.icons8.com/color/96/flower.png", globe: "https://img.icons8.com/color/96/globe.png", kite: "https://img.icons8.com/color/96/kite.png",
       moon: "https://img.icons8.com/emoji/96/crescent-moon-emoji.png"
     };
     const acceptableAnswers = {
@@ -281,17 +266,12 @@
     };
 
     const allObjects = Object.keys(objectLibrary);
-    let gridObjects = [];
-    let currentPrompt = "";
-    let recallObjects = [];
-    let round = 0;
-    let score = 0;
-    const totalRounds = 5;
+    let gridObjects = [], recallObjects = [];
+    let round = 0, score = 0, totalRounds = 5;
     let viewTimer, answerTimer;
 
     const roundCounterEl = document.getElementById('roundCounter');
     const finalSummaryDiv = document.getElementById('finalSummary');
-    const welcomeBanner = document.getElementById('welcomeBanner');
     const startBtn = document.getElementById('startBtn');
     const nextBtn = document.getElementById('nextBtn');
     const submitAnswerBtn = document.getElementById('submitAnswerBtn');
@@ -301,12 +281,14 @@
     const answerInput = document.getElementById('answer');
     const resultDiv = document.getElementById('result');
     const viewingMessageEl = document.getElementById('viewingMessage');
-    const viewingCountdownEl = document.getElementById('viewingCountdown');
     const answerCountdownEl = document.getElementById('answerCountdown');
 
     startBtn.addEventListener('click', startGame);
     nextBtn.addEventListener('click', nextRound);
     submitAnswerBtn.addEventListener('click', checkAnswer);
+    answerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') checkAnswer();
+    });
 
     function getRandomGrid() {
       const shuffled = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16);
@@ -315,21 +297,31 @@
       return grid;
     }
 
-    function updateRoundCounter() {
-      const roundsLeft = totalRounds - round;
-      if (round + 1 > totalRounds) return;
-      roundCounterEl.textContent = `Round ${round + 1} of ${totalRounds}`;
+    function resetTimers() {
+      clearInterval(viewTimer);
+      clearInterval(answerTimer);
+    }
+    
+    function startTimer(duration, displayElement, onEndCallback) {
+      let timeLeft = duration;
+      displayElement.textContent = timeLeft;
+      const timerId = setInterval(() => {
+        timeLeft--;
+        displayElement.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          onEndCallback();
+        }
+      }, 1000);
+      return timerId;
     }
 
     function startGame() {
-      welcomeBanner.style.display = 'none';
-      score = 0;
-      round = 0;
+      document.getElementById('welcomeBanner').style.display = 'none';
+      score = 0; round = 0;
       finalSummaryDiv.style.display = 'none';
       startBtn.classList.add('hidden');
-      nextBtn.classList.add('hidden');
-      roundCounterEl.style.display = 'block';
-      updateRoundCounter();
+      roundCounterEl.classList.remove('hidden');
       nextRound();
     }
 
@@ -343,13 +335,15 @@
       viewingMessageEl.classList.remove('hidden');
       nextBtn.classList.add('hidden');
       sceneDiv.classList.remove('hidden');
+      updateRoundCounter();
 
       gridObjects = getRandomGrid();
       const isRow = Math.random() < 0.5;
       const index = Math.floor(Math.random() * 4);
-      currentPrompt = `${isRow ? "row" : "column"} ${index + 1}`;
       
-      viewingMessageEl.innerHTML = `🔍 Memorize the pictures in the <strong>highlighted ${isRow ? "row" : "column"}</strong>! Time left: <span id="viewingCountdown">60</span>s`;
+      const promptText = `🔍 Memorize the pictures in the <strong>highlighted ${isRow ? "row" : "column"}</strong>! Time left: <span id="viewingCountdown">${60}</span>s`;
+      viewingMessageEl.innerHTML = promptText;
+      const viewingCountdownEl = document.getElementById('viewingCountdown');
 
       gridObjects.flat().forEach((item, i) => {
         const div = document.createElement('div');
@@ -360,48 +354,25 @@
         
         const rowIndex = Math.floor(i / 4);
         const colIndex = i % 4;
-
         if ((isRow && rowIndex === index) || (!isRow && colIndex === index)) {
           div.classList.add('highlight-border');
         }
-
         div.appendChild(img);
         sceneDiv.appendChild(div);
       });
 
       recallObjects = isRow ? gridObjects[index] : gridObjects.map(r => r[index]);
       
-      startTimer(60, document.getElementById('viewingCountdown'), () => {
-        hideSceneShowCurtain();
-      });
-    }
-
-    function startTimer(duration, displayElement, onEnd) {
-        let timer = duration;
-        displayElement.textContent = timer;
-        viewTimer = setInterval(() => {
-            timer--;
-            displayElement.textContent = timer;
-            if (timer <= 0) {
-                clearInterval(viewTimer);
-                onEnd();
-            }
-        }, 1000);
-    }
-    
-    function resetTimers() {
-      clearInterval(viewTimer);
-      clearInterval(answerTimer);
+      viewTimer = startTimer(60, viewingCountdownEl, hideSceneShowCurtain);
     }
 
     function hideSceneShowCurtain() {
       curtainEl.classList.add('active');
       viewingMessageEl.classList.add('hidden');
       inputAreaEl.classList.remove('hidden');
+      answerInput.focus();
 
-      startTimer(60, answerCountdownEl, () => {
-        checkAnswer();
-      });
+      answerTimer = startTimer(60, answerCountdownEl, checkAnswer);
     }
 
     function findObjectByAnswer(ans) {
@@ -425,10 +396,8 @@
       userAnswers.forEach(answer => {
         for (let i = 0; i < recallObjects.length; i++) {
           if (usedRecallIndices.has(i)) continue;
-          
           const correctObjectName = recallObjects[i];
           const possibleAnswers = acceptableAnswers[correctObjectName];
-          
           if (possibleAnswers.includes(answer)) {
             matchedObjects.add(correctObjectName);
             usedRecallIndices.add(i);
@@ -450,15 +419,12 @@
                          : `<img src="https://img.icons8.com/ios-filled/50/e63946/question-mark.png" alt="unknown" title="Unknown: ${ans}" class="unknown">`;
           }).join("");
       } else {
-          playerAnswerImages = `<p>No answer submitted.</p>`;
+          playerAnswerImages = `<p style="font-style: italic;">No answer submitted.</p>`;
       }
 
-      let feedbackHTML;
-      if (roundScore > 0) {
-        feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""} this round!</p>`;
-      } else {
-        feedbackHTML = `<p>Almost! Let's try the next one.</p>`;
-      }
+      let feedbackHTML = (roundScore > 0)
+        ? `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""} this round!</p>`
+        : `<p>Almost! Let's try the next one.</p>`;
 
       resultDiv.innerHTML = `
         ${feedbackHTML}
@@ -474,6 +440,7 @@
       resultDiv.classList.remove('hidden');
       inputAreaEl.classList.add('hidden');
       curtainEl.classList.remove('active');
+      sceneDiv.classList.add('hidden');
 
       round++;
       
@@ -481,21 +448,21 @@
         setTimeout(showFinalSummary, 3000);
       } else {
         nextBtn.classList.remove('hidden');
-        updateRoundCounter();
       }
+    }
+    
+    function updateRoundCounter() {
+        if (round + 1 > totalRounds) return;
+        roundCounterEl.textContent = `Round ${round + 1} of ${totalRounds}`;
     }
 
     function showFinalSummary() {
-      roundCounterEl.style.display = 'none';
-      sceneDiv.classList.add('hidden');
-      curtainEl.classList.remove('active');
-      inputAreaEl.classList.add('hidden');
+      roundCounterEl.classList.add('hidden');
       resultDiv.classList.add('hidden');
       nextBtn.classList.add('hidden');
-
       finalSummaryDiv.style.display = 'block';
-      const averageScore = (score / totalRounds).toFixed(2);
 
+      const averageScore = (score / totalRounds).toFixed(2);
       finalSummaryDiv.innerHTML = `
         <h2>Game Over!</h2>
         <p>Your total score: <strong>${score}</strong></p>
@@ -506,7 +473,6 @@
 
       document.getElementById('playAgainBtn').addEventListener('click', startGame);
       
-      // Tell Qualtrics the game is done, so it can show the Next button
       window.parent.postMessage("showNext", "*");
     }
   </script>
