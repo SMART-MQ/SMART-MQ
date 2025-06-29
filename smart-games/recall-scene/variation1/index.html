@@ -47,11 +47,6 @@
       position: relative;
     }
 
-    /* --- FIX: New containers for game phases to prevent overlap --- */
-    #viewing-phase, #answering-phase {
-        width: 100%;
-    }
-    
     #viewing-phase .message {
         font-size: 1.1em;
         margin-bottom: 15px;
@@ -62,7 +57,7 @@
     .scene {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px; /* Further reduced gap */
+      gap: 5px; /* Final reduction to fix horizontal scroll */
       position: relative;
     }
 
@@ -79,7 +74,6 @@
     
     .object.highlight-border {
         border: 4px solid #EF476F;
-        box-shadow: 0 0 15px rgba(239, 71, 111, 0.6);
     }
 
     .object img {
@@ -87,18 +81,15 @@
       height: 85%;
     }
     
-    /* --- FIX: Curtain is now the answering-phase container --- */
     #answering-phase {
-      background: #FFD166;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      color: #262626;
+      background: #fdfaf0;
       padding: 20px;
       border-radius: 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      min-height: 300px; /* Give it some body */
+      border: 2px dashed #FFD166;
+    }
+    
+    #answering-phase p {
+        font-weight: 600;
     }
 
     button {
@@ -212,20 +203,16 @@
   <div id="game-container" class="hidden">
       <div id="roundCounter" class="message">Round 1 of 5</div>
       <div class="game-area">
-        <!-- FIX: Viewing phase container -->
         <div id="viewing-phase">
             <div class="message">Focus on the <strong>highlighted items</strong>! Time left: <span id="viewingCountdown">60</span>s</div>
             <div id="scene" class="scene"></div>
         </div>
-
-        <!-- FIX: Answering phase is the curtain itself, containing the input -->
         <div id="answering-phase" class="hidden">
             <p>What did you see in the highlighted line?</p>
             <input type="text" id="answer" placeholder="e.g. apple book ball"/>
             <p class="message">⏳ Time left: <span id="answerCountdown">60</span>s</p>
             <button id="submitAnswerBtn">Submit Answer</button>
         </div>
-        
         <div id="result" class="hidden"></div>
       </div>
       <button id="nextBtn" class="hidden">Next Round</button>
@@ -267,8 +254,6 @@
     const resultDiv = document.getElementById('result');
     const viewingCountdownEl = document.getElementById('viewingCountdown');
     const answerCountdownEl = document.getElementById('answerCountdown');
-    
-    // FIX: Get references to the new phase containers
     const viewingPhase = document.getElementById('viewing-phase');
     const answeringPhase = document.getElementById('answering-phase');
 
@@ -285,14 +270,15 @@
     function startTimer(duration, displayEl, onEnd) {
       let timeLeft = duration;
       displayEl.textContent = timeLeft;
-      return setInterval(() => {
+      const timerId = setInterval(() => {
         timeLeft--;
         displayEl.textContent = timeLeft;
         if (timeLeft <= 0) {
-          clearInterval(this);
+          clearInterval(timerId);
           onEnd();
         }
       }, 1000);
+      return timerId;
     }
 
     function startGame() {
@@ -307,8 +293,8 @@
       resetTimers();
       resultDiv.classList.add('hidden');
       nextBtn.classList.add('hidden');
-      answeringPhase.classList.add('hidden'); // Hide the curtain
-      viewingPhase.classList.remove('hidden'); // Show the pictures
+      answeringPhase.classList.add('hidden');
+      viewingPhase.classList.remove('hidden');
       updateRoundCounter();
 
       const gridObjects = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16).reduce((rows, key, index) => { 
@@ -322,12 +308,10 @@
       gridObjects.flat().forEach((item, i) => {
         const div = document.createElement('div');
         div.className = 'object';
-        const img = document.createElement('img');
-        img.src = objectLibrary[item];
         if ((isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index)) {
           div.classList.add('highlight-border');
         }
-        div.appendChild(img);
+        div.innerHTML = `<img src="${objectLibrary[item]}" alt="${item}">`;
         sceneDiv.appendChild(div);
       });
 
@@ -343,19 +327,20 @@
         answerTimer = startTimer(60, answerCountdownEl, checkAnswer);
     }
 
-    // FIX: New, smarter word-finding logic
     function checkAnswer() {
       resetTimers();
       let userInput = answerInput.value.toLowerCase();
+      let userAnswersProvided = userInput.replace(/,/g, ' ').split(' ').filter(s => s.trim().length > 0);
       let matchedObjects = new Set();
-
+      
       recallObjects.forEach(correctObj => {
         const variants = acceptableAnswers[correctObj];
         for (const variant of variants) {
           if (userInput.includes(variant)) {
-            matchedObjects.add(correctObj);
-            userInput = userInput.replace(variant, ''); // Prevent re-matching
-            break; // Move to the next correct object
+            if (!matchedObjects.has(correctObj)) {
+                matchedObjects.add(correctObj);
+                userInput = userInput.replace(variant, '');
+            }
           }
         }
       });
@@ -364,34 +349,33 @@
       score += roundScore;
 
       const correctAnswerImages = recallObjects.map(obj => `<img src="${objectLibrary[obj]}" title="${obj}">`).join("");
-      const playerAnswersForDisplay = answerInput.value.toLowerCase().replace(/,/g, ' ').split(' ').filter(s => s);
       
-      let playerAnswerImages = playerAnswersForDisplay.map(ans => {
+      let playerAnswerImages = userAnswersProvided.map(ans => {
         let foundKey = null;
         for(const [key, variants] of Object.entries(acceptableAnswers)) {
-            if(variants.includes(ans)) {
-                foundKey = key;
-                break;
-            }
+            if(variants.includes(ans)) { foundKey = key; break; }
         }
         return foundKey ? `<img src="${objectLibrary[foundKey]}" title="${ans}">` 
                       : `<img src="https://img.icons8.com/fluency/96/question-mark.png" class="unknown" title="Unknown: ${ans}">`;
       }).join("");
 
-      if (!playerAnswerImages) {
-          playerAnswerImages = `<p style="font-style: italic;">No answer submitted.</p>`;
+      let feedbackHTML;
+      if (userAnswersProvided.length === 0) {
+        feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
+        playerAnswerImages = '';
+      } else if (roundScore > 0) {
+        feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}!</p>`;
+      } else {
+        feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
       }
-      
-      const feedbackHTML = (roundScore > 0)
-        ? `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}!</p>`
-        : `<p><strong>Almost!</strong> Let's get the next one.</p>`;
 
-      resultDiv.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div><div style="margin-top:12px;"><div class="answer-label">Your answer:</div><div class="answer-display">${playerAnswerImages}</div></div>`;
+      resultDiv.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
+                            (playerAnswerImages ? `<div style="margin-top:12px;"><div class="answer-label">Your answer:</div><div class="answer-display">${playerAnswerImages}</div></div>` : '');
+      
       resultDiv.classList.remove('hidden');
       answeringPhase.classList.add('hidden');
       
       round++;
-      
       if (round >= totalRounds) {
         setTimeout(showFinalSummary, 3500);
       } else {
@@ -400,17 +384,14 @@
     }
     
     function updateRoundCounter() {
-        if (round + 1 > totalRounds) return;
         roundCounterEl.textContent = `Round ${round + 1} of ${totalRounds}`;
     }
 
     function showFinalSummary() {
       gameContainer.classList.add('hidden');
       finalSummaryDiv.classList.remove('hidden');
-
       const averageScore = (score / totalRounds).toFixed(2);
       finalSummaryDiv.innerHTML = `<h2>Game Over!</h2><p>Your total score: <strong>${score}</strong></p><p>Your average score per round: <strong>${averageScore}</strong></p><p>Great job! Thanks for playing! 🎉</p><button id="playAgainBtn">Play Again</button>`;
-
       document.getElementById('playAgainBtn').addEventListener('click', () => location.reload());
       window.parent.postMessage("showNext", "*");
     }
