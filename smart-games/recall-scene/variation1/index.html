@@ -2,20 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
   <title>SMART memory game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      overflow: hidden; /* Prevent all scrolling */
+    }
     body {
       background-color: #f0f8ff;
       font-family: 'Balsamiq Sans', cursive;
       color: #333;
       text-align: center;
       margin: 0;
-      padding: 10px 5px;
+      padding: 5px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .hidden { display: none !important; }
@@ -23,21 +30,25 @@
     .fadeable { transition: opacity 0.4s ease-in-out; }
     .is-faded-out { opacity: 0; pointer-events: none; }
 
-    #instructions-container { padding: 15px; max-width: 550px; margin: 15px auto; }
+    #instructions-container { padding: 10px; max-width: 550px; margin: 10px auto; }
 
-    h1 { margin-top: 0; font-size: 2.5em; color: #0077b6; text-shadow: 3px 3px 0px #ffc300; }
-    h2.welcome-title { font-size: 1.3em; font-weight: 700; color: #555; margin-bottom: -5px; }
-    ul.instructions-list { list-style-type: none; padding: 0; margin: 15px auto; display: inline-block; text-align: left; }
-    ul.instructions-list li { font-size: 1.1em; margin-bottom: 8px; }
+    h1 { margin: 0 0 5px 0; font-size: 2.2em; color: #0077b6; text-shadow: 2px 2px 0px #ffc300; }
+    h2.welcome-title { font-size: 1.2em; font-weight: 700; color: #555; margin-bottom: 0; }
+    ul.instructions-list { list-style-type: none; padding: 0; margin: 10px auto; display: inline-block; text-align: left; }
+    ul.instructions-list li { font-size: 1em; margin-bottom: 5px; }
 
-    /* --- FIX: Added margin-top to give breathing room --- */
+    /* --- FIX: Flexbox layout for vertical stacking --- */
     #game-container {
-        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        justify-content: flex-start;
     }
 
-    .game-area { margin: 10px auto; width: 95%; max-width: 500px; position: relative; }
+    .game-area { margin: 5px auto; width: 95%; max-width: 500px; position: relative; }
 
-    .timer-bar-container { width: 100%; height: 20px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #0077b6; margin: 10px auto 10px auto; overflow: hidden; }
+    .timer-bar-container { width: 100%; height: 20px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #0077b6; margin: 5px auto 10px auto; overflow: hidden; }
     .timer-bar { height: 100%; width: 100%; background-color: #f94144; border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
     #viewing-phase .message, #answering-phase .message { font-size: 1em; font-weight: 700; color: #0077b6; margin-bottom: 10px; }
@@ -48,22 +59,22 @@
     .object.highlight-border { border: 3px solid #f94144; }
     .object img { width: 85%; height: 85%; }
     
-    /* --- FIX: Reduced padding to make boxes smaller --- */
-    #answering-phase { background: #e9f5ff; padding: 15px; border-radius: 12px; border: 3px dashed #0077b6; }
+    #answering-phase { background: #e9f5ff; padding: 10px; border-radius: 12px; border: 3px dashed #0077b6; }
+    #answering-phase p { margin: 5px 0; }
     
-    button { background-color: #ffc300; border: none; color: #333; padding: 10px 20px; margin: 5px; font-size: 1.1em; font-family: 'Balsamiq Sans', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 0 #e0a800; text-transform: uppercase; }
+    button { background-color: #ffc300; border: none; color: #333; padding: 8px 18px; margin: 5px; font-size: 1.1em; font-family: 'Balsamiq Sans', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 0 #e0a800; text-transform: uppercase; }
     button:hover:not(:disabled) { background-color: #ffd60a; transform: translateY(-2px); box-shadow: 0 6px 0 #e0a800; }
     #submitAnswerBtn { background-color: #f94144; color: white; box-shadow: 0 4px 0 #c22528; }
 
     input[type="text"] { padding: 8px; font-size: 1em; font-family: 'Balsamiq Sans', cursive; margin: 5px; border-radius: 8px; border: 2px solid #ccc; width: 80%; max-width: 300px; }
 
-    #roundCounter { font-size: 1.3em; font-weight: 700; color: #555; margin-bottom: 10px;}
-    #finalSummary { margin-top: 40px; font-size: 1.1em; background: #ffffff; border: 3px solid #0077b6; border-radius: 15px; padding: 20px; }
-    #finalSummary ul { list-style-type: none; padding: 0; margin: 15px 0; text-align: left; display: inline-block; }
-    #finalSummary li { font-size: 0.9em; margin-bottom: 8px; }
+    #roundCounter { font-size: 1.2em; font-weight: 700; color: #555; margin-bottom: 5px;}
+    #finalSummary { font-size: 1em; background: #ffffff; border: 3px solid #0077b6; border-radius: 15px; padding: 15px; }
+    #finalSummary p { margin: 5px 0; }
+    #finalSummary ul { list-style-type: none; padding: 0; margin: 10px 0; text-align: left; display: inline-block; }
+    #finalSummary li { font-size: 0.9em; margin-bottom: 5px; }
     
-    /* --- FIX: Reduced padding to make box smaller --- */
-    #result { background-color: #e9f5ff; padding: 10px; border-radius: 10px; margin-top: 15px; border: 2px solid #0077b6; }
+    #result { background-color: #e9f5ff; padding: 10px; border-radius: 10px; margin-top: 10px; border: 2px solid #0077b6; }
     #result p { margin: 8px 0; }
     
     @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
@@ -73,8 +84,8 @@
     @keyframes fanfare-anim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
 
-    .answer-display { margin-top: 8px; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
-    .answer-display img { width: 45px; height: 45px; border-radius: 8px; }
+    .answer-display { margin-top: 8px; display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; }
+    .answer-display img { width: 40px; height: 40px; border-radius: 8px; }
     .answer-label { font-weight: 700; margin-bottom: 5px; font-size: 1em; color: #003049; }
     
   </style>
