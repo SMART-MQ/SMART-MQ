@@ -34,6 +34,15 @@
       text-shadow: 3px 3px 0px #FFD166;
     }
     
+    /* --- NEW: Style for the Welcome title --- */
+    h2.welcome-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.5em;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: -10px;
+    }
+    
     p.intro-text {
         font-size: 1.1em;
         line-height: 1.6;
@@ -57,7 +66,7 @@
     .scene {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 5px; /* Final reduction to fix horizontal scroll */
+      gap: 5px;
       position: relative;
     }
 
@@ -116,6 +125,22 @@
     button:active {
         transform: translateY(2px);
         box-shadow: 0 2px 0 #E5A000;
+    }
+
+    /* --- FIX: Distinct color for the submit button --- */
+    #submitAnswerBtn {
+        background-color: #06D6A0;
+        color: white;
+        box-shadow: 0 4px 0 #05a780;
+    }
+
+    #submitAnswerBtn:hover {
+        background-color: #07c395;
+        box-shadow: 0 6px 0 #05a780;
+    }
+    
+    #submitAnswerBtn:active {
+        box-shadow: 0 2px 0 #05a780;
     }
 
     input[type="text"] {
@@ -195,6 +220,8 @@
 <body>
 
   <div id="instructions-container">
+    <!-- --- NEW: Welcome title added --- -->
+    <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
     <h1>Picture Perfect Memory</h1>
     <p class="intro-text">Look carefully at all the pictures. Your mission is to remember the ones in the <strong>highlighted</strong> row or column!</p>
     <button id="startBtn">Let's Play!</button>
@@ -328,59 +355,64 @@
     }
 
     function checkAnswer() {
-      resetTimers();
-      let userInput = answerInput.value.toLowerCase();
-      let userAnswersProvided = userInput.replace(/,/g, ' ').split(' ').filter(s => s.trim().length > 0);
-      let matchedObjects = new Set();
-      
-      recallObjects.forEach(correctObj => {
-        const variants = acceptableAnswers[correctObj];
-        for (const variant of variants) {
-          if (userInput.includes(variant)) {
-            if (!matchedObjects.has(correctObj)) {
-                matchedObjects.add(correctObj);
-                userInput = userInput.replace(variant, '');
+        resetTimers();
+        
+        const userInputText = answerInput.value.toLowerCase();
+        const userAnswersProvided = userInputText.replace(/,/g, ' ').split(' ').filter(s => s.trim().length > 0);
+        
+        let matchedObjects = new Set();
+        let tempUserInput = userInputText; // Use a copy for manipulation
+
+        // Find all correct words in the input string
+        recallObjects.forEach(correctObj => {
+            const variants = acceptableAnswers[correctObj];
+            for (const variant of variants) {
+                if (tempUserInput.includes(variant)) {
+                    if (!matchedObjects.has(correctObj)) {
+                        matchedObjects.add(correctObj);
+                        // "cross it off" by replacing it with spaces, to prevent re-matching parts of words
+                        tempUserInput = tempUserInput.replace(variant, ' '.repeat(variant.length));
+                    }
+                }
             }
-          }
+        });
+
+        const roundScore = matchedObjects.size;
+        score += roundScore;
+
+        const correctAnswerImages = recallObjects.map(obj => `<img src="${objectLibrary[obj]}" title="${obj}">`).join("");
+        
+        let playerAnswerImages = userAnswersProvided.map(ans => {
+            let foundKey = null;
+            for(const [key, variants] of Object.entries(acceptableAnswers)) {
+                if(variants.includes(ans)) { foundKey = key; break; }
+            }
+            return foundKey ? `<img src="${objectLibrary[foundKey]}" title="${ans}">` 
+                          : `<img src="https://img.icons8.com/fluency/96/question-mark.png" class="unknown" title="Unknown: ${ans}">`;
+        }).join("");
+
+        let feedbackHTML;
+        if (userAnswersProvided.length === 0) {
+            feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
+            playerAnswerImages = ''; // Don't show any "your answer" images if nothing was submitted
+        } else if (roundScore > 0) {
+            feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}!</p>`;
+        } else {
+            feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
         }
-      });
-      
-      const roundScore = matchedObjects.size;
-      score += roundScore;
 
-      const correctAnswerImages = recallObjects.map(obj => `<img src="${objectLibrary[obj]}" title="${obj}">`).join("");
-      
-      let playerAnswerImages = userAnswersProvided.map(ans => {
-        let foundKey = null;
-        for(const [key, variants] of Object.entries(acceptableAnswers)) {
-            if(variants.includes(ans)) { foundKey = key; break; }
+        resultDiv.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
+                              (playerAnswerImages ? `<div style="margin-top:12px;"><div class="answer-label">Your answer:</div><div class="answer-display">${playerAnswerImages}</div></div>` : '');
+        
+        resultDiv.classList.remove('hidden');
+        answeringPhase.classList.add('hidden');
+        
+        round++;
+        if (round >= totalRounds) {
+            setTimeout(showFinalSummary, 3500);
+        } else {
+            nextBtn.classList.remove('hidden');
         }
-        return foundKey ? `<img src="${objectLibrary[foundKey]}" title="${ans}">` 
-                      : `<img src="https://img.icons8.com/fluency/96/question-mark.png" class="unknown" title="Unknown: ${ans}">`;
-      }).join("");
-
-      let feedbackHTML;
-      if (userAnswersProvided.length === 0) {
-        feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
-        playerAnswerImages = '';
-      } else if (roundScore > 0) {
-        feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}!</p>`;
-      } else {
-        feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
-      }
-
-      resultDiv.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
-                            (playerAnswerImages ? `<div style="margin-top:12px;"><div class="answer-label">Your answer:</div><div class="answer-display">${playerAnswerImages}</div></div>` : '');
-      
-      resultDiv.classList.remove('hidden');
-      answeringPhase.classList.add('hidden');
-      
-      round++;
-      if (round >= totalRounds) {
-        setTimeout(showFinalSummary, 3500);
-      } else {
-        nextBtn.classList.remove('hidden');
-      }
     }
     
     function updateRoundCounter() {
