@@ -207,9 +207,22 @@
   <div id="finalSummary" class="hidden"></div>
 
   <script>
-    const objectLibrary = { /* ... a lot of objects ... */ }; // (Content is the same, removed for brevity)
-    const acceptableAnswers = { /* ... a lot of answers ... */ }; // (Content is the same)
-    
+    const objectLibrary = {
+      apple: "https://img.icons8.com/color/96/apple.png", book: "https://img.icons8.com/color/96/book.png", ball: "https://img.icons8.com/emoji/96/soccer-ball-emoji.png",
+      cat: "https://img.icons8.com/color/96/cat.png", car: "https://img.icons8.com/color/96/car.png", hat: "https://img.icons8.com/emoji/96/top-hat-emoji.png",
+      star: "https://img.icons8.com/color/96/star.png", fish: "https://img.icons8.com/color/96/fish.png", pen: "https://img.icons8.com/emoji/96/pen-emoji.png",
+      leaf: "https://img.icons8.com/color/96/leaf.png", cake: "https://img.icons8.com/color/96/birthday-cake.png", dog: "https://img.icons8.com/color/96/dog.png",
+      flower: "https://img.icons8.com/color/96/flower.png", globe: "https://img.icons8.com/color/96/globe.png", kite: "https://img.icons8.com/color/96/kite.png",
+      moon: "https://img.icons8.com/emoji/96/crescent-moon-emoji.png"
+    };
+    const acceptableAnswers = {
+      apple: ["apple"], book: ["book"], ball: ["ball", "soccer ball", "football"],
+      cat: ["cat"], car: ["car"], hat: ["hat", "top hat"], star: ["star"],
+      fish: ["fish"], pen: ["pen", "pencil"], leaf: ["leaf"],
+      cake: ["cake", "birthday cake"], dog: ["dog"], flower: ["flower"],
+      globe: ["globe", "world", "earth"], kite: ["kite"], moon: ["moon", "crescent moon"]
+    };
+
     const allObjects = Object.keys(objectLibrary);
     let recallObjects = [];
     let round = 0, score = 0;
@@ -309,7 +322,11 @@
         if ((isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index)) {
           div.classList.add('highlight-border');
         }
-        div.innerHTML = `<img src="${objectLibrary[item]}" alt="${item}">`;
+        // --- FIX: Create and append image element properly ---
+        const img = document.createElement('img');
+        img.src = objectLibrary[item];
+        img.alt = item;
+        div.appendChild(img);
         sceneDiv.appendChild(div);
       });
 
@@ -390,7 +407,9 @@
       
       resultDiv.classList.remove('is-faded-out');
       answeringPhase.classList.add('is-faded-out');
-      nextBtn.classList.remove('hidden');
+      if (!isGameOver) {
+        nextBtn.classList.remove('hidden');
+      }
     }
     
     function showFinalSummary() {
