@@ -100,7 +100,6 @@
             <input type="text" id="answer" placeholder="e.g. apple book ball"/>
             <button id="submitAnswerBtn">Submit</button>
         </div>
-        <!-- FIX: The Next Round button is now INSIDE the results box -->
         <div id="result" class="fadeable is-faded-out">
             <div id="result-content"></div>
             <button id="nextBtn" class="hidden">Next Round</button>
@@ -124,25 +123,17 @@
     
     const VIEWING_TIME = 60;
     const ANSWERING_TIME = 60;
-    const TOTAL_GAME_TIME = 600; // 10 minutes
+    const TOTAL_GAME_TIME = 600;
 
     const allElements = {
-        instructions: document.getElementById('instructions-container'),
-        game: document.getElementById('game-container'),
-        roundCounter: document.getElementById('roundCounter'),
-        finalSummary: document.getElementById('finalSummary'),
-        startBtn: document.getElementById('startBtn'),
-        nextBtn: document.getElementById('nextBtn'),
-        submitBtn: document.getElementById('submitAnswerBtn'),
-        scene: document.getElementById('scene'),
-        answerInput: document.getElementById('answer'),
-        result: document.getElementById('result'),
-        resultContent: document.getElementById('result-content'),
-        viewingCountdown: document.getElementById('viewingCountdown'),
-        answerCountdown: document.getElementById('answerCountdown'),
-        viewingPhase: document.getElementById('viewing-phase'),
-        answeringPhase: document.getElementById('answering-phase'),
-        roundFanfare: document.getElementById('round-fanfare'),
+        instructions: document.getElementById('instructions-container'), game: document.getElementById('game-container'),
+        roundCounter: document.getElementById('roundCounter'), finalSummary: document.getElementById('finalSummary'),
+        startBtn: document.getElementById('startBtn'), nextBtn: document.getElementById('nextBtn'),
+        submitBtn: document.getElementById('submitAnswerBtn'), scene: document.getElementById('scene'),
+        answerInput: document.getElementById('answer'), result: document.getElementById('result'),
+        resultContent: document.getElementById('result-content'), viewingCountdown: document.getElementById('viewingCountdown'),
+        answerCountdown: document.getElementById('answerCountdown'), viewingPhase: document.getElementById('viewing-phase'),
+        answeringPhase: document.getElementById('answering-phase'), roundFanfare: document.getElementById('round-fanfare'),
         mainTimerBar: document.getElementById('main-timer-bar')
     };
 
@@ -161,8 +152,7 @@
       allElements.instructions.classList.add('hidden');
       allElements.game.classList.remove('hidden');
       isGameOver = false;
-      score = 0;
-      round = 0; // FIX: Start round at 0 before the first increment
+      score = 0; round = 0;
       roundScores = [];
       allElements.finalSummary.classList.add('hidden');
       
@@ -187,7 +177,7 @@
 
     function nextRound() {
       if (isGameOver) return;
-      round++; // FIX: Increment round at the beginning of the round setup
+      round++;
       allElements.roundCounter.textContent = `Round ${round}`;
       
       resetTimers();
@@ -230,6 +220,7 @@
         if ((isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index)) {
           div.classList.add('highlight-border');
         }
+        // --- THIS IS THE PERMANENT, RELIABLE FIX ---
         const img = document.createElement('img');
         img.src = objectLibrary[item];
         img.alt = item;
