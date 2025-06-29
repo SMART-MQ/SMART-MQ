@@ -6,12 +6,15 @@
   <title>SMART memory game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@700&display=swap" rel="stylesheet">
   <style>
+    * {
+        box-sizing: border-box;
+    }
     body {
-      background-color: #FFFDF7;
-      font-family: 'Poppins', sans-serif;
-      color: #262626;
+      background-color: #f0f8ff; /* Light Sky Blue */
+      font-family: 'Balsamiq Sans', cursive;
+      color: #333;
       text-align: center;
       margin: 0;
       padding: 10px 5px;
@@ -27,30 +30,34 @@
 
     h1 {
       margin-top: 0;
-      font-family: 'Nunito', sans-serif;
-      font-weight: 900;
-      font-size: 2.8em;
-      color: #06D6A0;
-      text-shadow: 3px 3px 0px #FFD166;
+      font-size: 3em;
+      color: #0077b6; /* Bright Blue */
+      text-shadow: 3px 3px 0px #ffc300; /* Electric Yellow */
     }
     
     h2.welcome-title {
-        font-family: 'Poppins', sans-serif;
         font-size: 1.5em;
-        font-weight: 600;
+        font-weight: 700;
         color: #555;
         margin-bottom: -10px;
     }
     
-    p.intro-text {
-        font-size: 1.1em;
-        line-height: 1.6;
-        max-width: 500px;
-        margin: 15px auto;
+    ul.instructions-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 20px auto;
+        display: inline-block;
+        text-align: left;
+    }
+    ul.instructions-list li {
+        font-size: 1.2em;
+        margin-bottom: 10px;
     }
 
+    /* --- FIX: Responsive width to guarantee no scrolling --- */
     .game-area {
       margin: 20px auto;
+      width: 95%;
       max-width: 500px;
       position: relative;
     }
@@ -58,8 +65,8 @@
     #viewing-phase .message {
         font-size: 1.1em;
         margin-bottom: 15px;
-        font-weight: 600;
-        color: #555;
+        font-weight: 700;
+        color: #0077b6;
     }
 
     .scene {
@@ -77,11 +84,12 @@
       align-items: center;
       border-radius: 12px;
       background-color: white;
+      border: 3px solid #caf0f8;
       box-shadow: 0 4px 6px rgba(0,0,0,0.08);
     }
     
     .object.highlight-border {
-        border: 4px solid #EF476F;
+        border: 4px solid #f94144; /* Punchy Red/Magenta */
     }
 
     .object img {
@@ -90,82 +98,79 @@
     }
     
     #answering-phase {
-      background: #fdfaf0;
+      background: #e9f5ff;
       padding: 20px;
       border-radius: 12px;
-      border: 2px dashed #FFD166;
+      border: 3px dashed #0077b6;
     }
     
     #answering-phase p {
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 1.1em;
     }
 
     button {
-      background-color: #FFD166;
+      background-color: #ffc300;
       border: none;
-      color: #262626;
+      color: #333;
       padding: 12px 25px;
       margin: 20px 10px;
-      font-size: 1.1em;
-      font-family: 'Nunito', sans-serif;
+      font-size: 1.2em;
+      font-family: 'Balsamiq Sans', cursive;
       font-weight: 700;
       border-radius: 12px;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 0 #E5A000;
+      box-shadow: 0 5px 0 #e0a800;
+      text-transform: uppercase;
     }
     
     button:hover {
-        background-color: #FFC340;
+        background-color: #ffd60a;
         transform: translateY(-2px);
-        box-shadow: 0 6px 0 #E5A000;
+        box-shadow: 0 7px 0 #e0a800;
     }
     
     button:active {
         transform: translateY(2px);
-        box-shadow: 0 2px 0 #E5A000;
+        box-shadow: 0 3px 0 #e0a800;
     }
 
     #submitAnswerBtn {
-        background-color: #06D6A0;
+        background-color: #f94144;
         color: white;
-        box-shadow: 0 4px 0 #05a780;
+        box-shadow: 0 5px 0 #c22528;
     }
 
     #submitAnswerBtn:hover {
-        background-color: #07c395;
-        box-shadow: 0 6px 0 #05a780;
+        background-color: #fa5659;
+        box-shadow: 0 7px 0 #c22528;
     }
     
     #submitAnswerBtn:active {
-        box-shadow: 0 2px 0 #05a780;
+        box-shadow: 0 3px 0 #c22528;
     }
 
     input[type="text"] {
       padding: 10px;
       font-size: 1em;
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Balsamiq Sans', cursive;
       margin: 10px;
       border-radius: 8px;
       border: 2px solid #ccc;
       width: 80%;
       max-width: 300px;
     }
-    
-    input[type="text"]:focus {
-        border-color: #06D6A0;
-        outline: none;
-    }
 
     #roundCounter {
       position: fixed;
       bottom: 10px;
       left: 10px;
-      background: #06D6A0;
+      background: #0077b6;
       color: white;
       padding: 8px 15px;
       border-radius: 20px;
-      font-weight: 600;
+      font-weight: 700;
       z-index: 1000;
       font-size: 0.9em;
     }
@@ -174,7 +179,7 @@
       margin-top: 40px;
       font-size: 1.2em;
       background: #ffffff;
-      border: 3px solid #06D6A0;
+      border: 3px solid #0077b6;
       border-radius: 15px;
       padding: 30px;
     }
@@ -192,12 +197,23 @@
     }
 
     #result {
-        background-color: #f1faee;
+        background-color: #e9f5ff;
         padding: 15px;
         border-radius: 10px;
         margin-top: 20px;
-        border: 2px solid #a8dadc;
+        border: 2px solid #0077b6;
     }
+    
+    /* --- NEW: Celebration Animation --- */
+    @keyframes celebrate {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    .celebrate {
+        animation: celebrate 0.5s ease-in-out;
+    }
+
 
     .answer-display {
       margin-top: 10px;
@@ -211,20 +227,15 @@
       width: 50px;
       height: 50px;
       border-radius: 10px;
-      border: 2px solid #06D6A0;
     }
 
     .answer-label {
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 5px;
       font-size: 1em;
-      color: #1d3557;
+      color: #003049;
     }
     
-    .answer-display img.unknown {
-      border-color: #EF476F;
-      opacity: 0.8;
-    }
   </style>
 </head>
 <body>
@@ -232,7 +243,12 @@
   <div id="instructions-container">
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
     <h1>Picture Perfect Memory</h1>
-    <p class="intro-text">Look carefully at all the pictures. Your mission is to remember the ones in the <strong>highlighted</strong> row or column!</p>
+    <ul class="instructions-list">
+        <!-- --- NEW: Updated instructions --- -->
+        <li>⭐ This is a challenge <strong>just for you.</strong></li>
+        <li>🧠 Try to beat your best score each round!</li>
+        <li>🏆 Remember the pictures in the <strong>highlighted</strong> line!</li>
+    </ul>
     <button id="startBtn">Let's Play!</button>
   </div>
 
@@ -240,14 +256,14 @@
       <div id="roundCounter" class="message">Round 1 of 5</div>
       <div class="game-area">
         <div id="viewing-phase">
-            <div class="message">Focus on the <strong>highlighted items</strong>! Time left: <span id="viewingCountdown">60</span>s</div>
+            <div class="message">Focus on the highlighted items! Time left: <span id="viewingCountdown">60</span>s</div>
             <div id="scene" class="scene"></div>
         </div>
         <div id="answering-phase" class="hidden">
             <p>What did you see in the highlighted line?</p>
             <input type="text" id="answer" placeholder="e.g. apple book ball"/>
             <p class="message">⏳ Time left: <span id="answerCountdown">60</span>s</p>
-            <button id="submitAnswerBtn">Submit Answer</button>
+            <button id="submitAnswerBtn">Submit</button>
         </div>
         <div id="result" class="hidden"></div>
       </div>
@@ -329,6 +345,7 @@
 
     function nextRound() {
       resetTimers();
+      resultDiv.classList.remove('hidden');
       resultDiv.classList.add('hidden');
       nextBtn.classList.add('hidden');
       answeringPhase.classList.add('hidden');
@@ -389,6 +406,7 @@
       roundScores.push(roundScore);
 
       const correctAnswerImages = recallObjects.map(obj => `<img src="${objectLibrary[obj]}" title="${obj}">`).join("");
+      
       let playerAnswerImages = userAnswersProvided.map(ans => {
         let foundKey = null;
         for(const [key, variants] of Object.entries(acceptableAnswers)) {
@@ -398,14 +416,29 @@
                       : `<img src="https://img.icons8.com/fluency/96/question-mark.png" class="unknown" title="Unknown: ${ans}">`;
       }).join("");
 
+      // --- NEW: Dynamic and encouraging feedback text ---
       let feedbackHTML;
       if (userAnswersProvided.length === 0) {
         feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
         playerAnswerImages = '';
-      } else if (roundScore > 0) {
-        feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}!</p>`;
       } else {
-        feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
+          let scoreText = '';
+          if (roundScore === 4) scoreText = "PERFECT SCORE!";
+          else if (roundScore === 3) scoreText = "Awesome!";
+          else if (roundScore === 2) scoreText = "Great job!";
+          else if (roundScore === 1) scoreText = "Nice one!";
+          
+          if (roundScore > 0) {
+              feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}! ${scoreText}</p>`;
+          } else {
+              feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
+          }
+      }
+      
+      // --- NEW: Add celebration animation for high scores ---
+      resultDiv.classList.remove('celebrate'); // remove old animation
+      if (roundScore >= 3) {
+          setTimeout(() => resultDiv.classList.add('celebrate'), 10);
       }
 
       resultDiv.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
@@ -444,6 +477,8 @@
         <p><strong>Your Round Scores:</strong></p>
         <ul>${roundDetailsHTML}</ul>
         <p>Great job! Thanks for playing! 🎉</p>
+        <!-- --- NEW: Added the required survey text --- -->
+        <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
         <button id="playAgainBtn">Play Again</button>
       `;
 
