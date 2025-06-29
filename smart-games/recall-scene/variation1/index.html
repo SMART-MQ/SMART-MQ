@@ -35,14 +35,14 @@
     .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #0077b6; margin: 10px auto 15px auto; overflow: hidden; }
     .timer-bar { height: 100%; width: 100%; background-color: #f94144; border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
-    #viewing-phase .message { font-size: 1.1em; font-weight: 700; color: #0077b6; margin-bottom: 15px; }
+    #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #0077b6; margin-bottom: 15px; }
+    #answering-phase .message { margin-top: 0; }
 
     .scene { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
     .object { width: 100%; aspect-ratio: 1 / 1; display: flex; justify-content: center; align-items: center; border-radius: 12px; background-color: white; border: 3px solid #caf0f8; box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
     .object.highlight-border { border: 4px solid #f94144; }
     .object img { width: 85%; height: 85%; }
     
-    /* --- NEW: Overlay styles for both Answering and Results --- */
     .overlay {
         position: fixed;
         top: 0;
@@ -80,6 +80,8 @@
     #finalSummary { margin-top: 40px; font-size: 1.2em; background: #ffffff; border: 3px solid #0077b6; border-radius: 15px; padding: 30px; }
     #finalSummary ul { list-style-type: none; padding: 0; margin: 20px 0; text-align: left; display: inline-block; }
     #finalSummary li { font-size: 0.9em; margin-bottom: 8px; }
+    
+    #result p { margin: 8px 0; }
     
     @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .celebrate { animation: celebrate 0.5s ease-in-out; }
@@ -120,7 +122,6 @@
       </div>
   </div>
   
-  <!-- --- NEW: Overlay for Answering Phase --- -->
   <div id="answering-overlay" class="overlay fadeable is-faded-out">
       <div id="answering-phase" class="overlay-content">
           <p>What did you see in the highlighted line?</p>
@@ -130,7 +131,6 @@
       </div>
   </div>
 
-  <!-- --- NEW: Overlay for Results Phase --- -->
   <div id="results-overlay" class="overlay fadeable is-faded-out">
     <div id="result" class="overlay-content">
         <div id="result-content"></div>
@@ -164,9 +164,8 @@
         answerInput: document.getElementById('answer'), result: document.getElementById('result'),
         resultContent: document.getElementById('result-content'), viewingCountdown: document.getElementById('viewingCountdown'),
         answerCountdown: document.getElementById('answerCountdown'), viewingPhase: document.getElementById('viewing-phase'),
-        answeringOverlay: document.getElementById('answering-overlay'),
-        roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
-        resultsOverlay: document.getElementById('results-overlay')
+        answeringOverlay: document.getElementById('answering-overlay'), roundFanfare: document.getElementById('round-fanfare'),
+        mainTimerBar: document.getElementById('main-timer-bar'), resultsOverlay: document.getElementById('results-overlay')
     };
 
     allElements.startBtn.addEventListener('click', startGame);
@@ -240,14 +239,14 @@
     }
     
     function buildScene() {
-      const gridObjects = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16);
+      const gridItems = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16);
       
       allElements.scene.innerHTML = '';
       const isRow = Math.random() < 0.5;
       const index = Math.floor(Math.random() * 4);
       
       let currentRecallObjects = [];
-      gridObjects.forEach((item, i) => {
+      gridItems.forEach((item, i) => {
         const div = document.createElement('div');
         div.className = 'object';
         
@@ -358,17 +357,15 @@
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.finalSummary.classList.remove('hidden');
       
-      const averageScore = roundScores.length > 0 ? (score / roundScores.length).toFixed(2) : "0.00";
       const bestRoundScore = roundScores.length > 0 ? Math.max(...roundScores.map(r => r.score)) : 0;
       
       const roundDetailsHTML = roundScores.map(r => 
         `<li>Round ${r.round}: ${r.score} point(s) ${r.score === bestRoundScore && bestRoundScore > 0 ? '⭐' : ''}</li>`
       ).join('');
 
+      // --- FIX: Removed the requested lines from the final summary ---
       allElements.finalSummary.innerHTML = `
         <h2>Time's Up!</h2>
-        <p>Your final score: <strong>${score}</strong></p>
-        <p>You completed <strong>${round}</strong> rounds!</p>
         <p><strong>Your Round Scores:</strong></p>
         <ul>${roundDetailsHTML}</ul>
         <p>Great job! Thanks for playing! 🎉</p>
