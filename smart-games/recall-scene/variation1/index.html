@@ -12,7 +12,7 @@
         box-sizing: border-box;
     }
     body {
-      background-color: #f0f8ff; /* Light Sky Blue */
+      background-color: #f0f8ff;
       font-family: 'Balsamiq Sans', cursive;
       color: #333;
       text-align: center;
@@ -21,6 +21,15 @@
     }
 
     .hidden { display: none !important; }
+    
+    /* --- NEW: Class for smooth transitions --- */
+    .fadeable {
+        transition: opacity 0.4s ease-in-out;
+    }
+    .is-faded-out {
+        opacity: 0;
+        pointer-events: none;
+    }
 
     #instructions-container {
         padding: 20px;
@@ -31,8 +40,8 @@
     h1 {
       margin-top: 0;
       font-size: 3em;
-      color: #0077b6; /* Bright Blue */
-      text-shadow: 3px 3px 0px #ffc300; /* Electric Yellow */
+      color: #0077b6;
+      text-shadow: 3px 3px 0px #ffc300;
     }
     
     h2.welcome-title {
@@ -54,7 +63,6 @@
         margin-bottom: 10px;
     }
 
-    /* --- FIX: Responsive width to guarantee no scrolling --- */
     .game-area {
       margin: 20px auto;
       width: 95%;
@@ -89,7 +97,7 @@
     }
     
     .object.highlight-border {
-        border: 4px solid #f94144; /* Punchy Red/Magenta */
+        border: 4px solid #f94144;
     }
 
     .object img {
@@ -125,15 +133,23 @@
       text-transform: uppercase;
     }
     
-    button:hover {
+    button:hover:not(:disabled) {
         background-color: #ffd60a;
         transform: translateY(-2px);
         box-shadow: 0 7px 0 #e0a800;
     }
     
-    button:active {
+    button:active:not(:disabled) {
         transform: translateY(2px);
         box-shadow: 0 3px 0 #e0a800;
+    }
+    
+    /* --- NEW: Clear style for disabled buttons --- */
+    button:disabled {
+        background-color: #cccccc;
+        color: #888888;
+        box-shadow: 0 5px 0 #aaaaaa;
+        cursor: not-allowed;
     }
 
     #submitAnswerBtn {
@@ -204,7 +220,6 @@
         border: 2px solid #0077b6;
     }
     
-    /* --- NEW: Celebration Animation --- */
     @keyframes celebrate {
         0% { transform: scale(1); }
         50% { transform: scale(1.05); }
@@ -213,7 +228,32 @@
     .celebrate {
         animation: celebrate 0.5s ease-in-out;
     }
-
+    
+    /* --- NEW: Style for Round Start Fanfare --- */
+    #round-fanfare {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 119, 182, 0.9);
+        color: white;
+        padding: 20px 40px;
+        border-radius: 20px;
+        font-size: 3em;
+        font-weight: 700;
+        z-index: 9999;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    @keyframes fanfare-anim {
+        0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+        50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+    .fanfare-animate {
+        animation: fanfare-anim 2s ease-in-out;
+    }
 
     .answer-display {
       margin-top: 10px;
@@ -244,7 +284,6 @@
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
     <h1>Picture Perfect Memory</h1>
     <ul class="instructions-list">
-        <!-- --- NEW: Updated instructions --- -->
         <li>⭐ This is a challenge <strong>just for you.</strong></li>
         <li>🧠 Try to beat your best score each round!</li>
         <li>🏆 Remember the pictures in the <strong>highlighted</strong> line!</li>
@@ -255,21 +294,22 @@
   <div id="game-container" class="hidden">
       <div id="roundCounter" class="message">Round 1 of 5</div>
       <div class="game-area">
-        <div id="viewing-phase">
+        <div id="viewing-phase" class="fadeable is-faded-out">
             <div class="message">Focus on the highlighted items! Time left: <span id="viewingCountdown">60</span>s</div>
             <div id="scene" class="scene"></div>
         </div>
-        <div id="answering-phase" class="hidden">
+        <div id="answering-phase" class="fadeable is-faded-out">
             <p>What did you see in the highlighted line?</p>
             <input type="text" id="answer" placeholder="e.g. apple book ball"/>
             <p class="message">⏳ Time left: <span id="answerCountdown">60</span>s</p>
             <button id="submitAnswerBtn">Submit</button>
         </div>
-        <div id="result" class="hidden"></div>
+        <div id="result" class="fadeable is-faded-out"></div>
       </div>
       <button id="nextBtn" class="hidden">Next Round</button>
   </div>
-
+  
+  <div id="round-fanfare" class="hidden"></div>
   <div id="finalSummary" class="hidden"></div>
 
   <script>
@@ -294,6 +334,7 @@
     let round = 0, score = 0, totalRounds = 5;
     let roundScores = [];
     let viewTimer, answerTimer;
+    let roundStartTime; // --- NEW: To track start of 2-minute block ---
 
     const instructionsContainer = document.getElementById('instructions-container');
     const gameContainer = document.getElementById('game-container');
@@ -309,6 +350,7 @@
     const answerCountdownEl = document.getElementById('answerCountdown');
     const viewingPhase = document.getElementById('viewing-phase');
     const answeringPhase = document.getElementById('answering-phase');
+    const roundFanfareEl = document.getElementById('round-fanfare');
 
     startBtn.addEventListener('click', startGame);
     nextBtn.addEventListener('click', nextRound);
@@ -343,14 +385,25 @@
       nextRound();
     }
 
+    function triggerFanfare() {
+        roundFanfareEl.textContent = `Round ${round + 1}!`;
+        roundFanfareEl.classList.remove('hidden');
+        roundFanfareEl.classList.add('fanfare-animate');
+        setTimeout(() => {
+            roundFanfareEl.classList.remove('fanfare-animate');
+            roundFanfareEl.classList.add('hidden');
+        }, 2000);
+    }
+
     function nextRound() {
+      roundStartTime = Date.now(); // Start the 2-minute clock for this round
       resetTimers();
-      resultDiv.classList.remove('hidden');
-      resultDiv.classList.add('hidden');
+      resultDiv.classList.add('is-faded-out');
       nextBtn.classList.add('hidden');
-      answeringPhase.classList.add('hidden');
-      viewingPhase.classList.remove('hidden');
+      answeringPhase.classList.add('is-faded-out');
+      viewingPhase.classList.remove('is-faded-out');
       updateRoundCounter();
+      triggerFanfare();
 
       const gridObjects = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16).reduce((rows, key, index) => { 
         (index % 4 === 0 ? rows.push([key]) : rows[rows.length-1].push(key)); return rows;
@@ -375,8 +428,8 @@
     }
 
     function showAnsweringPhase() {
-        viewingPhase.classList.add('hidden');
-        answeringPhase.classList.remove('hidden');
+        viewingPhase.classList.add('is-faded-out');
+        answeringPhase.classList.remove('is-faded-out');
         answerInput.value = '';
         answerInput.focus();
         answerTimer = startTimer(60, answerCountdownEl, checkAnswer);
@@ -416,7 +469,6 @@
                       : `<img src="https://img.icons8.com/fluency/96/question-mark.png" class="unknown" title="Unknown: ${ans}">`;
       }).join("");
 
-      // --- NEW: Dynamic and encouraging feedback text ---
       let feedbackHTML;
       if (userAnswersProvided.length === 0) {
         feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
@@ -435,8 +487,7 @@
           }
       }
       
-      // --- NEW: Add celebration animation for high scores ---
-      resultDiv.classList.remove('celebrate'); // remove old animation
+      resultDiv.classList.remove('celebrate');
       if (roundScore >= 3) {
           setTimeout(() => resultDiv.classList.add('celebrate'), 10);
       }
@@ -444,14 +495,25 @@
       resultDiv.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
                             (playerAnswerImages ? `<div style="margin-top:12px;"><div class="answer-label">Your answer:</div><div class="answer-display">${playerAnswerImages}</div></div>` : '');
       
-      resultDiv.classList.remove('hidden');
-      answeringPhase.classList.add('hidden');
+      answeringPhase.classList.add('is-faded-out');
+      resultDiv.classList.remove('is-faded-out');
       
       round++;
       if (round >= totalRounds) {
-        setTimeout(showFinalSummary, 3500);
+        // --- NEW: Calculate remaining time in the 2-minute block before showing final summary ---
+        const elapsedTime = Date.now() - roundStartTime;
+        const waitTime = Math.max(0, 120000 - elapsedTime);
+        setTimeout(showFinalSummary, waitTime + 1000); // add a little extra delay
       } else {
         nextBtn.classList.remove('hidden');
+        nextBtn.disabled = true; // Disable it initially
+        
+        // --- NEW: Enable "Next Round" button after the 2-minute block is up ---
+        const elapsedTime = Date.now() - roundStartTime;
+        const waitTime = Math.max(0, 120000 - elapsedTime);
+        setTimeout(() => {
+            nextBtn.disabled = false;
+        }, waitTime);
       }
     }
     
@@ -477,7 +539,6 @@
         <p><strong>Your Round Scores:</strong></p>
         <ul>${roundDetailsHTML}</ul>
         <p>Great job! Thanks for playing! 🎉</p>
-        <!-- --- NEW: Added the required survey text --- -->
         <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
         <button id="playAgainBtn">Play Again</button>
       `;
