@@ -55,6 +55,7 @@
     #finalSummary { margin-top: 40px; font-size: 1.2em; background: #ffffff; border: 3px solid #0077b6; border-radius: 15px; padding: 30px; }
     #finalSummary ul { list-style-type: none; padding: 0; margin: 20px 0; text-align: left; display: inline-block; }
     #finalSummary li { font-size: 0.9em; margin-bottom: 8px; }
+    
     #result { background-color: #e9f5ff; padding: 15px; border-radius: 10px; margin-top: 20px; border: 2px solid #0077b6; }
     
     @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
@@ -67,9 +68,11 @@
     .answer-display { margin-top: 10px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
     .answer-display img { width: 50px; height: 50px; border-radius: 10px; }
     .answer-label { font-weight: 700; margin-bottom: 5px; font-size: 1em; color: #003049; }
+    
   </style>
 </head>
 <body>
+
   <div id="instructions-container">
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
     <h1>Picture Perfect Memory</h1>
@@ -97,24 +100,25 @@
             <input type="text" id="answer" placeholder="e.g. apple book ball"/>
             <button id="submitAnswerBtn">Submit</button>
         </div>
-        <div id="result" class="fadeable is-faded-out"></div>
+        <!-- FIX: The Next Round button is now INSIDE the results box -->
+        <div id="result" class="fadeable is-faded-out">
+            <div id="result-content"></div>
+            <button id="nextBtn" class="hidden">Next Round</button>
+        </div>
       </div>
-      <button id="nextBtn" class="hidden">Next Round</button>
   </div>
   
   <div id="round-fanfare" class="hidden"></div>
   <div id="finalSummary" class="hidden"></div>
 
   <script>
-    const objectLibrary = { /* Library content removed for brevity */ };
-    const acceptableAnswers = { /* Library content removed for brevity */ };
-    // --- Auto-populate simple acceptable answers ---
+    const objectLibrary = { apple: "https://img.icons8.com/color/96/apple.png", book: "https://img.icons8.com/color/96/book.png", ball: "https://img.icons8.com/emoji/96/soccer-ball-emoji.png", cat: "https://img.icons8.com/color/96/cat.png", car: "https://img.icons8.com/color/96/car.png", hat: "https://img.icons8.com/emoji/96/top-hat-emoji.png", star: "https://img.icons8.com/color/96/star.png", fish: "https://img.icons8.com/color/96/fish.png", pen: "https://img.icons8.com/emoji/96/pen-emoji.png", leaf: "https://img.icons8.com/color/96/leaf.png", cake: "https://img.icons8.com/color/96/birthday-cake.png", dog: "https://img.icons8.com/color/96/dog.png", flower: "https://img.icons8.com/color/96/flower.png", globe: "https://img.icons8.com/color/96/globe.png", kite: "https://img.icons8.com/color/96/kite.png", moon: "https://img.icons8.com/emoji/96/crescent-moon-emoji.png" };
+    const acceptableAnswers = { apple: ["apple"], book: ["book"], ball: ["ball", "soccer ball", "football"], cat: ["cat"], car: ["car"], hat: ["hat", "top hat"], star: ["star"], fish: ["fish"], pen: ["pen", "pencil"], leaf: ["leaf"], cake: ["cake", "birthday cake"], dog: ["dog"], flower: ["flower"], globe: ["globe", "world", "earth"], kite: ["kite"], moon: ["moon", "crescent moon"] };
     for (const key of Object.keys(objectLibrary)) { if (!acceptableAnswers[key]) acceptableAnswers[key] = [key]; }
 
     const allObjects = Object.keys(objectLibrary);
-    let recallObjects = [];
+    let recallObjects = [], roundScores = [];
     let round = 0, score = 0;
-    let roundScores = [];
     let viewTimer, answerTimer, mainGameTimer;
     let isGameOver = false;
     
@@ -122,27 +126,30 @@
     const ANSWERING_TIME = 60;
     const TOTAL_GAME_TIME = 600; // 10 minutes
 
-    const instructionsContainer = document.getElementById('instructions-container');
-    const gameContainer = document.getElementById('game-container');
-    const roundCounterEl = document.getElementById('roundCounter');
-    const finalSummaryDiv = document.getElementById('finalSummary');
-    const startBtn = document.getElementById('startBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const submitAnswerBtn = document.getElementById('submitAnswerBtn');
-    const sceneDiv = document.getElementById('scene');
-    const answerInput = document.getElementById('answer');
-    const resultDiv = document.getElementById('result');
-    const viewingCountdownEl = document.getElementById('viewingCountdown');
-    const answerCountdownEl = document.getElementById('answerCountdown');
-    const viewingPhase = document.getElementById('viewing-phase');
-    const answeringPhase = document.getElementById('answering-phase');
-    const roundFanfareEl = document.getElementById('round-fanfare');
-    const mainTimerBar = document.getElementById('main-timer-bar');
+    const allElements = {
+        instructions: document.getElementById('instructions-container'),
+        game: document.getElementById('game-container'),
+        roundCounter: document.getElementById('roundCounter'),
+        finalSummary: document.getElementById('finalSummary'),
+        startBtn: document.getElementById('startBtn'),
+        nextBtn: document.getElementById('nextBtn'),
+        submitBtn: document.getElementById('submitAnswerBtn'),
+        scene: document.getElementById('scene'),
+        answerInput: document.getElementById('answer'),
+        result: document.getElementById('result'),
+        resultContent: document.getElementById('result-content'),
+        viewingCountdown: document.getElementById('viewingCountdown'),
+        answerCountdown: document.getElementById('answerCountdown'),
+        viewingPhase: document.getElementById('viewing-phase'),
+        answeringPhase: document.getElementById('answering-phase'),
+        roundFanfare: document.getElementById('round-fanfare'),
+        mainTimerBar: document.getElementById('main-timer-bar')
+    };
 
-    startBtn.addEventListener('click', startGame);
-    nextBtn.addEventListener('click', nextRound);
-    submitAnswerBtn.addEventListener('click', checkAnswer);
-    answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
+    allElements.startBtn.addEventListener('click', startGame);
+    allElements.nextBtn.addEventListener('click', nextRound);
+    allElements.submitBtn.addEventListener('click', checkAnswer);
+    allElements.answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
 
     function resetAllTimers() {
       clearInterval(viewTimer);
@@ -151,18 +158,19 @@
     }
     
     function startGame() {
-      instructionsContainer.classList.add('hidden');
-      gameContainer.classList.remove('hidden');
+      allElements.instructions.classList.add('hidden');
+      allElements.game.classList.remove('hidden');
       isGameOver = false;
-      score = 0; round = 0;
+      score = 0;
+      round = 0; // FIX: Start round at 0 before the first increment
       roundScores = [];
-      finalSummaryDiv.classList.add('hidden');
+      allElements.finalSummary.classList.add('hidden');
       
       let mainTimeLeft = TOTAL_GAME_TIME;
       mainGameTimer = setInterval(() => {
           mainTimeLeft--;
-          mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
-          if (mainTimeLeft <= 0) {
+          allElements.mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
+          if (mainTimeLeft <= 0 && !isGameOver) {
               showFinalSummary();
           }
       }, 1000);
@@ -171,35 +179,34 @@
     }
     
     function triggerFanfare() {
-        roundFanfareEl.textContent = `Round ${round + 1}!`;
-        roundFanfareEl.classList.remove('hidden', 'fanfare-animate');
-        setTimeout(() => roundFanfareEl.classList.add('fanfare-animate'), 10);
-        setTimeout(() => roundFanfareEl.classList.add('hidden'), 1500);
+        allElements.roundFanfare.textContent = `Round ${round}!`;
+        allElements.roundFanfare.classList.remove('hidden', 'fanfare-animate');
+        setTimeout(() => allElements.roundFanfare.classList.add('fanfare-animate'), 10);
+        setTimeout(() => allElements.roundFanfare.classList.add('hidden'), 1500);
     }
 
     function nextRound() {
       if (isGameOver) return;
-      round++;
-      roundCounterEl.textContent = `Round ${round}`;
+      round++; // FIX: Increment round at the beginning of the round setup
+      allElements.roundCounter.textContent = `Round ${round}`;
       
       resetTimers();
-      resultDiv.classList.add('is-faded-out');
-      nextBtn.classList.add('hidden');
-      answeringPhase.classList.add('is-faded-out');
+      allElements.result.classList.add('is-faded-out');
+      allElements.nextBtn.classList.add('hidden');
+      allElements.answeringPhase.classList.add('is-faded-out');
       
       triggerFanfare();
       
-      // Delay showing the pictures until after the fanfare
       setTimeout(() => {
           if (isGameOver) return;
           buildScene();
-          viewingPhase.classList.remove('is-faded-out');
+          allElements.viewingPhase.classList.remove('is-faded-out');
           
           let timeLeft = VIEWING_TIME;
-          viewingCountdownEl.textContent = timeLeft;
+          allElements.viewingCountdown.textContent = timeLeft;
           viewTimer = setInterval(() => {
               timeLeft--;
-              viewingCountdownEl.textContent = timeLeft;
+              allElements.viewingCountdown.textContent = timeLeft;
               if (timeLeft <= 0) {
                   clearInterval(viewTimer);
                   showAnsweringPhase();
@@ -213,7 +220,7 @@
         (index % 4 === 0 ? rows.push([key]) : rows[rows.length-1].push(key)); return rows;
       }, []);
 
-      sceneDiv.innerHTML = '';
+      allElements.scene.innerHTML = '';
       const isRow = Math.random() < 0.5;
       const index = Math.floor(Math.random() * 4);
       
@@ -223,28 +230,27 @@
         if ((isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index)) {
           div.classList.add('highlight-border');
         }
-        // --- THE RELIABLE PICTURE FIX ---
         const img = document.createElement('img');
         img.src = objectLibrary[item];
         img.alt = item;
         div.appendChild(img);
-        sceneDiv.appendChild(div);
+        allElements.scene.appendChild(div);
       });
       recallObjects = isRow ? gridObjects[index] : gridObjects.map(r => r[index]);
     }
 
     function showAnsweringPhase() {
         if (isGameOver) return;
-        viewingPhase.classList.add('is-faded-out');
-        answeringPhase.classList.remove('is-faded-out');
-        answerInput.value = '';
-        answerInput.focus();
+        allElements.viewingPhase.classList.add('is-faded-out');
+        allElements.answeringPhase.classList.remove('is-faded-out');
+        allElements.answerInput.value = '';
+        allElements.answerInput.focus();
         
         let timeLeft = ANSWERING_TIME;
-        answerCountdownEl.textContent = timeLeft;
+        allElements.answerCountdown.textContent = timeLeft;
         answerTimer = setInterval(() => {
             timeLeft--;
-            answerCountdownEl.textContent = timeLeft;
+            allElements.answerCountdown.textContent = timeLeft;
             if (timeLeft <= 0) {
                 clearInterval(answerTimer);
                 checkAnswer();
@@ -256,7 +262,7 @@
       if (isGameOver) return;
       resetTimers();
       
-      const userInputText = answerInput.value.toLowerCase();
+      const userInputText = allElements.answerInput.value.toLowerCase();
       const userAnswersProvided = userInputText.replace(/,/g, ' ').split(' ').filter(s => s.trim().length > 0);
       let matchedObjects = new Set();
       let tempUserInput = " " + userInputText.replace(/,/g, ' ') + " ";
@@ -300,18 +306,17 @@
           feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}! ${scoreText}</p>`;
       }
       
-      resultDiv.classList.remove('celebrate');
-      if (roundScore >= 3) {
-          setTimeout(() => resultDiv.classList.add('celebrate'), 10);
-      }
-
-      resultDiv.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
+      allElements.resultContent.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
                             (playerAnswerImages ? `<div style="margin-top:12px;"><div class="answer-label">Your answer:</div><div class="answer-display">${playerAnswerImages}</div></div>` : '');
       
-      resultDiv.classList.remove('is-faded-out');
-      answeringPhase.classList.add('is-faded-out');
+      allElements.result.classList.remove('celebrate', 'is-faded-out');
+      if (roundScore >= 3) {
+          setTimeout(() => allElements.result.classList.add('celebrate'), 10);
+      }
+      
+      allElements.answeringPhase.classList.add('is-faded-out');
       if (!isGameOver) {
-        nextBtn.classList.remove('hidden');
+        allElements.nextBtn.classList.remove('hidden');
       }
     }
     
@@ -320,8 +325,8 @@
       isGameOver = true;
       resetAllTimers();
       
-      gameContainer.classList.add('hidden');
-      finalSummaryDiv.classList.remove('hidden');
+      allElements.game.classList.add('hidden');
+      allElements.finalSummary.classList.remove('hidden');
       
       const averageScore = roundScores.length > 0 ? (score / roundScores.length).toFixed(2) : "0.00";
       const bestRoundScore = roundScores.length > 0 ? Math.max(...roundScores.map(r => r.score)) : 0;
@@ -330,7 +335,7 @@
         `<li>Round ${r.round}: ${r.score} point(s) ${r.score === bestRoundScore && bestRoundScore > 0 ? '⭐' : ''}</li>`
       ).join('');
 
-      finalSummaryDiv.innerHTML = `
+      allElements.finalSummary.innerHTML = `
         <h2>Time's Up!</h2>
         <p>Your final score: <strong>${score}</strong></p>
         <p>You completed <strong>${round}</strong> rounds!</p>
@@ -338,29 +343,11 @@
         <ul>${roundDetailsHTML}</ul>
         <p>Great job! Thanks for playing! 🎉</p>
         <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
-        <button id="playAgainBtn">Play Again</button>
+        <button onclick="location.reload()">Play Again</button>
       `;
 
-      document.getElementById('playAgainBtn').addEventListener('click', () => location.reload());
       window.parent.postMessage("showNext", "*");
     }
-
-    // Full object libraries for the script to use
-    Object.assign(objectLibrary, {
-      apple: "https://img.icons8.com/color/96/apple.png", book: "https://img.icons8.com/color/96/book.png", ball: "https://img.icons8.com/emoji/96/soccer-ball-emoji.png",
-      cat: "https://img.icons8.com/color/96/cat.png", car: "https://img.icons8.com/color/96/car.png", hat: "https://img.icons8.com/emoji/96/top-hat-emoji.png",
-      star: "https://img.icons8.com/color/96/star.png", fish: "https://img.icons8.com/color/96/fish.png", pen: "https://img.icons8.com/emoji/96/pen-emoji.png",
-      leaf: "https://img.icons8.com/color/96/leaf.png", cake: "https://img.icons8.com/color/96/birthday-cake.png", dog: "https://img.icons8.com/color/96/dog.png",
-      flower: "https://img.icons8.com/color/96/flower.png", globe: "https://img.icons8.com/color/96/globe.png", kite: "https://img.icons8.com/color/96/kite.png",
-      moon: "https://img.icons8.com/emoji/96/crescent-moon-emoji.png"
-    });
-    Object.assign(acceptableAnswers, {
-      apple: ["apple"], book: ["book"], ball: ["ball", "soccer ball", "football"],
-      cat: ["cat"], car: ["car"], hat: ["hat", "top hat"], star: ["star"],
-      fish: ["fish"], pen: ["pen", "pencil"], leaf: ["leaf"],
-      cake: ["cake", "birthday cake"], dog: ["dog"], flower: ["flower"],
-      globe: ["globe", "world", "earth"], kite: ["kite"], moon: ["moon", "crescent moon"]
-    });
   </script>
 </body>
 </html>
