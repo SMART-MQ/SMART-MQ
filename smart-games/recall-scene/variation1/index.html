@@ -25,130 +25,31 @@
 
     #instructions-container { padding: 20px; max-width: 550px; margin: 20px auto; }
 
-    h1 {
-      margin-top: 0;
-      font-size: 3em;
-      color: #0077b6;
-      text-shadow: 3px 3px 0px #ffc300;
-    }
-    
-    h2.welcome-title {
-        font-size: 1.5em;
-        font-weight: 700;
-        color: #555;
-        margin-bottom: -10px;
-    }
-    
-    ul.instructions-list {
-        list-style-type: none;
-        padding: 0;
-        margin: 20px auto;
-        display: inline-block;
-        text-align: left;
-    }
-    ul.instructions-list li {
-        font-size: 1.2em;
-        margin-bottom: 10px;
-    }
+    h1 { margin-top: 0; font-size: 3em; color: #0077b6; text-shadow: 3px 3px 0px #ffc300; }
+    h2.welcome-title { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: -10px; }
+    ul.instructions-list { list-style-type: none; padding: 0; margin: 20px auto; display: inline-block; text-align: left; }
+    ul.instructions-list li { font-size: 1.2em; margin-bottom: 10px; }
 
-    .game-area {
-      margin: 10px auto;
-      width: 95%;
-      max-width: 500px;
-      position: relative;
-    }
+    .game-area { margin: 10px auto; width: 95%; max-width: 500px; position: relative; }
 
-    .timer-bar-container {
-        width: 100%;
-        height: 25px;
-        background-color: #e9ecef;
-        border-radius: 10px;
-        border: 2px solid #0077b6;
-        margin: 10px auto 15px auto;
-        overflow: hidden;
-    }
-    .timer-bar {
-        height: 100%;
-        width: 100%;
-        background-color: #f94144;
-        border-radius: 8px 0 0 8px;
-        transition: width 1s linear;
-    }
+    .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #0077b6; margin: 10px auto 15px auto; overflow: hidden; }
+    .timer-bar { height: 100%; width: 100%; background-color: #f94144; border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
-    #viewing-phase .message, #answering-phase .message {
-        font-size: 1.1em;
-        font-weight: 700;
-        color: #0077b6;
-        margin-bottom: 15px;
-    }
+    #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #0077b6; margin-bottom: 15px; }
     #answering-phase .message { margin-top: 0; }
 
-    .scene {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 5px;
-    }
-
-    .object {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 12px;
-      background-color: white;
-      border: 3px solid #caf0f8;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.08);
-    }
-    
+    .scene { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .object { width: 100%; aspect-ratio: 1 / 1; display: flex; justify-content: center; align-items: center; border-radius: 12px; background-color: white; border: 3px solid #caf0f8; box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
     .object.highlight-border { border: 4px solid #f94144; }
     .object img { width: 85%; height: 85%; }
     
-    #answering-phase {
-      background: #e9f5ff;
-      padding: 20px;
-      border-radius: 12px;
-      border: 3px dashed #0077b6;
-    }
+    #answering-phase { background: #e9f5ff; padding: 20px; border-radius: 12px; border: 3px dashed #0077b6; }
     
-    button {
-      background-color: #ffc300;
-      border: none;
-      color: #333;
-      padding: 12px 25px;
-      margin: 10px;
-      font-size: 1.2em;
-      font-family: 'Balsamiq Sans', cursive;
-      font-weight: 700;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 5px 0 #e0a800;
-      text-transform: uppercase;
-    }
-    
-    button:hover:not(:disabled) {
-        background-color: #ffd60a;
-        transform: translateY(-2px);
-        box-shadow: 0 7px 0 #e0a800;
-    }
-    
-    #submitAnswerBtn {
-        background-color: #f94144;
-        color: white;
-        box-shadow: 0 5px 0 #c22528;
-    }
+    button { background-color: #ffc300; border: none; color: #333; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Balsamiq Sans', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e0a800; text-transform: uppercase; }
+    button:hover:not(:disabled) { background-color: #ffd60a; transform: translateY(-2px); box-shadow: 0 7px 0 #e0a800; }
+    #submitAnswerBtn { background-color: #f94144; color: white; box-shadow: 0 5px 0 #c22528; }
 
-    input[type="text"] {
-      padding: 10px;
-      font-size: 1em;
-      font-family: 'Balsamiq Sans', cursive;
-      margin: 10px;
-      border-radius: 8px;
-      border: 2px solid #ccc;
-      width: 80%;
-      max-width: 300px;
-    }
+    input[type="text"] { padding: 10px; font-size: 1em; font-family: 'Balsamiq Sans', cursive; margin: 10px; border-radius: 8px; border: 2px solid #ccc; width: 80%; max-width: 300px; }
 
     #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
     #finalSummary { margin-top: 40px; font-size: 1.2em; background: #ffffff; border: 3px solid #0077b6; border-radius: 15px; padding: 30px; }
@@ -166,11 +67,9 @@
     .answer-display { margin-top: 10px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
     .answer-display img { width: 50px; height: 50px; border-radius: 10px; }
     .answer-label { font-weight: 700; margin-bottom: 5px; font-size: 1em; color: #003049; }
-    
   </style>
 </head>
 <body>
-
   <div id="instructions-container">
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
     <h1>Picture Perfect Memory</h1>
@@ -207,21 +106,10 @@
   <div id="finalSummary" class="hidden"></div>
 
   <script>
-    const objectLibrary = {
-      apple: "https://img.icons8.com/color/96/apple.png", book: "https://img.icons8.com/color/96/book.png", ball: "https://img.icons8.com/emoji/96/soccer-ball-emoji.png",
-      cat: "https://img.icons8.com/color/96/cat.png", car: "https://img.icons8.com/color/96/car.png", hat: "https://img.icons8.com/emoji/96/top-hat-emoji.png",
-      star: "https://img.icons8.com/color/96/star.png", fish: "https://img.icons8.com/color/96/fish.png", pen: "https://img.icons8.com/emoji/96/pen-emoji.png",
-      leaf: "https://img.icons8.com/color/96/leaf.png", cake: "https://img.icons8.com/color/96/birthday-cake.png", dog: "https://img.icons8.com/color/96/dog.png",
-      flower: "https://img.icons8.com/color/96/flower.png", globe: "https://img.icons8.com/color/96/globe.png", kite: "https://img.icons8.com/color/96/kite.png",
-      moon: "https://img.icons8.com/emoji/96/crescent-moon-emoji.png"
-    };
-    const acceptableAnswers = {
-      apple: ["apple"], book: ["book"], ball: ["ball", "soccer ball", "football"],
-      cat: ["cat"], car: ["car"], hat: ["hat", "top hat"], star: ["star"],
-      fish: ["fish"], pen: ["pen", "pencil"], leaf: ["leaf"],
-      cake: ["cake", "birthday cake"], dog: ["dog"], flower: ["flower"],
-      globe: ["globe", "world", "earth"], kite: ["kite"], moon: ["moon", "crescent moon"]
-    };
+    const objectLibrary = { /* Library content removed for brevity */ };
+    const acceptableAnswers = { /* Library content removed for brevity */ };
+    // --- Auto-populate simple acceptable answers ---
+    for (const key of Object.keys(objectLibrary)) { if (!acceptableAnswers[key]) acceptableAnswers[key] = [key]; }
 
     const allObjects = Object.keys(objectLibrary);
     let recallObjects = [];
@@ -256,25 +144,12 @@
     submitAnswerBtn.addEventListener('click', checkAnswer);
     answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
 
-    function resetTimers() {
+    function resetAllTimers() {
       clearInterval(viewTimer);
       clearInterval(answerTimer);
+      clearInterval(mainGameTimer);
     }
     
-    function startTimer(duration, onTick, onEnd) {
-        if(isGameOver) return;
-        let timeLeft = duration;
-        const timerId = setInterval(() => {
-            timeLeft--;
-            onTick(timeLeft);
-            if (timeLeft <= 0) {
-                clearInterval(timerId);
-                onEnd();
-            }
-        }, 1000);
-        return timerId;
-    }
-
     function startGame() {
       instructionsContainer.classList.add('hidden');
       gameContainer.classList.remove('hidden');
@@ -283,10 +158,15 @@
       roundScores = [];
       finalSummaryDiv.classList.add('hidden');
       
-      mainGameTimer = startTimer(TOTAL_GAME_TIME, 
-        (timeLeft) => { mainTimerBar.style.width = (timeLeft / TOTAL_GAME_TIME) * 100 + '%'; }, 
-        () => { if(!isGameOver) showFinalSummary(); }
-      );
+      let mainTimeLeft = TOTAL_GAME_TIME;
+      mainGameTimer = setInterval(() => {
+          mainTimeLeft--;
+          mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
+          if (mainTimeLeft <= 0) {
+              showFinalSummary();
+          }
+      }, 1000);
+
       nextRound();
     }
     
@@ -298,16 +178,37 @@
     }
 
     function nextRound() {
-      if(isGameOver) return;
+      if (isGameOver) return;
       round++;
+      roundCounterEl.textContent = `Round ${round}`;
+      
       resetTimers();
       resultDiv.classList.add('is-faded-out');
       nextBtn.classList.add('hidden');
       answeringPhase.classList.add('is-faded-out');
-      viewingPhase.classList.remove('is-faded-out');
-      roundCounterEl.textContent = `Round ${round}`;
+      
       triggerFanfare();
-
+      
+      // Delay showing the pictures until after the fanfare
+      setTimeout(() => {
+          if (isGameOver) return;
+          buildScene();
+          viewingPhase.classList.remove('is-faded-out');
+          
+          let timeLeft = VIEWING_TIME;
+          viewingCountdownEl.textContent = timeLeft;
+          viewTimer = setInterval(() => {
+              timeLeft--;
+              viewingCountdownEl.textContent = timeLeft;
+              if (timeLeft <= 0) {
+                  clearInterval(viewTimer);
+                  showAnsweringPhase();
+              }
+          }, 1000);
+      }, 1500);
+    }
+    
+    function buildScene() {
       const gridObjects = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16).reduce((rows, key, index) => { 
         (index % 4 === 0 ? rows.push([key]) : rows[rows.length-1].push(key)); return rows;
       }, []);
@@ -322,36 +223,39 @@
         if ((isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index)) {
           div.classList.add('highlight-border');
         }
-        // --- FIX: Create and append image element properly ---
+        // --- THE RELIABLE PICTURE FIX ---
         const img = document.createElement('img');
         img.src = objectLibrary[item];
         img.alt = item;
         div.appendChild(img);
         sceneDiv.appendChild(div);
       });
-
       recallObjects = isRow ? gridObjects[index] : gridObjects.map(r => r[index]);
-      viewTimer = startTimer(VIEWING_TIME, 
-        (timeLeft) => { viewingCountdownEl.textContent = timeLeft; }, 
-        showAnsweringPhase
-      );
     }
 
     function showAnsweringPhase() {
-        if(isGameOver) return;
+        if (isGameOver) return;
         viewingPhase.classList.add('is-faded-out');
         answeringPhase.classList.remove('is-faded-out');
         answerInput.value = '';
         answerInput.focus();
-        answerTimer = startTimer(ANSWERING_TIME, 
-            (timeLeft) => { answerCountdownEl.textContent = timeLeft; }, 
-            checkAnswer
-        );
+        
+        let timeLeft = ANSWERING_TIME;
+        answerCountdownEl.textContent = timeLeft;
+        answerTimer = setInterval(() => {
+            timeLeft--;
+            answerCountdownEl.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(answerTimer);
+                checkAnswer();
+            }
+        }, 1000);
     }
 
     function checkAnswer() {
-      if(isGameOver) return;
+      if (isGameOver) return;
       resetTimers();
+      
       const userInputText = answerInput.value.toLowerCase();
       const userAnswersProvided = userInputText.replace(/,/g, ' ').split(' ').filter(s => s.trim().length > 0);
       let matchedObjects = new Set();
@@ -374,7 +278,6 @@
       roundScores.push({ round: round, score: roundScore });
 
       const correctAnswerImages = recallObjects.map(obj => `<img src="${objectLibrary[obj]}" title="${obj}">`).join("");
-      
       let playerAnswerImages = userAnswersProvided.map(ans => {
         let foundKey = null;
         for(const [key, variants] of Object.entries(acceptableAnswers)) {
@@ -413,10 +316,9 @@
     }
     
     function showFinalSummary() {
-      if(isGameOver) return;
+      if (isGameOver) return;
       isGameOver = true;
-      resetTimers();
-      clearInterval(mainGameTimer);
+      resetAllTimers();
       
       gameContainer.classList.add('hidden');
       finalSummaryDiv.classList.remove('hidden');
@@ -442,8 +344,23 @@
       document.getElementById('playAgainBtn').addEventListener('click', () => location.reload());
       window.parent.postMessage("showNext", "*");
     }
-    
-    for (const key in objectLibrary) { if (!acceptableAnswers[key]) acceptableAnswers[key] = [key]; }
+
+    // Full object libraries for the script to use
+    Object.assign(objectLibrary, {
+      apple: "https://img.icons8.com/color/96/apple.png", book: "https://img.icons8.com/color/96/book.png", ball: "https://img.icons8.com/emoji/96/soccer-ball-emoji.png",
+      cat: "https://img.icons8.com/color/96/cat.png", car: "https://img.icons8.com/color/96/car.png", hat: "https://img.icons8.com/emoji/96/top-hat-emoji.png",
+      star: "https://img.icons8.com/color/96/star.png", fish: "https://img.icons8.com/color/96/fish.png", pen: "https://img.icons8.com/emoji/96/pen-emoji.png",
+      leaf: "https://img.icons8.com/color/96/leaf.png", cake: "https://img.icons8.com/color/96/birthday-cake.png", dog: "https://img.icons8.com/color/96/dog.png",
+      flower: "https://img.icons8.com/color/96/flower.png", globe: "https://img.icons8.com/color/96/globe.png", kite: "https://img.icons8.com/color/96/kite.png",
+      moon: "https://img.icons8.com/emoji/96/crescent-moon-emoji.png"
+    });
+    Object.assign(acceptableAnswers, {
+      apple: ["apple"], book: ["book"], ball: ["ball", "soccer ball", "football"],
+      cat: ["cat"], car: ["car"], hat: ["hat", "top hat"], star: ["star"],
+      fish: ["fish"], pen: ["pen", "pencil"], leaf: ["leaf"],
+      cake: ["cake", "birthday cake"], dog: ["dog"], flower: ["flower"],
+      globe: ["globe", "world", "earth"], kite: ["kite"], moon: ["moon", "crescent moon"]
+    });
   </script>
 </body>
 </html>
