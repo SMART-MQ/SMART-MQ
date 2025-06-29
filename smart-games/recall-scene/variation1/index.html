@@ -320,17 +320,20 @@
                       : `<img src="https://img.icons8.com/fluency/96/question-mark.png" class="unknown" title="Unknown: ${ans}">`;
       }).join("");
 
+      // --- THE FINAL FIX FOR THE FEEDBACK ---
       let feedbackHTML;
       if (userAnswersProvided.length === 0) {
         feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
         playerAnswerImages = '';
-      } else {
+      } else if (roundScore > 0) {
           let scoreText = '';
           if (roundScore === 4) scoreText = "PERFECT SCORE!";
           else if (roundScore === 3) scoreText = "Awesome!";
           else if (roundScore === 2) scoreText = "Great job!";
           else if (roundScore === 1) scoreText = "Nice one!";
           feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}! ${scoreText}</p>`;
+      } else {
+          feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
       }
       
       allElements.resultContent.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
@@ -357,13 +360,13 @@
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.finalSummary.classList.remove('hidden');
       
+      const averageScore = roundScores.length > 0 ? (score / roundScores.length).toFixed(2) : "0.00";
       const bestRoundScore = roundScores.length > 0 ? Math.max(...roundScores.map(r => r.score)) : 0;
       
       const roundDetailsHTML = roundScores.map(r => 
         `<li>Round ${r.round}: ${r.score} point(s) ${r.score === bestRoundScore && bestRoundScore > 0 ? '⭐' : ''}</li>`
       ).join('');
 
-      // --- FIX: Removed the requested lines from the final summary ---
       allElements.finalSummary.innerHTML = `
         <h2>Time's Up!</h2>
         <p><strong>Your Round Scores:</strong></p>
