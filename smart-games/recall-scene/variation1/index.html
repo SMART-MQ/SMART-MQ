@@ -14,7 +14,7 @@
       color: #262626;
       text-align: center;
       margin: 0;
-      padding: 10px;
+      padding: 10px 5px;
     }
 
     .hidden { display: none !important; }
@@ -34,7 +34,6 @@
       text-shadow: 3px 3px 0px #FFD166;
     }
     
-    /* --- NEW: Style for the Welcome title --- */
     h2.welcome-title {
         font-family: 'Poppins', sans-serif;
         font-size: 1.5em;
@@ -127,7 +126,6 @@
         box-shadow: 0 2px 0 #E5A000;
     }
 
-    /* --- FIX: Distinct color for the submit button --- */
     #submitAnswerBtn {
         background-color: #06D6A0;
         color: white;
@@ -181,6 +179,18 @@
       padding: 30px;
     }
     
+    #finalSummary ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 20px 0;
+        text-align: left;
+        display: inline-block;
+    }
+    #finalSummary li {
+        font-size: 0.9em;
+        margin-bottom: 8px;
+    }
+
     #result {
         background-color: #f1faee;
         padding: 15px;
@@ -220,7 +230,6 @@
 <body>
 
   <div id="instructions-container">
-    <!-- --- NEW: Welcome title added --- -->
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
     <h1>Picture Perfect Memory</h1>
     <p class="intro-text">Look carefully at all the pictures. Your mission is to remember the ones in the <strong>highlighted</strong> row or column!</p>
@@ -267,6 +276,7 @@
     const allObjects = Object.keys(objectLibrary);
     let recallObjects = [];
     let round = 0, score = 0, totalRounds = 5;
+    let roundScores = [];
     let viewTimer, answerTimer;
 
     const instructionsContainer = document.getElementById('instructions-container');
@@ -312,6 +322,7 @@
       instructionsContainer.classList.add('hidden');
       gameContainer.classList.remove('hidden');
       score = 0; round = 0;
+      roundScores = [];
       finalSummaryDiv.classList.add('hidden');
       nextRound();
     }
@@ -355,64 +366,60 @@
     }
 
     function checkAnswer() {
-        resetTimers();
-        
-        const userInputText = answerInput.value.toLowerCase();
-        const userAnswersProvided = userInputText.replace(/,/g, ' ').split(' ').filter(s => s.trim().length > 0);
-        
-        let matchedObjects = new Set();
-        let tempUserInput = userInputText; // Use a copy for manipulation
+      resetTimers();
+      const userInputText = answerInput.value.toLowerCase();
+      const userAnswersProvided = userInputText.replace(/,/g, ' ').split(' ').filter(s => s.trim().length > 0);
+      let matchedObjects = new Set();
+      let tempUserInput = " " + userInputText.replace(/,/g, ' ') + " ";
 
-        // Find all correct words in the input string
-        recallObjects.forEach(correctObj => {
-            const variants = acceptableAnswers[correctObj];
-            for (const variant of variants) {
-                if (tempUserInput.includes(variant)) {
-                    if (!matchedObjects.has(correctObj)) {
-                        matchedObjects.add(correctObj);
-                        // "cross it off" by replacing it with spaces, to prevent re-matching parts of words
-                        tempUserInput = tempUserInput.replace(variant, ' '.repeat(variant.length));
-                    }
-                }
-            }
-        });
+      recallObjects.forEach(correctObj => {
+          const variants = acceptableAnswers[correctObj];
+          for (const variant of variants) {
+              if (tempUserInput.includes(" " + variant + " ")) {
+                  if (!matchedObjects.has(correctObj)) {
+                      matchedObjects.add(correctObj);
+                      tempUserInput = tempUserInput.replace(" " + variant + " ", " ");
+                  }
+              }
+          }
+      });
+      
+      const roundScore = matchedObjects.size;
+      score += roundScore;
+      roundScores.push(roundScore);
 
-        const roundScore = matchedObjects.size;
-        score += roundScore;
-
-        const correctAnswerImages = recallObjects.map(obj => `<img src="${objectLibrary[obj]}" title="${obj}">`).join("");
-        
-        let playerAnswerImages = userAnswersProvided.map(ans => {
-            let foundKey = null;
-            for(const [key, variants] of Object.entries(acceptableAnswers)) {
-                if(variants.includes(ans)) { foundKey = key; break; }
-            }
-            return foundKey ? `<img src="${objectLibrary[foundKey]}" title="${ans}">` 
-                          : `<img src="https://img.icons8.com/fluency/96/question-mark.png" class="unknown" title="Unknown: ${ans}">`;
-        }).join("");
-
-        let feedbackHTML;
-        if (userAnswersProvided.length === 0) {
-            feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
-            playerAnswerImages = ''; // Don't show any "your answer" images if nothing was submitted
-        } else if (roundScore > 0) {
-            feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}!</p>`;
-        } else {
-            feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
+      const correctAnswerImages = recallObjects.map(obj => `<img src="${objectLibrary[obj]}" title="${obj}">`).join("");
+      let playerAnswerImages = userAnswersProvided.map(ans => {
+        let foundKey = null;
+        for(const [key, variants] of Object.entries(acceptableAnswers)) {
+            if(variants.includes(ans)) { foundKey = key; break; }
         }
+        return foundKey ? `<img src="${objectLibrary[foundKey]}" title="${ans}">` 
+                      : `<img src="https://img.icons8.com/fluency/96/question-mark.png" class="unknown" title="Unknown: ${ans}">`;
+      }).join("");
 
-        resultDiv.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
-                              (playerAnswerImages ? `<div style="margin-top:12px;"><div class="answer-label">Your answer:</div><div class="answer-display">${playerAnswerImages}</div></div>` : '');
-        
-        resultDiv.classList.remove('hidden');
-        answeringPhase.classList.add('hidden');
-        
-        round++;
-        if (round >= totalRounds) {
-            setTimeout(showFinalSummary, 3500);
-        } else {
-            nextBtn.classList.remove('hidden');
-        }
+      let feedbackHTML;
+      if (userAnswersProvided.length === 0) {
+        feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
+        playerAnswerImages = '';
+      } else if (roundScore > 0) {
+        feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}!</p>`;
+      } else {
+        feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
+      }
+
+      resultDiv.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
+                            (playerAnswerImages ? `<div style="margin-top:12px;"><div class="answer-label">Your answer:</div><div class="answer-display">${playerAnswerImages}</div></div>` : '');
+      
+      resultDiv.classList.remove('hidden');
+      answeringPhase.classList.add('hidden');
+      
+      round++;
+      if (round >= totalRounds) {
+        setTimeout(showFinalSummary, 3500);
+      } else {
+        nextBtn.classList.remove('hidden');
+      }
     }
     
     function updateRoundCounter() {
@@ -420,10 +427,26 @@
     }
 
     function showFinalSummary() {
+      resetTimers();
       gameContainer.classList.add('hidden');
       finalSummaryDiv.classList.remove('hidden');
-      const averageScore = (score / totalRounds).toFixed(2);
-      finalSummaryDiv.innerHTML = `<h2>Game Over!</h2><p>Your total score: <strong>${score}</strong></p><p>Your average score per round: <strong>${averageScore}</strong></p><p>Great job! Thanks for playing! 🎉</p><button id="playAgainBtn">Play Again</button>`;
+      const averageScore = roundScores.length > 0 ? (score / roundScores.length).toFixed(2) : "0.00";
+      const bestRoundScore = roundScores.length > 0 ? Math.max(...roundScores) : 0;
+      
+      const roundDetailsHTML = roundScores.map((s, i) => 
+        `<li>Round ${i + 1}: ${s} point(s) ${s === bestRoundScore && bestRoundScore > 0 ? '⭐' : ''}</li>`
+      ).join('');
+
+      finalSummaryDiv.innerHTML = `
+        <h2>Game Over!</h2>
+        <p>Your total score: <strong>${score}</strong></p>
+        <p>Your average score per round: <strong>${averageScore}</strong></p>
+        <p><strong>Your Round Scores:</strong></p>
+        <ul>${roundDetailsHTML}</ul>
+        <p>Great job! Thanks for playing! 🎉</p>
+        <button id="playAgainBtn">Play Again</button>
+      `;
+
       document.getElementById('playAgainBtn').addEventListener('click', () => location.reload());
       window.parent.postMessage("showNext", "*");
     }
