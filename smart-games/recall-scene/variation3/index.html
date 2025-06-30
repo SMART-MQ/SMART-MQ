@@ -66,7 +66,7 @@
     }
     .item:active { transform: translateY(4px); box-shadow: 0 2px 0 #b39db3; }
 
-    .item.correct { border-color: #32cd32; background-color: #d4edda; transform: translateY(4px); box-shadow: 0 2px 0 #28a745; }
+    .item.correct { border-color: #32cd32; background-color: #d4edda; pointer-events: none; transform: translateY(4px); box-shadow: 0 2px 0 #28a745; }
     .item.incorrect { border-color: #dc3545; animation: shake 0.5s; }
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
@@ -103,8 +103,6 @@
     @keyframes fanfare-anim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
 
-    .answer-display { margin-top: 10px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
-    .answer-display div { width: 50px; height: 50px; border-radius: 10px; font-size: 2em; display: flex; justify-content: center; align-items: center; background-color: white; border: 2px solid #ccc;}
     .answer-label { font-weight: 700; margin-bottom: 5px; font-size: 1em; color: #4b0082; }
     
   </style>
@@ -136,7 +134,6 @@
         </div>
         <div id="answering-phase" class="fadeable is-faded-out">
             <div class="message">Find the items you saw! (<span id="answerCountdown">60</span>s)</div>
-            <!-- --- NEW: Tally Counter --- -->
             <div class="message" id="tallyCounter">Found: 0 / 4</div>
             <div id="choices" class="scene"></div>
         </div>
@@ -176,7 +173,7 @@
         viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
         roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
         resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn'),
-        tallyCounter: document.getElementById('tallyCounter') // Tally counter reference
+        tallyCounter: document.getElementById('tallyCounter')
     };
 
     allElements.startBtn.addEventListener('click', startGame);
@@ -267,7 +264,7 @@
         
         allElements.choices.innerHTML = '';
         correctFound = 0;
-        totalClicks = 0; // Reset click counter for the round
+        totalClicks = 0;
         allElements.tallyCounter.textContent = `Found: 0 / 4`;
         
         choices.forEach(item => {
@@ -301,7 +298,7 @@
             setTimeout(() => element.classList.remove('incorrect'), 500);
         }
 
-        if (totalClicks === 4) {
+        if (correctFound === 4) {
             endRound();
         }
     }
@@ -310,25 +307,29 @@
         if (isGameOver) return;
         clearInterval(answerTimer);
         
-        const roundScore = correctFound;
+        // --- NEW: Efficiency Score Calculation ---
+        let roundScore = 0;
+        if (correctFound === 4) { // Only score if all 4 were found
+            if (totalClicks === 4) roundScore = 4;      // Perfect
+            else if (totalClicks === 5) roundScore = 3;
+            else if (totalClicks === 6) roundScore = 2;
+            else if (totalClicks === 7) roundScore = 1;
+            else roundScore = 0;
+        }
+        
         score += roundScore;
-        roundScores.push({ round, score: roundScore });
+        roundScores.push({ round, score: roundScore, clicks: totalClicks });
 
         let feedbackHTML;
-        if (roundScore > 0) {
-            let scoreText = '';
-            if (roundScore === 4) scoreText = "PERFECT SCORE!";
-            else if (roundScore === 3) scoreText = "Awesome!";
-            else if (roundScore === 2) scoreText = "Great job!";
-            else if (roundScore === 1) scoreText = "Nice one!";
-            feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}! ${scoreText}</p>`;
+        if (roundScore === 4) {
+            feedbackHTML = `<p>PERFECT SCORE! You found all 4 in just 4 clicks!</p>`;
+        } else if (correctFound === 4) {
+            feedbackHTML = `<p>Great job! You found them all in ${totalClicks} clicks.</p><p>Your score is <strong>${roundScore}</strong> points.</p>`;
         } else {
-            feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
+            feedbackHTML = `<p>Almost! You found ${correctFound} before time ran out.</p>`;
         }
 
-        const correctAnswersHTML = recallObjects.map(item => `<div>${item}</div>`).join('');
-
-        allElements.resultContent.innerHTML = `${feedbackHTML}<div><div class="answer-label">The correct items were:</div><div class="answer-display">${correctAnswersHTML}</div></div>`;
+        allElements.resultContent.innerHTML = feedbackHTML;
         
         allElements.result.classList.remove('celebrate');
         if (roundScore >= 3) {
