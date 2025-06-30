@@ -2,349 +2,399 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SMART Colour Memory Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@700&display=swap" rel="stylesheet">
   <style>
+    * { box-sizing: border-box; }
     body {
-      background-color: #fcefe3;
-      font-family: 'Arial', sans-serif;
-      color: black;
+      background-color: #f0f8ff;
+      font-family: 'Balsamiq Sans', cursive;
+      color: #333;
       text-align: center;
       margin: 0;
-      padding: 0;
+      padding: 10px 5px;
     }
 
-    h1 {
-      margin-top: 20px;
-      font-size: 22px;
-    }
+    .hidden { display: none !important; }
+    
+    .fadeable { transition: opacity 0.4s ease-in-out; }
+    .is-faded-out { opacity: 0; pointer-events: none; }
 
-    .banner {
-      background-color: #a8dadc;
-      padding: 15px;
-      font-size: 20px;
-      font-weight: bold;
-    }
+    #instructions-container { padding: 20px; max-width: 550px; margin: 20px auto; }
 
-    .game-area {
-      margin: 20px auto;
-      max-width: 600px;
-      position: relative;
+    h1 { margin-top: 15px; font-size: 3em; color: #0077b6; text-shadow: 3px 3px 0px #ffc300; }
+    
+    h2.welcome-title {
+        display: inline-block;
+        font-size: 1.3em;
+        font-weight: 700;
+        color: #0077b6;
+        background-color: #e0f2fe;
+        padding: 8px 20px;
+        border-radius: 30px;
+        border: 2px solid #bae6fd;
+        margin-bottom: 0;
     }
+    
+    ul.instructions-list { list-style-type: none; padding: 0; margin: 20px auto; display: inline-block; text-align: left; }
+    ul.instructions-list li { font-size: 1.2em; margin-bottom: 10px; }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 20px;
-    }
+    .game-area { margin: 10px auto; width: 95%; max-width: 500px; position: relative; }
 
-    .cell {
-      width: 90px;
-      height: 90px;
-      border-radius: 10px;
-    }
+    .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #0077b6; margin: 10px auto 15px auto; overflow: hidden; }
+    .timer-bar { height: 100%; width: 100%; background-color: #f94144; border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
-    .hidden {
-      display: none;
-    }
+    #viewing-phase .message { font-size: 1.1em; font-weight: 700; color: #0077b6; margin-bottom: 15px; }
+    #answering-phase .message { margin-top: 0; }
 
-    .message {
-      font-size: 16px;
-      margin-top: 10px;
+    .scene { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .object { width: 100%; aspect-ratio: 1 / 1; display: flex; justify-content: center; align-items: center; border-radius: 12px; border: 3px solid #caf0f8; box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
+    .object.highlight-border { border: 4px solid #EF476F; }
+    
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.6);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
     }
+    
+    .overlay-content {
+        background-color: #e9f5ff; 
+        padding: 20px; 
+        border-radius: 15px; 
+        border: 3px solid #0077b6; 
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    #answering-phase p { font-weight: 700; font-size: 1.1em; }
+    
+    button { background-color: #ffc300; border: none; color: #333; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Balsamiq Sans', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e0a800; text-transform: uppercase; }
+    button:hover:not(:disabled) { background-color: #ffd60a; transform: translateY(-2px); box-shadow: 0 7px 0 #e0a800; }
+    button:disabled { background-color: #cccccc; color: #888888; box-shadow: 0 5px 0 #aaaaaa; cursor: not-allowed; }
+    #submitAnswerBtn { background-color: #f94144; color: white; box-shadow: 0 5px 0 #c22528; }
 
-    button {
-      background-color: #a8dadc;
-      border: none;
-      color: black;
-      padding: 10px 20px;
-      margin: 20px 10px;
-      font-size: 16px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
+    input[type="text"] { padding: 10px; font-size: 1em; font-family: 'Balsamiq Sans', cursive; margin: 10px; border-radius: 8px; border: 2px solid #ccc; width: 80%; max-width: 300px; }
 
-    input[type="text"] {
-      padding: 8px;
-      font-size: 16px;
-      margin: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      width: 90%;
-      max-width: 300px;
-    }
+    #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
+    #finalSummary { margin-top: 40px; font-size: 1.2em; background: #ffffff; border: 3px solid #0077b6; border-radius: 15px; padding: 30px; }
+    #finalSummary ul { list-style-type: none; padding: 0; margin: 20px 0; text-align: left; display: inline-block; }
+    #finalSummary li { font-size: 0.9em; margin-bottom: 8px; }
+    
+    #result p { margin: 8px 0; }
+    
+    @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    .celebrate { animation: celebrate 0.5s ease-in-out; }
+    
+    #round-fanfare { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 119, 182, 0.9); color: white; padding: 20px 40px; border-radius: 20px; font-size: 3em; font-weight: 700; z-index: 9999; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+    @keyframes fanfare-anim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+    .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
 
-    #roundCounter {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-      background: #a8dadc;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-weight: bold;
-      z-index: 1000;
-      user-select: none;
-      font-size: 14px;
-    }
-
-    #finalSummary {
-      margin-top: 40px;
-      font-size: 18px;
-      background: #e1f0f7;
-      border-radius: 10px;
-      padding: 30px;
-      display: none;
-    }
-
-    #correctDisplay {
-      font-size: 16px;
-      margin-top: 20px;
-      background: #f0f0f0;
-      border-radius: 10px;
-      padding: 15px;
-      display: none;
-    }
-
-    .display-colors {
-      margin-top: 10px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .color-box {
-      width: 40px;
-      height: 40px;
-      border-radius: 5px;
-      border: 1px solid #000;
-    }
-
-    /* Container for title + moved countdown and prompt */
-    #topInfo {
-      max-width: 600px;
-      margin: 0 auto 0;
-    }
+    .answer-display { margin-top: 10px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+    .answer-display div { width: 50px; height: 50px; border-radius: 10px; border: 2px solid rgba(0,0,0,0.2); }
+    .answer-label { font-weight: 700; margin-bottom: 5px; font-size: 1em; color: #003049; }
+    
   </style>
 </head>
 <body>
-  <div class="banner" id="welcomeBanner">Welcome to the SMART memory game!</div>
 
-  <div id="topInfo">
-    <h1>🎨 SMART Colour Memory Game 🎨</h1>
-    <p id="instruction">Memorize the colors in the grid! You'll be asked to recall a specific row or column.</p>
-    <p id="prompt" class="message hidden"></p>
-    <p id="countdown" class="message hidden">⏳ Time left to remember: <span id="timer">60</span> seconds</p>
+  <div id="instructions-container">
+    <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
+    <h1>Colour Recall Challenge</h1>
+    <ul class="instructions-list">
+        <li>⭐ This is a challenge <strong>just for you.</strong></li>
+        <li>🧠 Your mission: Memorise the 4 highlighted colours in 30 seconds!</li>
+        <li>🏆 Score as many points as you can before the 10 minutes are up!</li>
+    </ul>
+    <button id="startBtn">Let's Play!</button>
   </div>
 
-  <div id="roundCounter" class="message">Round 0 of 5 — 5 rounds remaining</div>
+  <div id="game-container" class="hidden">
+      <div id="main-timer-bar-container" class="timer-bar-container">
+          <div id="main-timer-bar" class="timer-bar"></div>
+      </div>
+      <div id="roundCounter">Round 1</div>
+      <div class="game-area">
+        <div id="viewing-phase" class="fadeable is-faded-out">
+            <div class="message">Memorise the highlighted items! You have <span id="viewingCountdown">30</span>s</div>
+            <div id="scene" class="scene"></div>
+            <button id="readyBtn">I've Memorised It!</button>
+        </div>
+      </div>
+  </div>
+  
+  <div id="answering-overlay" class="overlay fadeable is-faded-out">
+      <div id="answering-phase" class="overlay-content">
+          <p>What did you see in the highlighted line?</p>
+          <p class="message">⏳ Time left: <span id="answerCountdown">60</span>s</p>
+          <input type="text" id="answer" placeholder="e.g. red, blue, green"/>
+          <button id="submitAnswerBtn">Submit</button>
+      </div>
+  </div>
 
-  <div class="game-area">
-    <div id="grid" class="grid"></div>
-
-    <div id="input-area" class="hidden">
-      <p>Type the colors in order (like "red, blue, yellow"):</p>
-      <input type="text" id="answer" placeholder="e.g. red, yellow, blue" autocomplete="off"/>
-      <button id="submit">Submit</button>
+  <div id="results-overlay" class="overlay fadeable is-faded-out">
+    <div id="result" class="overlay-content">
+        <div id="result-content"></div>
+        <button id="nextBtn" class="hidden" disabled>Next Round in 3</button>
     </div>
-
-    <div id="result" class="hidden"></div>
-    <div id="correctDisplay"></div>
-    <button id="start">Start Game</button>
-    <button id="next" class="hidden">Next Round</button>
-    <div id="finalSummary"></div>
   </div>
+  
+  <div id="round-fanfare" class="hidden"></div>
+  <div id="finalSummary" class="hidden"></div>
 
   <script>
-    const simpleColors = ["red", "blue", "green", "yellow", "orange", "purple", "black"];
-    const totalRounds = 5;
+    // --- THE FINAL, SIMPLIFIED & CORRECTED COLOR LISTS ---
+    const colorLibrary = { red: "red", blue: "blue", green: "green", yellow: "yellow", orange: "orange", purple: "purple", black: "black", pink: "pink", brown: "brown" };
+    const acceptableAnswers = { red: ["red"], blue: ["blue", "dark blue"], green: ["green", "dark green", "forest green"], yellow: ["yellow"], orange: ["orange"], purple: ["purple"], black: ["black"], pink: ["pink"], brown: ["brown"] };
 
-    const gridDiv = document.getElementById("grid");
-    const promptP = document.getElementById("prompt");
-    const countdownP = document.getElementById("countdown");
-    const timerSpan = document.getElementById("timer");
-    const inputArea = document.getElementById("input-area");
-    const answerInput = document.getElementById("answer");
-    const submitBtn = document.getElementById("submit");
-    const resultDiv = document.getElementById("result");
-    const correctDisplay = document.getElementById("correctDisplay");
-    const startBtn = document.getElementById("start");
-    const nextBtn = document.getElementById("next");
-    const roundCounter = document.getElementById("roundCounter");
-    const finalSummary = document.getElementById("finalSummary");
-    const welcomeBanner = document.getElementById("welcomeBanner");
-    const instructionP = document.getElementById("instruction");
+    const allObjects = Object.keys(colorLibrary);
+    let recallObjects = [], roundScores = [];
+    let round = 0, score = 0;
+    let viewTimer, answerTimer, mainGameTimer, nextBtnTimer;
+    let isGameOver = false;
+    
+    const VIEWING_TIME = 30;
+    const ANSWERING_TIME = 60;
+    const TOTAL_GAME_TIME = 600;
 
-    let currentRound = 0;
-    let grid = [];
-    let recallSet = [];
-    let promptText = "";
-    let timer = null;
-    let timeLeft = 60;
-    let score = 0;
+    const allElements = {
+        instructions: document.getElementById('instructions-container'), game: document.getElementById('game-container'),
+        roundCounter: document.getElementById('roundCounter'), finalSummary: document.getElementById('finalSummary'),
+        startBtn: document.getElementById('startBtn'), nextBtn: document.getElementById('nextBtn'),
+        submitBtn: document.getElementById('submitAnswerBtn'), scene: document.getElementById('scene'),
+        answerInput: document.getElementById('answer'), result: document.getElementById('result'),
+        resultContent: document.getElementById('result-content'), viewingCountdown: document.getElementById('viewingCountdown'),
+        answerCountdown: document.getElementById('answerCountdown'), viewingPhase: document.getElementById('viewing-phase'),
+        answeringOverlay: document.getElementById('answering-overlay'), roundFanfare: document.getElementById('round-fanfare'),
+        mainTimerBar: document.getElementById('main-timer-bar'), resultsOverlay: document.getElementById('results-overlay'),
+        readyBtn: document.getElementById('readyBtn')
+    };
 
-    function normalizeColor(input) {
-      return input.toLowerCase().trim();
+    allElements.startBtn.addEventListener('click', startGame);
+    allElements.nextBtn.addEventListener('click', nextRound);
+    allElements.submitBtn.addEventListener('click', checkAnswer);
+    allElements.answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
+    allElements.readyBtn.addEventListener('click', showAnsweringPhase);
+
+    function resetAllTimers() {
+      clearInterval(viewTimer);
+      clearInterval(answerTimer);
+      clearInterval(mainGameTimer);
+      clearInterval(nextBtnTimer);
     }
-
-    function createGrid() {
-      const chosen = [];
-      while (chosen.length < 16) {
-        simpleColors.forEach(color => {
-          if (chosen.length < 16) chosen.push(color);
-        });
-      }
-      for (let i = chosen.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [chosen[i], chosen[j]] = [chosen[j], chosen[i]];
-      }
-      grid = [];
-      for (let i = 0; i < 4; i++) {
-        grid.push(chosen.slice(i * 4, i * 4 + 4));
-      }
-    }
-
-    function showGrid() {
-      gridDiv.innerHTML = "";
-      grid.forEach(row => {
-        row.forEach(c => {
-          const cell = document.createElement("div");
-          cell.className = "cell";
-          cell.style.backgroundColor = c;
-          gridDiv.appendChild(cell);
-        });
-      });
-      gridDiv.classList.remove("hidden");
-    }
-
-    function startRound() {
-      currentRound++;
-      roundCounter.textContent = currentRound === totalRounds
-        ? "Last Round!"
-        : `Round ${currentRound} of ${totalRounds} — ${totalRounds - currentRound} rounds remaining`;
-
-      resultDiv.classList.add("hidden");
-      correctDisplay.style.display = "none";
-      inputArea.classList.add("hidden");
-      answerInput.value = "";
-      promptP.classList.remove("hidden");
-      countdownP.classList.remove("hidden");
-      nextBtn.classList.add("hidden");
-
-      createGrid();
-      showGrid();
-
-      const isRow = Math.random() < 0.5;
-      const index = Math.floor(Math.random() * 4);
-      promptText = `${isRow ? "row" : "column"} ${index + 1}`;
-      recallSet = isRow ? grid[index] : grid.map(r => r[index]);
-
-      promptP.textContent = `Remember the colors in ${promptText}`;
-      timeLeft = 60;
-      timerSpan.textContent = timeLeft;
-
-      timer = setInterval(() => {
-        timeLeft--;
-        timerSpan.textContent = timeLeft;
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          startRecall();
-        }
+    
+    function startGame() {
+      allElements.instructions.classList.add('hidden');
+      allElements.game.classList.remove('hidden');
+      isGameOver = false; score = 0; round = 0; roundScores = [];
+      allElements.finalSummary.classList.add('hidden');
+      
+      let mainTimeLeft = TOTAL_GAME_TIME;
+      mainGameTimer = setInterval(() => {
+          mainTimeLeft--;
+          allElements.mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
+          if (mainTimeLeft <= 0 && !isGameOver) { showFinalSummary(); }
       }, 1000);
 
-      startBtn.classList.add("hidden");
+      nextRound();
+    }
+    
+    function triggerFanfare() {
+        allElements.roundFanfare.textContent = `Round ${round}!`;
+        allElements.roundFanfare.classList.remove('hidden', 'fanfare-animate');
+        setTimeout(() => allElements.roundFanfare.classList.add('fanfare-animate'), 10);
+        setTimeout(() => allElements.roundFanfare.classList.add('hidden'), 1500);
     }
 
-    function startRecall() {
-      gridDiv.classList.add("hidden");
-      countdownP.classList.add("hidden");
-      promptP.textContent = `Enter the colors in ${promptText}`;
-      inputArea.classList.remove("hidden");
-      answerInput.focus();
+    function nextRound() {
+      if (isGameOver) return;
+      round++;
+      allElements.roundCounter.textContent = `Round ${round}`;
+      
+      clearInterval(viewTimer); clearInterval(answerTimer);
+      allElements.resultsOverlay.classList.add('is-faded-out');
+      allElements.nextBtn.classList.add('hidden');
+      allElements.answeringOverlay.classList.add('is-faded-out');
+      
+      triggerFanfare();
+      
+      setTimeout(() => {
+          if (isGameOver) return;
+          buildScene();
+          allElements.viewingPhase.classList.remove('is-faded-out');
+          
+          allElements.readyBtn.disabled = true;
+          setTimeout(() => { allElements.readyBtn.disabled = false; }, 10000);
+
+          let timeLeft = VIEWING_TIME;
+          allElements.viewingCountdown.textContent = timeLeft;
+          viewTimer = setInterval(() => {
+              if(isGameOver) { clearInterval(viewTimer); return; }
+              timeLeft--;
+              allElements.viewingCountdown.textContent = timeLeft;
+              if (timeLeft <= 0) {
+                  clearInterval(viewTimer);
+                  showAnsweringPhase();
+              }
+          }, 1000);
+      }, 1500);
     }
-
-    function checkAnswer() {
-      clearInterval(timer);
-      const user = answerInput.value.split(",").map(s => normalizeColor(s));
-      const correctColors = recallSet.map(normalizeColor);
-      let correctCount = 0;
-      const matched = new Set();
-
-      user.forEach(color => {
-        const idx = correctColors.findIndex((c, i) => c === color && !matched.has(i));
-        if (idx !== -1) {
-          correctCount++;
-          matched.add(idx);
+    
+    function buildScene() {
+      const gridItems = [...allObjects, ...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16);
+      allElements.scene.innerHTML = '';
+      const isRow = Math.random() < 0.5;
+      const index = Math.floor(Math.random() * 4);
+      let currentRecallObjects = [];
+      gridItems.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'object';
+        const shouldHighlight = (isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index);
+        if (shouldHighlight) {
+          div.classList.add('highlight-border');
+          currentRecallObjects.push(item);
         }
+        div.style.backgroundColor = colorLibrary[item];
+        allElements.scene.appendChild(div);
       });
+      recallObjects = currentRecallObjects;
+    }
 
-      score += correctCount;
+    function showAnsweringPhase() {
+        if (isGameOver) return;
+        clearInterval(viewTimer);
+        allElements.viewingPhase.classList.add('is-faded-out');
+        allElements.answeringOverlay.classList.remove('is-faded-out');
+        allElements.answerInput.value = '';
+        allElements.answerInput.focus();
+        
+        let timeLeft = ANSWERING_TIME;
+        allElements.answerCountdown.textContent = timeLeft;
+        answerTimer = setInterval(() => {
+            if(isGameOver) { clearInterval(answerTimer); return; }
+            timeLeft--;
+            allElements.answerCountdown.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(answerTimer);
+                checkAnswer();
+            }
+        }, 1000);
+    }
+    
+    function checkAnswer() {
+      if (isGameOver) return;
+      clearInterval(answerTimer);
+      
+      const userAnswersProvided = allElements.answerInput.value.toLowerCase().replace(/,/g, ' ').split(' ').filter(s => s.trim().length > 0);
+      let matchedObjects = new Set();
+      let remainingRecallObjects = [...recallObjects];
 
-      resultDiv.textContent = `You got ${correctCount} correct color${correctCount !== 1 ? "s" : ""}!`;
-      resultDiv.classList.remove("hidden");
-      inputArea.classList.add("hidden");
+      userAnswersProvided.forEach(answer => {
+          for (let i = 0; i < remainingRecallObjects.length; i++) {
+              const correctObj = remainingRecallObjects[i];
+              if (acceptableAnswers[correctObj] && acceptableAnswers[correctObj].includes(answer)) {
+                  matchedObjects.add(correctObj);
+                  remainingRecallObjects.splice(i, 1);
+                  break;
+              }
+          }
+      });
+      
+      const roundScore = matchedObjects.size;
+      score += roundScore;
+      roundScores.push({ round: round, score: roundScore });
 
-      correctDisplay.style.display = "block";
-      correctDisplay.innerHTML = `
-        <strong>Correct:</strong><div class="display-colors">${
-          recallSet.map(c => `<div class="color-box" style="background:${c}"></div>`).join('')
-        }</div>
-        <strong>Your answer:</strong><div class="display-colors">${
-          user.map(c => `<div class="color-box" style="background:${c}"></div>`).join('')
-        }</div>
+      const correctAnswerImages = recallObjects.map(obj => `<div style="background-color:${colorLibrary[obj]}"></div>`).join("");
+      let playerAnswerImages = userAnswersProvided.map(ans => {
+        let foundKey = null;
+        for(const [key, variants] of Object.entries(acceptableAnswers)) {
+            if(variants.includes(ans)) { foundKey = key; break; }
+        }
+        return foundKey ? `<div style="background-color:${colorLibrary[foundKey]}"></div>` 
+                      : `<div style="background-image: url(https://img.icons8.com/fluency/96/question-mark.png); background-size: cover;"></div>`;
+      }).join("");
+
+      let feedbackHTML;
+      if (userAnswersProvided.length === 0) {
+        feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
+        playerAnswerImages = '';
+      } else if (roundScore > 0) {
+          let scoreText = '';
+          if (roundScore === 4) scoreText = "PERFECT SCORE!";
+          else if (roundScore === 3) scoreText = "Awesome!";
+          else if (roundScore === 2) scoreText = "Great job!";
+          else if (roundScore === 1) scoreText = "Nice one!";
+          feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}! ${scoreText}</p>`;
+      } else {
+          feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
+      }
+      
+      allElements.resultContent.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
+                            (playerAnswerImages ? `<div style="margin-top:12px;"><div class="answer-label">Your answer:</div><div class="answer-display">${playerAnswerImages}</div></div>` : '');
+      
+      allElements.result.classList.remove('celebrate');
+      if (roundScore >= 3) {
+          setTimeout(() => allElements.result.classList.add('celebrate'), 10);
+      }
+      
+      allElements.answeringOverlay.classList.add('is-faded-out');
+      allElements.resultsOverlay.classList.remove('is-faded-out');
+      if (!isGameOver) {
+        allElements.nextBtn.classList.remove('hidden');
+        
+        let countdown = 3;
+        allElements.nextBtn.textContent = `Next Round in ${countdown}`;
+        allElements.nextBtn.disabled = true;
+        clearInterval(nextBtnTimer);
+        nextBtnTimer = setInterval(() => {
+            countdown--;
+            allElements.nextBtn.textContent = `Next Round in ${countdown}`;
+            if (countdown <= 0) {
+                clearInterval(nextBtnTimer);
+                allElements.nextBtn.textContent = 'Next Round';
+                allElements.nextBtn.disabled = false;
+            }
+        }, 1000);
+      }
+    }
+    
+    function showFinalSummary() {
+      if (isGameOver) return;
+      isGameOver = true;
+      resetAllTimers();
+      
+      allElements.game.classList.add('hidden');
+      allElements.resultsOverlay.classList.add('is-faded-out');
+      allElements.finalSummary.classList.remove('hidden');
+      
+      const bestRoundScore = roundScores.length > 0 ? Math.max(...roundScores.map(r => r.score)) : 0;
+      const roundDetailsHTML = roundScores.map(r => 
+        `<li>Round ${r.round}: ${r.score} point(s) ${r.score === bestRoundScore && bestRoundScore > 0 ? '⭐' : ''}</li>`
+      ).join('');
+
+      allElements.finalSummary.innerHTML = `
+        <h2>Time's Up!</h2>
+        <p><strong>Your Round Scores:</strong></p>
+        <ul>${roundDetailsHTML}</ul>
+        <p>Great job! Thanks for playing! 🎉</p>
+        <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
+        <button onclick="location.reload()">Play Again</button>
       `;
 
-      if (currentRound < totalRounds) {
-        nextBtn.classList.remove("hidden");
-      } else {
-        finalSummary.style.display = "block";
-        finalSummary.innerHTML = `
-          Game over! Your total score: ${score} out of ${totalRounds * 4}.<br><br>
-          <strong>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</strong>
-        `;
-        startBtn.textContent = "Play Again";
-        startBtn.classList.remove("hidden");
-        window.parent.postMessage("showNext", "*");
-      }
+      window.parent.postMessage("showNext", "*");
     }
-
-    startBtn.addEventListener("click", () => {
-      // Hide welcome banner on start
-      welcomeBanner.style.display = "none";
-      // Hide the instruction paragraph after first start
-      instructionP.style.display = "none";
-
-      finalSummary.style.display = "none";
-      currentRound = 0;
-      score = 0;
-      startRound();
-    });
-
-    submitBtn.addEventListener("click", () => {
-      if (!answerInput.value.trim()) {
-        alert("Please enter your answer.");
-        return;
-      }
-      checkAnswer();
-    });
-
-    nextBtn.addEventListener("click", () => {
-      nextBtn.classList.add("hidden");
-      resultDiv.classList.add("hidden");
-      correctDisplay.style.display = "none";
-      gridDiv.classList.remove("hidden");
-      promptP.classList.remove("hidden");
-      countdownP.classList.remove("hidden");
-      inputArea.classList.add("hidden");
-      startRound();
-    });
-
-    answerInput.addEventListener("keydown", e => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        submitBtn.click();
-      }
-    });
   </script>
 </body>
 </html>
