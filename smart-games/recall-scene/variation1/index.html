@@ -47,7 +47,7 @@
     .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #4b0082; margin: 10px auto 15px auto; overflow: hidden; }
     .timer-bar { height: 100%; width: 100%; background-color: #32cd32; border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
-    #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; }
+    #viewing-phase .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; }
     
     .scene { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     
@@ -87,7 +87,7 @@
     
     #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
     #finalSummary { font-size: 1.2em; background: #ffffff; border: 3px solid #4b0082; border-radius: 15px; padding: 30px; }
-    #finalSummary p { margin: 12px 0; } /* Spacing for the scorecard */
+    #finalSummary p { margin: 12px 0; }
     
     #result p, #result h2 { margin: 8px 0; }
     
@@ -125,14 +125,18 @@
             <div id="scene" class="scene"></div>
             <button id="readyBtn">I've Memorised It!</button>
         </div>
-        <div id="answering-phase" class="fadeable is-faded-out">
-            <div class="message">Was this item in the scene?</div>
-            <div id="test-item" class="item"></div>
-            <div class="choice-buttons">
-                <button id="trueBtn">True</button>
-                <button id="falseBtn">False</button>
-            </div>
-        </div>
+      </div>
+  </div>
+  
+  <!-- --- NEW: Answering Phase is now an overlay --- -->
+  <div id="answering-overlay" class="overlay fadeable is-faded-out">
+      <div id="answering-phase" class="overlay-content">
+          <div class="message">Was this item in the scene?</div>
+          <div id="test-item" class="item"></div>
+          <div class="choice-buttons">
+              <button id="trueBtn">True</button>
+              <button id="falseBtn">False</button>
+          </div>
       </div>
   </div>
   
@@ -163,7 +167,7 @@
         startBtn: document.getElementById('startBtn'), nextBtn: document.getElementById('nextBtn'),
         scene: document.getElementById('scene'), result: document.getElementById('result'), 
         resultContent: document.getElementById('result-content'), viewingCountdown: document.getElementById('viewingCountdown'),
-        viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
+        viewingPhase: document.getElementById('viewing-phase'), answeringOverlay: document.getElementById('answering-overlay'),
         roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
         resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn'),
         testItem: document.getElementById('test-item'), trueBtn: document.getElementById('trueBtn'), falseBtn: document.getElementById('falseBtn')
@@ -211,7 +215,7 @@
       clearInterval(viewTimer);
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.nextBtn.classList.add('hidden');
-      allElements.answeringPhase.classList.add('is-faded-out');
+      allElements.answeringOverlay.classList.add('is-faded-out');
       
       triggerFanfare();
       
@@ -250,7 +254,7 @@
         if (isGameOver) return;
         clearInterval(viewTimer);
         allElements.viewingPhase.classList.add('is-faded-out');
-        allElements.answeringPhase.classList.remove('is-faded-out');
+        allElements.answeringOverlay.classList.remove('is-faded-out');
         
         wasInScene = Math.random() < 0.5;
         if (wasInScene) {
@@ -287,7 +291,7 @@
             setTimeout(() => allElements.result.classList.add('celebrate'), 10);
         }
         
-        allElements.answeringPhase.classList.add('is-faded-out');
+        allElements.answeringOverlay.classList.add('is-faded-out');
         allElements.resultsOverlay.classList.remove('is-faded-out');
         allElements.nextBtn.classList.remove('hidden');
         
@@ -319,7 +323,6 @@
       const incorrectAnswers = totalRoundsPlayed - score;
       const accuracy = totalRoundsPlayed > 0 ? Math.round((score / totalRoundsPlayed) * 100) : 0;
 
-      // --- NEW: Scorecard Summary ---
       allElements.finalSummary.innerHTML = `
         <h2>Time's Up!</h2>
         <p>Correct Answers: <strong style="color: #28a745;">${score} ⭐</strong></p>
