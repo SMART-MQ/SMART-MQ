@@ -286,7 +286,7 @@
     }
     
     function handleChoice(element, item) {
-        if (element.classList.contains('correct') || element.classList.contains('incorrect')) return;
+        if (element.classList.contains('correct')) return;
         
         totalClicks++;
         if (recallObjects.includes(item)) {
@@ -307,26 +307,25 @@
         if (isGameOver) return;
         clearInterval(answerTimer);
         
-        // --- NEW: Efficiency Score Calculation ---
         let roundScore = 0;
-        if (correctFound === 4) { // Only score if all 4 were found
-            if (totalClicks === 4) roundScore = 4;      // Perfect
+        if (correctFound === 4) {
+            if (totalClicks === 4) roundScore = 4;
             else if (totalClicks === 5) roundScore = 3;
             else if (totalClicks === 6) roundScore = 2;
             else if (totalClicks === 7) roundScore = 1;
-            else roundScore = 0;
         }
         
         score += roundScore;
         roundScores.push({ round, score: roundScore, clicks: totalClicks });
 
+        // --- THE FINAL, ENCOURAGING FEEDBACK LOGIC ---
         let feedbackHTML;
         if (roundScore === 4) {
             feedbackHTML = `<p>PERFECT SCORE! You found all 4 in just 4 clicks!</p>`;
-        } else if (correctFound === 4) {
+        } else if (roundScore > 0) {
             feedbackHTML = `<p>Great job! You found them all in ${totalClicks} clicks.</p><p>Your score is <strong>${roundScore}</strong> points.</p>`;
         } else {
-            feedbackHTML = `<p>Almost! You found ${correctFound} before time ran out.</p>`;
+            feedbackHTML = `<p>That was a tricky one! Let's get the next one.</p>`;
         }
 
         allElements.resultContent.innerHTML = feedbackHTML;
