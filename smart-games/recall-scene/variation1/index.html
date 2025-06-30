@@ -296,47 +296,23 @@
         }, 1000);
     }
     
-    function animateScore(finalScore) {
-        let currentScore = 0;
-        const scoreElement = document.getElementById('score-display');
-        const scorePraise = document.getElementById('score-praise');
-        
-        if (!scoreElement || !scorePraise) return; // Safety check
-
-        const scoreInterval = setInterval(() => {
-            currentScore++;
-            scoreElement.textContent = currentScore;
-            if (currentScore >= finalScore) {
-                clearInterval(scoreInterval);
-                let scoreText = '';
-                if (finalScore === 4) scoreText = "PERFECT SCORE!";
-                else if (finalScore === 3) scoreText = "Awesome!";
-                else if (finalScore === 2) scoreText = "Great job!";
-                else if (finalScore === 1) scoreText = "Nice one!";
-                scorePraise.textContent = scoreText;
-            }
-        }, 100);
-    }
-
     function checkAnswer() {
       if (isGameOver) return;
       clearInterval(answerTimer);
       
       const userAnswersProvided = allElements.answerInput.value.toLowerCase().replace(/,/g, ' ').split(' ').filter(s => s.trim().length > 0);
       
-      // --- THIS IS THE PERMANENT FIX FOR THE SCORING LOGIC ---
       let matchedObjects = new Set();
-      let remainingRecallObjects = [...recallObjects];
+      let tempUserInput = " " + allElements.answerInput.value.toLowerCase().replace(/,/g, ' ') + " ";
 
-      userAnswersProvided.forEach(answer => {
-          let foundMatch = false;
-          for (let i = 0; i < remainingRecallObjects.length; i++) {
-              const correctObj = remainingRecallObjects[i];
-              if (acceptableAnswers[correctObj].includes(answer)) {
-                  matchedObjects.add(correctObj);
-                  remainingRecallObjects.splice(i, 1); // Remove from list to prevent re-matching
-                  foundMatch = true;
-                  break;
+      recallObjects.forEach(correctObj => {
+          const variants = acceptableAnswers[correctObj];
+          for (const variant of variants) {
+              if (tempUserInput.includes(" " + variant + " ")) {
+                  if (!matchedObjects.has(correctObj)) {
+                      matchedObjects.add(correctObj);
+                      tempUserInput = tempUserInput.replace(" " + variant + " ", " ");
+                  }
               }
           }
       });
@@ -355,13 +331,18 @@
                       : `<img src="https://img.icons8.com/fluency/96/question-mark.png" class="unknown" title="Unknown: ${ans}">`;
       }).join("");
 
+      // --- THE FINAL, SIMPLIFIED FEEDBACK LOGIC ---
       let feedbackHTML;
       if (userAnswersProvided.length === 0) {
         feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
         playerAnswerImages = '';
       } else if (roundScore > 0) {
-          feedbackHTML = `<p>You scored <strong id="score-display">0</strong> point${roundScore !== 1 ? "s" : ""}! <span id="score-praise"></span></p>`;
-          setTimeout(() => animateScore(roundScore), 10); // Delay animation slightly
+          let scoreText = '';
+          if (roundScore === 4) scoreText = "PERFECT SCORE!";
+          else if (roundScore === 3) scoreText = "Awesome!";
+          else if (roundScore === 2) scoreText = "Great job!";
+          else if (roundScore === 1) scoreText = "Nice one!";
+          feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}! ${scoreText}</p>`;
       } else {
           feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
       }
@@ -382,7 +363,7 @@
         let countdown = 3;
         allElements.nextBtn.textContent = `Next Round in ${countdown}`;
         allElements.nextBtn.disabled = true;
-        clearInterval(nextBtnTimer); // Clear any previous timer
+        clearInterval(nextBtnTimer);
         nextBtnTimer = setInterval(() => {
             countdown--;
             allElements.nextBtn.textContent = `Next Round in ${countdown}`;
