@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SMART Colour Memory Game</title>
+  <title>SMART Memory Game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     body {
-      background-color: #f0f8ff;
-      font-family: 'Balsamiq Sans', cursive;
-      color: #333;
+      background-color: #f3e8ff; /* Light Lavender */
+      font-family: 'Fredoka One', cursive;
+      color: #3d3d3d;
       text-align: center;
       margin: 0;
       padding: 10px 5px;
@@ -25,17 +25,17 @@
 
     #instructions-container { padding: 20px; max-width: 550px; margin: 20px auto; }
 
-    h1 { margin-top: 15px; font-size: 3em; color: #0077b6; text-shadow: 3px 3px 0px #ffc300; }
+    h1 { margin-top: 15px; font-size: 3em; color: #4b0082; /* Indigo */ text-shadow: 3px 3px 0px #ff7f50; /* Coral */ }
     
     h2.welcome-title {
         display: inline-block;
         font-size: 1.3em;
         font-weight: 700;
-        color: #0077b6;
-        background-color: #e0f2fe;
+        color: #4b0082;
+        background-color: #e6e6fa;
         padding: 8px 20px;
         border-radius: 30px;
-        border: 2px solid #bae6fd;
+        border: 2px solid #d8bfd8;
         margin-bottom: 0;
     }
     
@@ -44,52 +44,53 @@
 
     .game-area { margin: 10px auto; width: 95%; max-width: 500px; position: relative; }
 
-    .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #0077b6; margin: 10px auto 15px auto; overflow: hidden; }
-    .timer-bar { height: 100%; width: 100%; background-color: #f94144; border-radius: 8px 0 0 8px; transition: width 1s linear; }
+    .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #4b0082; margin: 10px auto 15px auto; overflow: hidden; }
+    .timer-bar { height: 100%; width: 100%; background-color: #32cd32; /* Lime Green */ border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
-    #viewing-phase .message { font-size: 1.1em; font-weight: 700; color: #0077b6; margin-bottom: 15px; }
-    #answering-phase .message { margin-top: 0; }
+    #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; }
+    
+    .scene { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .item {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 15px;
+      background-color: white;
+      border: 3px solid #d8bfd8;
+      box-shadow: 0 6px 0 #b39db3;
+      font-size: clamp(24px, 10vw, 40px); /* Responsive emoji size */
+      cursor: pointer;
+      transition: all 0.1s ease-out;
+    }
+    .item:active { transform: translateY(4px); box-shadow: 0 2px 0 #b39db3; }
 
-    .scene { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-    .object { width: 100%; aspect-ratio: 1 / 1; display: flex; justify-content: center; align-items: center; border-radius: 12px; border: 3px solid #caf0f8; box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
-    .object.highlight-border { border: 4px solid #EF476F; }
+    .item.correct { border-color: #32cd32; background-color: #d4edda; pointer-events: none; transform: translateY(4px); box-shadow: 0 2px 0 #28a745; }
+    .item.incorrect { border-color: #dc3545; animation: shake 0.5s; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
     
     .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.6);
-        z-index: 1000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 15px;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.6); z-index: 1000; display: flex;
+        justify-content: center; align-items: center; padding: 15px;
     }
-    
     .overlay-content {
-        background-color: #e9f5ff; 
-        padding: 20px; 
-        border-radius: 15px; 
-        border: 3px solid #0077b6; 
-        width: 100%;
-        max-width: 500px;
-        max-height: 90vh;
-        overflow-y: auto;
+        background-color: #e6e6fa; padding: 20px; border-radius: 15px; 
+        border: 3px solid #4b0082; width: 100%; max-width: 500px;
+        max-height: 90vh; overflow-y: auto;
     }
     
-    #answering-phase p { font-weight: 700; font-size: 1.1em; }
-    
-    button { background-color: #ffc300; border: none; color: #333; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Balsamiq Sans', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e0a800; text-transform: uppercase; }
-    button:hover:not(:disabled) { background-color: #ffd60a; transform: translateY(-2px); box-shadow: 0 7px 0 #e0a800; }
+    button { background-color: #ff7f50; border: none; color: white; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Fredoka One', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e06c3a; text-transform: uppercase; }
+    button:hover:not(:disabled) { background-color: #ff9066; transform: translateY(-2px); box-shadow: 0 7px 0 #e06c3a; }
     button:disabled { background-color: #cccccc; color: #888888; box-shadow: 0 5px 0 #aaaaaa; cursor: not-allowed; }
-    #submitAnswerBtn { background-color: #f94144; color: white; box-shadow: 0 5px 0 #c22528; }
-
-    input[type="text"] { padding: 10px; font-size: 1em; font-family: 'Balsamiq Sans', cursive; margin: 10px; border-radius: 8px; border: 2px solid #ccc; width: 80%; max-width: 300px; }
-
+    
     #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
-    #finalSummary { margin-top: 40px; font-size: 1.2em; background: #ffffff; border: 3px solid #0077b6; border-radius: 15px; padding: 30px; }
+    #finalSummary { font-size: 1.2em; background: #ffffff; border: 3px solid #4b0082; border-radius: 15px; padding: 30px; }
     #finalSummary ul { list-style-type: none; padding: 0; margin: 20px 0; text-align: left; display: inline-block; }
     #finalSummary li { font-size: 0.9em; margin-bottom: 8px; }
     
@@ -98,13 +99,11 @@
     @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .celebrate { animation: celebrate 0.5s ease-in-out; }
     
-    #round-fanfare { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 119, 182, 0.9); color: white; padding: 20px 40px; border-radius: 20px; font-size: 3em; font-weight: 700; z-index: 9999; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+    #round-fanfare { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(75, 0, 130, 0.9); color: white; padding: 20px 40px; border-radius: 20px; font-size: 3em; font-weight: 700; z-index: 9999; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
     @keyframes fanfare-anim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
 
-    .answer-display { margin-top: 10px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
-    .answer-display div { width: 50px; height: 50px; border-radius: 10px; border: 2px solid rgba(0,0,0,0.2); }
-    .answer-label { font-weight: 700; margin-bottom: 5px; font-size: 1em; color: #003049; }
+    .answer-label { font-weight: 700; margin-bottom: 5px; font-size: 1em; color: #4b0082; }
     
   </style>
 </head>
@@ -112,13 +111,12 @@
 
   <div id="instructions-container">
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
-    <h1>Colour Recall Challenge</h1>
+    <h1>Memory Mix-Up</h1>
     <ul class="instructions-list">
         <li>⭐ This is a challenge <strong>just for you.</strong></li>
-        <!-- --- NEW: Emphasized instructions for order --- -->
-        <li>🧠 Memorise the 4 highlighted colours.</li>
-        <li>⚠️ You MUST type the colours in the <strong>EXACT</strong> order you saw them!</li>
-        <li>🏆 Score as many points as you can before the 10 minutes are up!</li>
+        <li>🧠 Memorise the items you see.</li>
+        <li>🔍 Then, find them in the big mix-up!</li>
+        <li>🏆 Score as many points as you can before time runs out!</li>
     </ul>
     <button id="startBtn">Let's Play!</button>
   </div>
@@ -130,22 +128,17 @@
       <div id="roundCounter">Round 1</div>
       <div class="game-area">
         <div id="viewing-phase" class="fadeable is-faded-out">
-            <div class="message">Memorise the highlighted items! You have <span id="viewingCountdown">30</span>s</div>
+            <div class="message">Memorise these items! (<span id="viewingCountdown">30</span>s)</div>
             <div id="scene" class="scene"></div>
             <button id="readyBtn">I've Memorised It!</button>
+        </div>
+        <div id="answering-phase" class="fadeable is-faded-out">
+            <div class="message">Find the items you saw! (<span id="answerCountdown">60</span>s)</div>
+            <div id="choices" class="scene"></div>
         </div>
       </div>
   </div>
   
-  <div id="answering-overlay" class="overlay fadeable is-faded-out">
-      <div id="answering-phase" class="overlay-content">
-          <p>What did you see in the highlighted line?</p>
-          <p class="message">⏳ Time left: <span id="answerCountdown">60</span>s</p>
-          <input type="text" id="answer" placeholder="e.g. red, blue, green"/>
-          <button id="submitAnswerBtn">Submit</button>
-      </div>
-  </div>
-
   <div id="results-overlay" class="overlay fadeable is-faded-out">
     <div id="result" class="overlay-content">
         <div id="result-content"></div>
@@ -157,14 +150,13 @@
   <div id="finalSummary" class="hidden"></div>
 
   <script>
-    const colorLibrary = { red: "red", blue: "blue", green: "green", yellow: "yellow", orange: "orange", purple: "purple", black: "black", pink: "pink", brown: "brown" };
-    const acceptableAnswers = { red: ["red"], blue: ["blue", "dark blue"], green: ["green", "dark green", "forest green"], yellow: ["yellow"], orange: ["orange"], purple: ["purple"], black: ["black"], pink: ["pink"], brown: ["brown"] };
-
-    const allObjects = Object.keys(colorLibrary);
+    const allItems = ['🍎','🐶','🧸','🎈','📚','🚲','🎮','🧃','🎩','🖍️','🧼','🎵', '⭐', '🚗', '🏠', '🌳'];
     let recallObjects = [], roundScores = [];
     let round = 0, score = 0;
     let viewTimer, answerTimer, mainGameTimer, nextBtnTimer;
     let isGameOver = false;
+    let correctFound = 0;
+    let mistakeMade = false; // --- NEW: To track the first mistake ---
     
     const VIEWING_TIME = 30;
     const ANSWERING_TIME = 60;
@@ -174,19 +166,16 @@
         instructions: document.getElementById('instructions-container'), game: document.getElementById('game-container'),
         roundCounter: document.getElementById('roundCounter'), finalSummary: document.getElementById('finalSummary'),
         startBtn: document.getElementById('startBtn'), nextBtn: document.getElementById('nextBtn'),
-        submitBtn: document.getElementById('submitAnswerBtn'), scene: document.getElementById('scene'),
-        answerInput: document.getElementById('answer'), result: document.getElementById('result'),
-        resultContent: document.getElementById('result-content'), viewingCountdown: document.getElementById('viewingCountdown'),
-        answerCountdown: document.getElementById('answerCountdown'), viewingPhase: document.getElementById('viewing-phase'),
-        answeringOverlay: document.getElementById('answering-overlay'), roundFanfare: document.getElementById('round-fanfare'),
-        mainTimerBar: document.getElementById('main-timer-bar'), resultsOverlay: document.getElementById('results-overlay'),
-        readyBtn: document.getElementById('readyBtn')
+        scene: document.getElementById('scene'), choices: document.getElementById('choices'),
+        result: document.getElementById('result'), resultContent: document.getElementById('result-content'),
+        viewingCountdown: document.getElementById('viewingCountdown'), answerCountdown: document.getElementById('answerCountdown'),
+        viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
+        roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
+        resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn')
     };
 
     allElements.startBtn.addEventListener('click', startGame);
     allElements.nextBtn.addEventListener('click', nextRound);
-    allElements.submitBtn.addEventListener('click', checkAnswer);
-    allElements.answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
     allElements.readyBtn.addEventListener('click', showAnsweringPhase);
 
     function resetAllTimers() {
@@ -208,7 +197,6 @@
           allElements.mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
           if (mainTimeLeft <= 0 && !isGameOver) { showFinalSummary(); }
       }, 1000);
-
       nextRound();
     }
     
@@ -227,7 +215,7 @@
       clearInterval(viewTimer); clearInterval(answerTimer);
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.nextBtn.classList.add('hidden');
-      allElements.answeringOverlay.classList.add('is-faded-out');
+      allElements.answeringPhase.classList.add('is-faded-out');
       
       triggerFanfare();
       
@@ -245,116 +233,94 @@
               if(isGameOver) { clearInterval(viewTimer); return; }
               timeLeft--;
               allElements.viewingCountdown.textContent = timeLeft;
-              if (timeLeft <= 0) {
-                  clearInterval(viewTimer);
-                  showAnsweringPhase();
-              }
+              if (timeLeft <= 0) { showAnsweringPhase(); }
           }, 1000);
       }, 1500);
     }
     
     function buildScene() {
-      const gridItems = [...allObjects, ...allObjects, ...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16);
+      const shuffled = [...allItems].sort(() => 0.5 - Math.random());
+      recallObjects = shuffled.slice(0, 4);
       allElements.scene.innerHTML = '';
-      const isRow = Math.random() < 0.5;
-      const index = Math.floor(Math.random() * 4);
-      let currentRecallObjects = [];
-      gridItems.forEach((item, i) => {
+      recallObjects.forEach(item => {
         const div = document.createElement('div');
-        div.className = 'object';
-        const shouldHighlight = (isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index);
-        if (shouldHighlight) {
-          div.classList.add('highlight-border');
-          currentRecallObjects.push(item);
-        }
-        div.style.backgroundColor = colorLibrary[item];
+        div.className = 'item';
+        div.textContent = item;
         allElements.scene.appendChild(div);
       });
-      recallObjects = currentRecallObjects;
     }
 
     function showAnsweringPhase() {
         if (isGameOver) return;
         clearInterval(viewTimer);
         allElements.viewingPhase.classList.add('is-faded-out');
-        allElements.answeringOverlay.classList.remove('is-faded-out');
-        allElements.answerInput.value = '';
-        allElements.answerInput.focus();
+        allElements.answeringPhase.classList.remove('is-faded-out');
         
+        const distractors = allItems.filter(item => !recallObjects.includes(item));
+        const shuffledDistractors = [...distractors].sort(() => 0.5 - Math.random()).slice(0, 4);
+        const choices = [...recallObjects, ...shuffledDistractors].sort(() => 0.5 - Math.random());
+        
+        allElements.choices.innerHTML = '';
+        correctFound = 0;
+        mistakeMade = false; // Reset mistake tracker for the new round
+        
+        choices.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.textContent = item;
+            div.addEventListener('click', () => handleChoice(div, item));
+            allElements.choices.appendChild(div);
+        });
+
         let timeLeft = ANSWERING_TIME;
         allElements.answerCountdown.textContent = timeLeft;
         answerTimer = setInterval(() => {
             if(isGameOver) { clearInterval(answerTimer); return; }
             timeLeft--;
             allElements.answerCountdown.textContent = timeLeft;
-            if (timeLeft <= 0) {
-                clearInterval(answerTimer);
-                checkAnswer();
-            }
+            if (timeLeft <= 0) { endRound(); }
         }, 1000);
     }
     
-    function checkAnswer() {
-      if (isGameOver) return;
-      clearInterval(answerTimer);
-      
-      const userAnswersProvided = allElements.answerInput.value.toLowerCase().replace(/,/g, ' ').split(' ').filter(s => s.trim().length > 0);
-      
-      // --- NEW: Strict In-Order Scoring Logic ---
-      let roundScore = 0;
-      for (let i = 0; i < recallObjects.length; i++) {
-          if (i < userAnswersProvided.length) {
-              const correctColor = recallObjects[i];
-              const userAnswer = userAnswersProvided[i];
-              if (acceptableAnswers[correctColor] && acceptableAnswers[correctColor].includes(userAnswer)) {
-                  roundScore++;
-              } else {
-                  break; // Stop scoring as soon as an order mistake is found
-              }
-          } else {
-              break; // Stop if user provides fewer answers than required
-          }
-      }
-      
-      score += roundScore;
-      roundScores.push({ round: round, score: roundScore });
-
-      const correctAnswerImages = recallObjects.map(obj => `<div style="background-color:${colorLibrary[obj]}"></div>`).join("");
-      let playerAnswerImages = userAnswersProvided.map(ans => {
-        let foundKey = null;
-        for(const [key, variants] of Object.entries(acceptableAnswers)) {
-            if(variants.includes(ans)) { foundKey = key; break; }
+    function handleChoice(element, item) {
+        if (recallObjects.includes(item)) {
+            element.classList.add('correct');
+            // --- NEW: Only increment score if no mistake has been made ---
+            if (!mistakeMade) {
+                correctFound++;
+            }
+            if (document.querySelectorAll('.item.correct').length === recallObjects.length) {
+                endRound();
+            }
+        } else {
+            // --- NEW: A mistake locks the score ---
+            mistakeMade = true;
+            element.classList.add('incorrect');
+            setTimeout(() => element.classList.remove('incorrect'), 500);
         }
-        return foundKey ? `<div style="background-color:${colorLibrary[foundKey]}"></div>` 
-                      : `<div style="background-image: url(https://img.icons8.com/fluency/96/question-mark.png); background-size: cover;"></div>`;
-      }).join("");
+    }
 
-      let feedbackHTML;
-      if (userAnswersProvided.length === 0) {
-        feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
-        playerAnswerImages = '';
-      } else if (roundScore > 0) {
-          let scoreText = '';
-          if (roundScore === 4) scoreText = "PERFECT SCORE!";
-          else if (roundScore === 3) scoreText = "Awesome!";
-          else if (roundScore === 2) scoreText = "Great job!";
-          else if (roundScore === 1) scoreText = "Nice one!";
-          feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}! ${scoreText}</p>`;
-      } else {
-          feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
-      }
-      
-      allElements.resultContent.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
-                            (playerAnswerImages ? `<div style="margin-top:12px;"><div class="answer-label">Your answer:</div><div class="answer-display">${playerAnswerImages}</div></div>` : '');
-      
-      allElements.result.classList.remove('celebrate');
-      if (roundScore >= 3) {
-          setTimeout(() => allElements.result.classList.add('celebrate'), 10);
-      }
-      
-      allElements.answeringOverlay.classList.add('is-faded-out');
-      allElements.resultsOverlay.classList.remove('is-faded-out');
-      if (!isGameOver) {
+    function endRound() {
+        if (isGameOver) return;
+        clearInterval(answerTimer);
+        const roundScore = correctFound; // The final score is what was found before any mistake
+        score += roundScore;
+        roundScores.push({ round, score: roundScore });
+
+        let feedbackHTML = '';
+        if (roundScore === 4) feedbackHTML = "<h2>PERFECT SCORE!</h2>";
+        else if (roundScore > 0) feedbackHTML = `<h2>You found ${roundScore} correctly!</h2>`;
+        else feedbackHTML = `<h2>Oops! Let's try the next one!</h2>`;
+        
+        allElements.resultContent.innerHTML = `${feedbackHTML}<p>Great effort!</p>`;
+        
+        allElements.result.classList.remove('celebrate');
+        if (roundScore >= 3) {
+            setTimeout(() => allElements.result.classList.add('celebrate'), 10);
+        }
+        
+        allElements.answeringPhase.classList.add('is-faded-out');
+        allElements.resultsOverlay.classList.remove('is-faded-out');
         allElements.nextBtn.classList.remove('hidden');
         
         let countdown = 3;
@@ -370,7 +336,6 @@
                 allElements.nextBtn.disabled = false;
             }
         }, 1000);
-      }
     }
     
     function showFinalSummary() {
