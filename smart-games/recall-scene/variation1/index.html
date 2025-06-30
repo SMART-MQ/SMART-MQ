@@ -47,9 +47,9 @@
     .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #4b0082; margin: 10px auto 15px auto; overflow: hidden; }
     .timer-bar { height: 100%; width: 100%; background-color: #32cd32; border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
-    #viewing-phase .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; }
+    #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; }
     
-    .scene { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .scene { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; align-items: center; }
     
     .item {
       width: 100%;
@@ -65,10 +65,12 @@
       cursor: pointer;
       transition: all 0.1s ease-out;
     }
-    
-    #test-item { font-size: 5em; margin: 20px 0; }
-    
-    .choice-buttons { display: flex; justify-content: center; gap: 20px; }
+    .item:hover { transform: scale(1.05); }
+    .item:active { transform: translateY(4px); box-shadow: 0 2px 0 #b39db3; }
+
+    .item.correct { border-color: #32cd32; background-color: #d4edda; pointer-events: none; transform: translateY(4px); box-shadow: 0 2px 0 #28a745; }
+    .item.incorrect { border-color: #dc3545; animation: shake 0.5s; pointer-events: none; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
     
     .overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -89,7 +91,7 @@
     #finalSummary { font-size: 1.2em; background: #ffffff; border: 3px solid #4b0082; border-radius: 15px; padding: 30px; }
     #finalSummary p { margin: 12px 0; }
     
-    #result p, #result h2 { margin: 8px 0; }
+    #result h2, #result p { margin: 8px 0; }
     
     @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .celebrate { animation: celebrate 0.5s ease-in-out; }
@@ -104,11 +106,11 @@
 
   <div id="instructions-container">
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
-    <h1>True or False?</h1>
+    <h1>Memory Detective</h1>
     <ul class="instructions-list">
         <li>⭐ This is a challenge <strong>just for you.</strong></li>
         <li>🧠 Memorise the items you see.</li>
-        <li>🤔 Then, decide if the item shown was in the scene!</li>
+        <li>🤔 Then, choose which of the two items was in the original scene!</li>
         <li>🏆 Score as many points as you can before time runs out!</li>
     </ul>
     <button id="startBtn">Let's Play!</button>
@@ -125,18 +127,10 @@
             <div id="scene" class="scene"></div>
             <button id="readyBtn">I've Memorised It!</button>
         </div>
-      </div>
-  </div>
-  
-  <!-- --- NEW: Answering Phase is now an overlay --- -->
-  <div id="answering-overlay" class="overlay fadeable is-faded-out">
-      <div id="answering-phase" class="overlay-content">
-          <div class="message">Was this item in the scene?</div>
-          <div id="test-item" class="item"></div>
-          <div class="choice-buttons">
-              <button id="trueBtn">True</button>
-              <button id="falseBtn">False</button>
-          </div>
+        <div id="answering-phase" class="fadeable is-faded-out">
+            <div class="message">Which one was in the scene?</div>
+            <div id="choices" class="scene"></div>
+        </div>
       </div>
   </div>
   
@@ -156,7 +150,11 @@
     let round = 0, score = 0;
     let viewTimer, mainGameTimer, nextBtnTimer;
     let isGameOver = false;
-    let testItem = '', wasInScene = false;
+    let correctChoice = '';
+    
+    let currentLevel = 1;
+    let correctStreak = 0;
+    const MAX_LEVEL = 4;
     
     const VIEWING_TIME = 30;
     const TOTAL_GAME_TIME = 600;
@@ -165,19 +163,17 @@
         instructions: document.getElementById('instructions-container'), game: document.getElementById('game-container'),
         roundCounter: document.getElementById('roundCounter'), finalSummary: document.getElementById('finalSummary'),
         startBtn: document.getElementById('startBtn'), nextBtn: document.getElementById('nextBtn'),
-        scene: document.getElementById('scene'), result: document.getElementById('result'), 
-        resultContent: document.getElementById('result-content'), viewingCountdown: document.getElementById('viewingCountdown'),
-        viewingPhase: document.getElementById('viewing-phase'), answeringOverlay: document.getElementById('answering-overlay'),
+        scene: document.getElementById('scene'), choices: document.getElementById('choices'),
+        result: document.getElementById('result'), resultContent: document.getElementById('result-content'),
+        viewingCountdown: document.getElementById('viewingCountdown'),
+        viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
         roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
-        resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn'),
-        testItem: document.getElementById('test-item'), trueBtn: document.getElementById('trueBtn'), falseBtn: document.getElementById('falseBtn')
+        resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn')
     };
 
     allElements.startBtn.addEventListener('click', startGame);
     allElements.nextBtn.addEventListener('click', nextRound);
     allElements.readyBtn.addEventListener('click', showAnsweringPhase);
-    allElements.trueBtn.addEventListener('click', () => handleChoice(true));
-    allElements.falseBtn.addEventListener('click', () => handleChoice(false));
 
     function resetAllTimers() {
       clearInterval(viewTimer);
@@ -189,6 +185,7 @@
       allElements.instructions.classList.add('hidden');
       allElements.game.classList.remove('hidden');
       isGameOver = false; score = 0; round = 0; roundScores = [];
+      currentLevel = 1; correctStreak = 0;
       allElements.finalSummary.classList.add('hidden');
       
       let mainTimeLeft = TOTAL_GAME_TIME;
@@ -215,7 +212,7 @@
       clearInterval(viewTimer);
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.nextBtn.classList.add('hidden');
-      allElements.answeringOverlay.classList.add('is-faded-out');
+      allElements.answeringPhase.classList.add('is-faded-out');
       
       triggerFanfare();
       
@@ -239,9 +236,13 @@
     }
     
     function buildScene() {
+      const itemsToMemorise = 3 + currentLevel;
       const shuffled = [...allItems].sort(() => 0.5 - Math.random());
-      recallObjects = shuffled.slice(0, 5);
+      recallObjects = shuffled.slice(0, itemsToMemorise);
+      
       allElements.scene.innerHTML = '';
+      allElements.scene.style.gridTemplateColumns = `repeat(${itemsToMemorise}, 1fr)`;
+
       recallObjects.forEach(item => {
         const div = document.createElement('div');
         div.className = 'item';
@@ -254,44 +255,75 @@
         if (isGameOver) return;
         clearInterval(viewTimer);
         allElements.viewingPhase.classList.add('is-faded-out');
-        allElements.answeringOverlay.classList.remove('is-faded-out');
+        allElements.answeringPhase.classList.remove('is-faded-out');
         
-        wasInScene = Math.random() < 0.5;
-        if (wasInScene) {
-            testItem = recallObjects[Math.floor(Math.random() * recallObjects.length)];
-        } else {
-            const distractors = allItems.filter(item => !recallObjects.includes(item));
-            testItem = distractors[Math.floor(Math.random() * distractors.length)];
-        }
-        allElements.testItem.textContent = testItem;
+        correctChoice = recallObjects[Math.floor(Math.random() * recallObjects.length)];
+        const distractors = allItems.filter(item => !recallObjects.includes(item));
+        const incorrectChoice = distractors[Math.floor(Math.random() * distractors.length)];
+        
+        const choices = [correctChoice, incorrectChoice].sort(() => 0.5 - Math.random());
+        
+        allElements.choices.innerHTML = '';
+        allElements.choices.style.gridTemplateColumns = '1fr 1fr';
+        
+        choices.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.textContent = item;
+            div.addEventListener('click', () => handleChoice(div, item === correctChoice));
+            allElements.choices.appendChild(div);
+        });
     }
     
-    function handleChoice(playerChoice) {
+    function handleChoice(element, isCorrect) {
         if (isGameOver) return;
-        const isCorrect = (playerChoice === wasInScene);
+        
+        element.classList.add(isCorrect ? 'correct' : 'incorrect');
+        
+        const choiceElements = allElements.choices.children;
+        for(const el of choiceElements) {
+            if (el.classList.contains('item')) {
+                el.style.pointerEvents = 'none';
+                if (el.textContent === correctChoice && !isCorrect) {
+                    setTimeout(() => el.classList.add('correct'), 500);
+                }
+            }
+        }
+        
         endRound(isCorrect);
     }
 
     function endRound(wasCorrect) {
         if (isGameOver) return;
+        
         const roundScore = wasCorrect ? 1 : 0;
         score += roundScore;
-        roundScores.push({ round, score: roundScore });
+        roundScores.push({ round, score: roundScore, level: currentLevel });
 
         let feedbackHTML = '';
         if (wasCorrect) {
+            correctStreak++;
             feedbackHTML = `<h2>Correct! Great memory! 🎉</h2>`;
+            if (correctStreak >= 2 && currentLevel < MAX_LEVEL) {
+                currentLevel++;
+                correctStreak = 0;
+                feedbackHTML += `<p style="color: #28a745; font-weight: bold;">LEVEL UP!</p>`;
+            }
         } else {
-            feedbackHTML = `<h2>Almost! Let's get the next one.</h2>`;
+            correctStreak = 0;
+            if (currentLevel > 1) {
+                currentLevel--;
+            }
+            feedbackHTML = `<h2>Almost! Let's try another one.</h2>`;
         }
-        allElements.resultContent.innerHTML = feedbackHTML;
         
+        allElements.resultContent.innerHTML = feedbackHTML;
         allElements.result.classList.remove('celebrate');
         if (wasCorrect) {
             setTimeout(() => allElements.result.classList.add('celebrate'), 10);
         }
         
-        allElements.answeringOverlay.classList.add('is-faded-out');
+        allElements.answeringPhase.classList.add('is-faded-out');
         allElements.resultsOverlay.classList.remove('is-faded-out');
         allElements.nextBtn.classList.remove('hidden');
         
