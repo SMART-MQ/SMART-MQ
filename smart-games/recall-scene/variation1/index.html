@@ -115,9 +115,10 @@
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
     <h1>Picture Perfect Memory</h1>
     <ul class="instructions-list">
+        <!-- --- NEW: Updated Instructions --- -->
         <li>⭐ This is a challenge <strong>just for you.</strong></li>
-        <li>🧠 See how many rounds you can complete in 10 minutes!</li>
-        <li>🏆 Try to beat your best score each round!</li>
+        <li>🧠 Your mission: Memorise the 4 highlighted pictures in 30 seconds!</li>
+        <li>🏆 Score as many points as you can before the 10 minutes are up!</li>
     </ul>
     <button id="startBtn">Let's Play!</button>
   </div>
@@ -148,7 +149,8 @@
   <div id="results-overlay" class="overlay fadeable is-faded-out">
     <div id="result" class="overlay-content">
         <div id="result-content"></div>
-        <button id="nextBtn" class="hidden">Next Round</button>
+        <!-- --- NEW: Smart Next Round Button --- -->
+        <button id="nextBtn" class="hidden" disabled>Next Round in 3</button>
     </div>
   </div>
   
@@ -162,7 +164,7 @@
     const allObjects = Object.keys(objectLibrary);
     let recallObjects = [], roundScores = [];
     let round = 0, score = 0;
-    let viewTimer, answerTimer, mainGameTimer;
+    let viewTimer, answerTimer, mainGameTimer, nextBtnTimer;
     let isGameOver = false;
     
     const VIEWING_TIME = 30;
@@ -192,6 +194,7 @@
       clearInterval(viewTimer);
       clearInterval(answerTimer);
       clearInterval(mainGameTimer);
+      clearInterval(nextBtnTimer);
     }
     
     function startGame() {
@@ -235,7 +238,7 @@
           allElements.viewingPhase.classList.remove('is-faded-out');
           
           allElements.readyBtn.disabled = true;
-          setTimeout(() => { allElements.readyBtn.disabled = false; }, 10000); // Enable after 10 seconds
+          setTimeout(() => { allElements.readyBtn.disabled = false; }, 10000);
 
           let timeLeft = VIEWING_TIME;
           allElements.viewingCountdown.textContent = timeLeft;
@@ -295,6 +298,26 @@
         }, 1000);
     }
 
+    function animateScore(finalScore) {
+        let currentScore = 0;
+        const scoreElement = document.getElementById('score-display');
+        const scorePraise = document.getElementById('score-praise');
+        
+        const scoreInterval = setInterval(() => {
+            currentScore++;
+            scoreElement.textContent = currentScore;
+            if (currentScore >= finalScore) {
+                clearInterval(scoreInterval);
+                let scoreText = '';
+                if (finalScore === 4) scoreText = "PERFECT SCORE!";
+                else if (finalScore === 3) scoreText = "Awesome!";
+                else if (finalScore === 2) scoreText = "Great job!";
+                else if (finalScore === 1) scoreText = "Nice one!";
+                scorePraise.textContent = scoreText;
+            }
+        }, 100);
+    }
+
     function checkAnswer() {
       if (isGameOver) return;
       clearInterval(answerTimer);
@@ -335,12 +358,8 @@
         feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
         playerAnswerImages = '';
       } else if (roundScore > 0) {
-          let scoreText = '';
-          if (roundScore === 4) scoreText = "PERFECT SCORE!";
-          else if (roundScore === 3) scoreText = "Awesome!";
-          else if (roundScore === 2) scoreText = "Great job!";
-          else if (roundScore === 1) scoreText = "Nice one!";
-          feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}! ${scoreText}</p>`;
+          feedbackHTML = `<p>You scored <strong id="score-display">0</strong> point${roundScore !== 1 ? "s" : ""}! <span id="score-praise"></span></p>`;
+          animateScore(roundScore);
       } else {
           feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
       }
@@ -357,6 +376,19 @@
       allElements.resultsOverlay.classList.remove('is-faded-out');
       if (!isGameOver) {
         allElements.nextBtn.classList.remove('hidden');
+        
+        let countdown = 3;
+        allElements.nextBtn.textContent = `Next Round in ${countdown}`;
+        allElements.nextBtn.disabled = true;
+        nextBtnTimer = setInterval(() => {
+            countdown--;
+            allElements.nextBtn.textContent = `Next Round in ${countdown}`;
+            if (countdown <= 0) {
+                clearInterval(nextBtnTimer);
+                allElements.nextBtn.textContent = 'Next Round';
+                allElements.nextBtn.disabled = false;
+            }
+        }, 1000);
       }
     }
     
