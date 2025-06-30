@@ -25,8 +25,21 @@
 
     #instructions-container { padding: 20px; max-width: 550px; margin: 20px auto; }
 
-    h1 { margin-top: 0; font-size: 3em; color: #0077b6; text-shadow: 3px 3px 0px #ffc300; }
-    h2.welcome-title { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: -10px; }
+    h1 { margin-top: 15px; font-size: 3em; color: #0077b6; text-shadow: 3px 3px 0px #ffc300; }
+    
+    /* --- NEW: Polished Welcome Title Banner --- */
+    h2.welcome-title {
+        display: inline-block;
+        font-size: 1.3em;
+        font-weight: 700;
+        color: #0077b6;
+        background-color: #e0f2fe;
+        padding: 8px 20px;
+        border-radius: 30px;
+        border: 2px solid #bae6fd;
+        margin-bottom: 0;
+    }
+    
     ul.instructions-list { list-style-type: none; padding: 0; margin: 20px auto; display: inline-block; text-align: left; }
     ul.instructions-list li { font-size: 1.2em; margin-bottom: 10px; }
 
@@ -35,7 +48,7 @@
     .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #0077b6; margin: 10px auto 15px auto; overflow: hidden; }
     .timer-bar { height: 100%; width: 100%; background-color: #f94144; border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
-    #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #0077b6; margin-bottom: 15px; }
+    #viewing-phase .message { font-size: 1.1em; font-weight: 700; color: #0077b6; margin-bottom: 15px; }
     #answering-phase .message { margin-top: 0; }
 
     .scene { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
@@ -72,6 +85,7 @@
     
     button { background-color: #ffc300; border: none; color: #333; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Balsamiq Sans', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e0a800; text-transform: uppercase; }
     button:hover:not(:disabled) { background-color: #ffd60a; transform: translateY(-2px); box-shadow: 0 7px 0 #e0a800; }
+    button:disabled { background-color: #cccccc; color: #888888; box-shadow: 0 5px 0 #aaaaaa; cursor: not-allowed; }
     #submitAnswerBtn { background-color: #f94144; color: white; box-shadow: 0 5px 0 #c22528; }
 
     input[type="text"] { padding: 10px; font-size: 1em; font-family: 'Balsamiq Sans', cursive; margin: 10px; border-radius: 8px; border: 2px solid #ccc; width: 80%; max-width: 300px; }
@@ -116,8 +130,10 @@
       <div id="roundCounter">Round 1</div>
       <div class="game-area">
         <div id="viewing-phase" class="fadeable is-faded-out">
-            <div class="message">Memorize the highlighted items! You have <span id="viewingCountdown">60</span>s</div>
+            <div class="message">Memorize the highlighted items! You have <span id="viewingCountdown">30</span>s</div>
             <div id="scene" class="scene"></div>
+            <!-- --- NEW: "I'm Ready!" button --- -->
+            <button id="readyBtn">I've Memorized It!</button>
         </div>
       </div>
   </div>
@@ -142,9 +158,9 @@
   <div id="finalSummary" class="hidden"></div>
 
   <script>
+    // --- NEW: All your requested synonyms are now included ---
     const objectLibrary = { apple: "https://img.icons8.com/color/96/apple.png", book: "https://img.icons8.com/color/96/book.png", ball: "https://img.icons8.com/emoji/96/soccer-ball-emoji.png", cat: "https://img.icons8.com/color/96/cat.png", car: "https://img.icons8.com/color/96/car.png", hat: "https://img.icons8.com/emoji/96/top-hat-emoji.png", star: "https://img.icons8.com/color/96/star.png", fish: "https://img.icons8.com/color/96/fish.png", pen: "https://img.icons8.com/emoji/96/pen-emoji.png", leaf: "https://img.icons8.com/color/96/leaf.png", cake: "https://img.icons8.com/color/96/birthday-cake.png", dog: "https://img.icons8.com/color/96/dog.png", flower: "https://img.icons8.com/color/96/flower.png", globe: "https://img.icons8.com/color/96/globe.png", kite: "https://img.icons8.com/color/96/kite.png", moon: "https://img.icons8.com/emoji/96/crescent-moon-emoji.png" };
-    const acceptableAnswers = { apple: ["apple"], book: ["book"], ball: ["ball", "soccer ball", "football"], cat: ["cat"], car: ["car"], hat: ["hat", "top hat"], star: ["star"], fish: ["fish"], pen: ["pen", "pencil"], leaf: ["leaf"], cake: ["cake", "birthday cake"], dog: ["dog"], flower: ["flower"], globe: ["globe", "world", "earth"], kite: ["kite"], moon: ["moon", "crescent moon"] };
-    for (const key of Object.keys(objectLibrary)) { if (!acceptableAnswers[key]) acceptableAnswers[key] = [key]; }
+    const acceptableAnswers = { apple: ["apple", "red apple", "apple seed", "half apple"], book: ["book", "notebook"], ball: ["ball", "soccer ball", "football", "soccer"], cat: ["cat", "kitten"], car: ["car", "automobile"], hat: ["hat", "top hat", "magician", "magic"], star: ["star", "night"], fish: ["fish"], pen: ["pen", "pencil"], leaf: ["leaf", "tree", "plant"], cake: ["cake", "birthday cake", "birthday"], dog: ["dog", "puppy"], flower: ["flower"], globe: ["globe", "world", "earth", "planet"], kite: ["kite"], moon: ["moon", "crescent moon", "crescent", "night"] };
 
     const allObjects = Object.keys(objectLibrary);
     let recallObjects = [], roundScores = [];
@@ -152,7 +168,7 @@
     let viewTimer, answerTimer, mainGameTimer;
     let isGameOver = false;
     
-    const VIEWING_TIME = 60;
+    const VIEWING_TIME = 30; // New viewing time
     const ANSWERING_TIME = 60;
     const TOTAL_GAME_TIME = 600;
 
@@ -165,13 +181,15 @@
         resultContent: document.getElementById('result-content'), viewingCountdown: document.getElementById('viewingCountdown'),
         answerCountdown: document.getElementById('answerCountdown'), viewingPhase: document.getElementById('viewing-phase'),
         answeringOverlay: document.getElementById('answering-overlay'), roundFanfare: document.getElementById('round-fanfare'),
-        mainTimerBar: document.getElementById('main-timer-bar'), resultsOverlay: document.getElementById('results-overlay')
+        mainTimerBar: document.getElementById('main-timer-bar'), resultsOverlay: document.getElementById('results-overlay'),
+        readyBtn: document.getElementById('readyBtn') // New button reference
     };
 
     allElements.startBtn.addEventListener('click', startGame);
     allElements.nextBtn.addEventListener('click', nextRound);
     allElements.submitBtn.addEventListener('click', checkAnswer);
     allElements.answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
+    allElements.readyBtn.addEventListener('click', showAnsweringPhase); // New event listener
 
     function resetAllTimers() {
       clearInterval(viewTimer);
@@ -182,20 +200,15 @@
     function startGame() {
       allElements.instructions.classList.add('hidden');
       allElements.game.classList.remove('hidden');
-      isGameOver = false;
-      score = 0; round = 0;
-      roundScores = [];
+      isGameOver = false; score = 0; round = 0; roundScores = [];
       allElements.finalSummary.classList.add('hidden');
       
       let mainTimeLeft = TOTAL_GAME_TIME;
       mainGameTimer = setInterval(() => {
           mainTimeLeft--;
           allElements.mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
-          if (mainTimeLeft <= 0 && !isGameOver) {
-              showFinalSummary();
-          }
+          if (mainTimeLeft <= 0 && !isGameOver) { showFinalSummary(); }
       }, 1000);
-
       nextRound();
     }
     
@@ -211,8 +224,7 @@
       round++;
       allElements.roundCounter.textContent = `Round ${round}`;
       
-      clearInterval(viewTimer);
-      clearInterval(answerTimer);
+      clearInterval(viewTimer); clearInterval(answerTimer);
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.nextBtn.classList.add('hidden');
       allElements.answeringOverlay.classList.add('is-faded-out');
@@ -224,6 +236,9 @@
           buildScene();
           allElements.viewingPhase.classList.remove('is-faded-out');
           
+          allElements.readyBtn.disabled = true; // Disable button initially
+          setTimeout(() => { allElements.readyBtn.disabled = false; }, 15000); // Enable after 15 seconds
+
           let timeLeft = VIEWING_TIME;
           allElements.viewingCountdown.textContent = timeLeft;
           viewTimer = setInterval(() => {
@@ -240,22 +255,18 @@
     
     function buildScene() {
       const gridItems = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16);
-      
       allElements.scene.innerHTML = '';
       const isRow = Math.random() < 0.5;
       const index = Math.floor(Math.random() * 4);
-      
       let currentRecallObjects = [];
       gridItems.forEach((item, i) => {
         const div = document.createElement('div');
         div.className = 'object';
-        
         const shouldHighlight = (isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index);
         if (shouldHighlight) {
           div.classList.add('highlight-border');
           currentRecallObjects.push(item);
         }
-        
         const img = document.createElement('img');
         img.src = objectLibrary[item];
         img.alt = item;
@@ -267,6 +278,7 @@
 
     function showAnsweringPhase() {
         if (isGameOver) return;
+        clearInterval(viewTimer); // Ensure viewing timer is stopped
         allElements.viewingPhase.classList.add('is-faded-out');
         allElements.answeringOverlay.classList.remove('is-faded-out');
         allElements.answerInput.value = '';
@@ -320,7 +332,6 @@
                       : `<img src="https://img.icons8.com/fluency/96/question-mark.png" class="unknown" title="Unknown: ${ans}">`;
       }).join("");
 
-      // --- THE FINAL FIX FOR THE FEEDBACK ---
       let feedbackHTML;
       if (userAnswersProvided.length === 0) {
         feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
@@ -360,9 +371,7 @@
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.finalSummary.classList.remove('hidden');
       
-      const averageScore = roundScores.length > 0 ? (score / roundScores.length).toFixed(2) : "0.00";
       const bestRoundScore = roundScores.length > 0 ? Math.max(...roundScores.map(r => r.score)) : 0;
-      
       const roundDetailsHTML = roundScores.map(r => 
         `<li>Round ${r.round}: ${r.score} point(s) ${r.score === bestRoundScore && bestRoundScore > 0 ? '⭐' : ''}</li>`
       ).join('');
