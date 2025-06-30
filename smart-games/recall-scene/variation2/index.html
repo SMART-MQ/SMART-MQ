@@ -49,10 +49,9 @@
 
     #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; }
     
-    .scene { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    /* --- NEW: Style for the 5-item choice grid --- */
-    #choices { grid-template-columns: repeat(5, 1fr); }
-    
+    .scene { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    #scene { grid-template-columns: repeat(4, 1fr); }
+
     .item {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -63,13 +62,13 @@
       background-color: white;
       border: 3px solid #d8bfd8;
       box-shadow: 0 6px 0 #b39db3;
-      font-size: clamp(24px, 10vw, 40px);
+      font-size: clamp(24px, 10vw, 36px);
       cursor: pointer;
       transition: all 0.1s ease-out;
     }
     .item:active { transform: translateY(4px); box-shadow: 0 2px 0 #b39db3; }
 
-    .item.correct { border-color: #32cd32; background-color: #d4edda; transform: translateY(4px); box-shadow: 0 2px 0 #28a745; }
+    .item.correct { border-color: #32cd32; background-color: #d4edda; pointer-events: none; transform: translateY(4px); box-shadow: 0 2px 0 #28a745; }
     .item.incorrect { border-color: #dc3545; animation: shake 0.5s; }
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
@@ -112,7 +111,7 @@
 
   <div id="instructions-container">
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
-    <h1>Which One is New?</h1>
+    <h1>Memory Mix-Up</h1>
     <ul class="instructions-list">
         <li>⭐ This is a challenge <strong>just for you.</strong></li>
         <li>🧠 Memorise the items you see.</li>
@@ -239,9 +238,17 @@
     }
     
     function buildScene() {
+      // --- NEW: Progressive Difficulty Logic ---
+      let itemsToMemorise = 3;
+      if (round >= 4) itemsToMemorise = 4;
+      if (round >= 7) itemsToMemorise = 5;
+      
       const shuffled = [...allItems].sort(() => 0.5 - Math.random());
-      recallObjects = shuffled.slice(0, 4);
+      recallObjects = shuffled.slice(0, itemsToMemorise);
+      
       allElements.scene.innerHTML = '';
+      allElements.scene.style.gridTemplateColumns = `repeat(${itemsToMemorise}, 1fr)`;
+
       recallObjects.forEach(item => {
         const div = document.createElement('div');
         div.className = 'item';
@@ -261,6 +268,8 @@
         const choices = [...recallObjects, newItem].sort(() => 0.5 - Math.random());
         
         allElements.choices.innerHTML = '';
+        allElements.choices.style.gridTemplateColumns = `repeat(${choices.length}, 1fr)`;
+        
         choices.forEach(item => {
             const div = document.createElement('div');
             div.className = 'item';
@@ -275,7 +284,7 @@
             if(isGameOver) { clearInterval(answerTimer); return; }
             timeLeft--;
             allElements.answerCountdown.textContent = timeLeft;
-            if (timeLeft <= 0) { endRound(false); } // Player ran out of time, not correct
+            if (timeLeft <= 0) { endRound(false); }
         }, 1000);
     }
     
@@ -290,7 +299,6 @@
             element.classList.add('incorrect');
         }
         
-        // Disable all other choices
         const choiceElements = allElements.choices.children;
         for(const el of choiceElements) {
             el.style.pointerEvents = 'none';
@@ -348,7 +356,7 @@
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.finalSummary.classList.remove('hidden');
       
-      const bestRoundScore = 1; // In this game, a 1 is a perfect score
+      const bestRoundScore = 1;
       const roundDetailsHTML = roundScores.map(r => 
         `<li>Round ${r.round}: ${r.score} point(s) ${r.score === bestRoundScore ? '⭐' : ''}</li>`
       ).join('');
