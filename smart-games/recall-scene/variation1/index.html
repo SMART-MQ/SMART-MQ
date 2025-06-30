@@ -1,23 +1,17 @@
- fix:**
-
-*   **It Permanently Solves the Scrolling Issue:** The layout now gracefully adapts to more items, ensuring<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1. they always fit on the screen.
-*   **It Looks Better:** A two-line grid is much cleaner and easier to read0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SMART Memory Game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic. than a long, cramped single line of items.
-*   **It Adds to the Challenge:** Spreading the items acrosscom" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     body {
       background-color: #f3e8ff;
- two lines is a subtle but effective way to make the scene slightly harder to memorize, which fits perfectly with the increasing difficulty.
-
-This is a targeted change to the CSS and the `buildScene` function only. The rest of the stable      font-family: 'Fredoka One', cursive;
+      font-family: 'Fredoka One', cursive;
       color: #3d3d3d;
       text-align: center;
       margin: 0;
@@ -29,20 +23,7 @@ This is a targeted change to the CSS and the `buildScene` function only. The res
     .fadeable { transition: opacity 0.4s ease-in-out; }
     .is-faded-out { opacity: 0; pointer-events: none; }
 
-    #instructions-container { padding: game logic will remain untouched. I will implement this now.
-
-***
-
-### The Final Code with the Two-Line Layout
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SMART Memory Game</title>
-  <link rel="preconnect 20px; max-width: 550px; margin: 20px auto; }
+    #instructions-container { padding: 20px; max-width: 550px; margin: 20px auto; }
 
     h1 { margin-top: 15px; font-size: 3em; color: #4b0082; text-shadow: 3px 3px 0px #ff7f50; }
     
@@ -50,86 +31,23 @@ This is a targeted change to the CSS and the `buildScene` function only. The res
         display: inline-block;
         font-size: 1.3em;
         font-weight: 700;
-" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      background-color: #f3e8ff;
-      font-family: 'Fredoka One', cursive;
-      color: #3d3d3d;
-      text-align: center;
-      margin: 0;
-      padding: 1        color: #4b0082;
+        color: #4b0082;
         background-color: #e6e6fa;
         padding: 8px 20px;
         border-radius: 30px;
         border: 2px solid #d8bfd8;
         margin-bottom: 0;
-0px 5px;
-    }
-
-    .hidden { display: none !important; }
-    
-    .fadeable { transition: opacity 0.4s ease-in-out; }
-    .is    }
-    
-    ul.instructions-list { list-style-type: none; padding: 0; margin: 20px auto; display: inline-block; text-align: left; }
-    ul.-faded-out { opacity: 0; pointer-events: none; }
-
-    #instructions-container { padding: 20px; max-width: 550px; margin: 20px auto; }
-
-    h1 { margin-top: 15px; font-size: 3em; color:instructions-list li { font-size: 1.2em; margin-bottom: 10px; }
-
-    .game-area { margin: 10px auto; width: 95%; max- #4b0082; text-shadow: 3px 3px 0px #ff7f50; }
-    
-    h2.welcome-title {
-        display: inline-block;
-        fontwidth: 500px; position: relative; }
-
-    .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border--size: 1.3em;
-        font-weight: 700;
-        color: #4b0082;
-        background-color: #e6e6fa;
-        paddingradius: 10px; border: 2px solid #4b0082; margin: 10: 8px 20px;
-        border-radius: 30px;
-        border:px auto 15px auto; overflow: hidden; }
-    .timer-bar { height: 100%; width: 100%; background-color: #32cd32; border-radius 2px solid #d8bfd8;
-        margin-bottom: 0;
     }
     
     ul.instructions-list { list-style-type: none; padding: 0; margin: 20px auto; display: inline-block; text-align: left; }
-    ul.instructions-list li { font-size: 1.2em; margin-bottom: 10px; }: 8px 0 0 8px; transition: width 1s linear; }
+    ul.instructions-list li { font-size: 1.2em; margin-bottom: 10px; }
 
-    #viewing-phase .message, #answering-phase .message { font-size: 1.1em
+    .game-area { margin: 10px auto; width: 95%; max-width: 500px; position: relative; }
 
-    .game-area { margin: 10px auto; width: 95%; max-width; font-weight: 700; color: #4b0082; margin-bottom: 1: 500px; position: relative; }
+    .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #4b0082; margin: 10px auto 15px auto; overflow: hidden; }
+    .timer-bar { height: 100%; width: 100%; background-color: #32cd32; border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
-    .timer-bar-container { width: 5px; }
-    
-    /* --- THE TWO-ROW FIX --- */
-    .scene { 
-        display:100%; height: 25px; background-color: #e9ecef; border-radius flex;
-        flex-wrap: wrap; /* Allows items to wrap to the next line */
-        justify-: 10px; border: 2px solid #4b0082; margin: 1content: center;
-        gap: 10px; 
-    }
-    #choices.scene { grid-0px auto 15px auto; overflow: hidden; }
-    .timer-bar { height: 100%; width: 100%; background-color: #32cd32; border-template-columns: 1fr 1fr; display: grid; }
-    
-    .item {
-      /* Use flex-basis to control how many items fit per row */
-      flex-basis: calc(2radius: 8px 0 0 8px; transition: width 1s linear; }
-
-    #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font5% - 10px); /* 4 items per row */
-      aspect-ratio: 1 / 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 15px;
-      background-color: white;
-      border: 3-weight: 700; color: #4b0082; margin-bottom: 15px; }
+    #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; }
     
     .scene { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; align-items: center; }
     
@@ -139,20 +57,11 @@ This is a targeted change to the CSS and the `buildScene` function only. The res
       display: flex;
       justify-content: center;
       align-items: center;
-      border-radius:px solid #d8bfd8;
-      box-shadow: 0 6px 0 #b39db3;
-      font-size: clamp(24px, 10vw, 36px);
-      cursor: pointer;
-      transition: all 0.1s ease-out;
-    }
-    .item:hover { transform: scale(1.05); }
-    .item:active { transform: translateY(4px); box-shadow: 0 2px 0 #b39db3; }
-
-    .item.correct { border-color: #32cd32; background-color: #d4edda; pointer-events: none; transform: translateY(4px); box-shadow: 0 15px;
+      border-radius: 15px;
       background-color: white;
       border: 3px solid #d8bfd8;
       box-shadow: 0 6px 0 #b39db3;
-      font-size: clamp(24px, 10vw, 36px);
+      font-size: clamp(24px, 10vw, 40px);
       cursor: pointer;
       transition: all 0.1s ease-out;
     }
@@ -160,20 +69,11 @@ This is a targeted change to the CSS and the `buildScene` function only. The res
     .item:active { transform: translateY(4px); box-shadow: 0 2px 0 #b39db3; }
 
     .item.correct { border-color: #32cd32; background-color: #d4edda; pointer-events: none; transform: translateY(4px); box-shadow: 0 2px 0 #28a745; }
-    .item.incorrect { border-color: #dc35 2px 0 #28a745; }
     .item.incorrect { border-color: #dc3545; animation: shake 0.5s; pointer-events: none; }
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
     
     .overlay {
-        position: fixed; top: 0; left: 0; width45; animation: shake 0.5s; pointer-events: none; }
-    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
-    
-    #choices { grid-template-columns: 1fr 1fr; }
-    
-    .overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: rgba(0,0,0,0.6); z-index: 1000; display: flex;
-        justify-content: center; align-: 100%; height: 100%;
         background-color: rgba(0,0,0,0.6); z-index: 1000; display: flex;
         justify-content: center; align-items: center; padding: 15px;
     }
@@ -183,31 +83,9 @@ This is a targeted change to the CSS and the `buildScene` function only. The res
         max-height: 90vh; overflow-y: auto;
     }
     
-    button { background-coloritems: center; padding: 15px;
-    }
-    .overlay-content {
-        background-color: #e6e6fa; padding: 20px; border-radius: 15px; 
-        border: 3px solid #4b0082; width: 100%; max-width: 500px;
-        max-height: 90vh; overflow-y: auto;
-    }
-    
-    button { background-color: #ff7f50; border: none; color: white; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Fredoka One', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e06c3a; text-: #ff7f50; border: none; color: white; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Fredoka One', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e06c3a; text-transform: uppercase; }
+    button { background-color: #ff7f50; border: none; color: white; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Fredoka One', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e06c3a; text-transform: uppercase; }
     button:hover:not(:disabled) { background-color: #ff9066; transform: translateY(-2px); box-shadow: 0 7px 0 #e06c3a; }
     button:disabled { background-color: #cccccc; color: #888888; box-shadow: 0 5px 0 #aaaaaa; cursor: not-allowed; }
-    
-    #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
-    #finalSummary { font-size: 1.2em; background: #ffffff; border: 3px solid #4b0082; border-radius: 15px; padding: 30px; }
-    #finalSummary p { margin: 12px 0transform: uppercase; }
-    button:hover:not(:disabled) { background-color: #ff9066; transform: translateY(-2px); box-shadow: 0 7px 0 #e06c3a; }
-    button:disabled { background-color: #cccccc; color: #888888; box-shadow: 0 5px 0 #aaaaaa; cursor: not-allowed;; }
-    
-    #result h2, #result p { margin: 8px 0; }
-    
-    @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-    .celebrate { animation: celebrate 0.5s ease-in-out; }
-    
-    #round-fanfare { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(75, 0, 130, 0.9); color: white; padding: 20px 40px; border-radius: 20px; font-size: 3em; font-weight: 700; z-index: 9999; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-    @keyframes fanfare-anim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity:  }
     
     #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
     #finalSummary { font-size: 1.2em; background: #ffffff; border: 3px solid #4b0082; border-radius: 15px; padding: 30px; }
@@ -218,33 +96,7 @@ This is a targeted change to the CSS and the `buildScene` function only. The res
     @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .celebrate { animation: celebrate 0.5s ease-in-out; }
     
-    #round-fanfare { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(75, 0, 130, 0.9); color: white; padding: 20px 40px; border-radius: 20px; font-size:1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
-    .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
-
-  </style>
-</head>
-<body>
-
-  <div id="instructions-container">
-    <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
-    <h1>Memory Detective</h1>
-    <ul class="instructions-list">
-        <li>⭐ This is a challenge <strong>just for you.</strong></li>
-        <li>🧠 Memorise the items you see.</li>
-        <li>🤔 Then, choose which of the two items was in the original scene!</li>
-        <li>🏆 Score as many points as you can before time runs out!</li>
-    </ul>
-    <button id="startBtn">Let's Play!</button>
-  </div>
-
-  <div id="game-container" class="hidden">
-      <div id="main-timer-bar-container" class="timer-bar-container">
-          <div id="main-timer-bar" class="timer-bar"></div>
-      </div>
-      <div id="roundCounter">Round 1</div>
-      <div class="game-area">
-        <div id="viewing-phase" class="fadeable is-faded-out">
-            <div class="message">Memorise these items! (<span id 3em; font-weight: 700; z-index: 9999; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+    #round-fanfare { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(75, 0, 130, 0.9); color: white; padding: 20px 40px; border-radius: 20px; font-size: 3em; font-weight: 700; z-index: 9999; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
     @keyframes fanfare-anim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
 
@@ -283,51 +135,7 @@ This is a targeted change to the CSS and the `buildScene` function only. The res
   </div>
   
   <div id="results-overlay" class="overlay fadeable is-faded-out">
-    <div id="viewingCountdown">30</span>s)</div>
-            <div id="scene" class="scene"></div>
-            <button id="readyBtn">I've Memorised It!</button>
-        </div>
-        <div id="answering-phase" class="fadeable is-faded-out">
-            <div class="message">Which one was in the scene?</div>
-            <div id="choices" class="scene"></div>
-        </div>
-      </div>
-  </div>
-  
-  <div id="results-overlay" class="overlay fadeable is-faded-out">
     <div id="result" class="overlay-content">
-        <div id="result-content"></div>
-        <button id="nextBtn" class="hidden" disabled>Next Round in 3</button>
-    </div>
-  </div>
-  
-  <div id="round-fanfare" class="hidden"></div>
-  <div id="finalSummary" class="hidden"></div>
-
-  <script>
-    const allItems = ['🍎','🐶','🧸','🎈','📚','🚲','🎮','🧃','🎩','🖍️','🧼','🎵', '⭐', '🚗', '🏠', '🌳'];
-    let recallObjects = [], roundScores = [];
-    let round = 0, score = 0;
-    let viewTimer, mainGameTimer, nextBtnTimer;
-    let isGameOver = false;
-    let correctChoice = '';
-    
-    let currentLevel = 1;
-    let correctStreak = 0;
-    const MAX_LEVEL = 5; // Increased max level slightly
-    
-    const VIEWING_TIME = 30;
-    const TOTAL_GAME_TIME = 600;
-
-    const allElements = {
-        instructions: document.getElementById('instructions-container'), game: document.getElementById('game-container'),
-        roundCounter: document.getElementById('roundCounter'), finalSummary: document.getElementById('finalSummary'),
-        startBtn: document.getElementById('startBtn'), nextBtn: document.getElementById('nextBtn'),
-        scene: document.getElementById('scene'), choices: document.getElementById('choices'),
-        result: document.getElementById('result'), resultContent: document.getElementById('result-content'),
-        viewingCountdown: document.getElementById('viewingCountdown'),
-        viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
-        roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar="result" class="overlay-content">
         <div id="result-content"></div>
         <button id="nextBtn" class="hidden" disabled>Next Round in 3</button>
     </div>
@@ -354,7 +162,12 @@ This is a targeted change to the CSS and the `buildScene` function only. The res
     const allElements = {
         instructions: document.getElementById('instructions-container'), game: document.getElementById('game-container'),
         roundCounter: document.getElementById('roundCounter'), finalSummary: document.getElementById('finalSummary'),
-        startBtn: document.getElementById('startBtn'), nextBtn: document.getElementById('nextBtn'),'),
+        startBtn: document.getElementById('startBtn'), nextBtn: document.getElementById('nextBtn'),
+        scene: document.getElementById('scene'), choices: document.getElementById('choices'),
+        result: document.getElementById('result'), resultContent: document.getElementById('result-content'),
+        viewingCountdown: document.getElementById('viewingCountdown'),
+        viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
+        roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
         resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn')
     };
 
@@ -400,45 +213,6 @@ This is a targeted change to the CSS and the `buildScene` function only. The res
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.nextBtn.classList.add('hidden');
       allElements.answeringPhase.classList.add('is-faded-out');
-        scene: document.getElementById('scene'), choices: document.getElementById('choices'),
-        result: document.getElementById('result'), resultContent: document.getElementById('result-content'),
-        viewingCountdown: document.getElementById('viewingCountdown'),
-        viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
-        roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
-        resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn')
-    };
-
-    allElements.startBtn.addEventListener('click', startGame);
-    allElements.nextBtn.addEventListener('click', nextRound);
-    allElements.readyBtn.addEventListener('click', showAnsweringPhase);
-
-    function resetAllTimers() {
-      clearInterval(viewTimer);
-      clearInterval(mainGameTimer);
-      clearInterval(nextBtnTimer);
-    }
-    
-    function startGame() {
-      allElements.instructions.classList.add('hidden');
-      allElements.game.classList.remove('hidden');
-      isGameOver = false; score = 0; round = 0; roundScores = [];
-      currentLevel = 1; correctStreak = 0;
-      allElements.finalSummary.classList.add('hidden');
-      
-      let mainTimeLeft = TOTAL_GAME_TIME;
-      mainGameTimer = setInterval(() => {
-          mainTimeLeft--;
-          allElements.mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
-          if (mainTimeLeft <= 0 && !isGameOver) { showFinalSummary(); }
-      }, 1000);
-      nextRound();
-    }
-    
-    function triggerFanfare() {
-        allElements.roundFanfare.textContent = `Round ${round}!`;
-        allElements.roundFanfare.classList.remove('hidden', 'fanfare-animate');
-        setTimeout(() => allElements.roundFanfare.classList.add('fanfare-animate'), 10);
-        setTimeout(() => allElements.roundFanfare.classList.add('hidden
       
       triggerFanfare();
       
@@ -467,104 +241,7 @@ This is a targeted change to the CSS and the `buildScene` function only. The res
       recallObjects = shuffled.slice(0, itemsToMemorise);
       
       allElements.scene.innerHTML = '';
-
-      recallObjects.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'item';
-        div.textContent = item;
-        allElements.scene.appendChild(div);
-      });
-    }
-
-    function showAnsweringPhase() {
-        if (isGameOver) return;
-        clearInterval(viewTimer);
-        allElements.viewing'), 1500);
-    }
-
-    function nextRound() {
-      if (isGameOver) return;
-      round++;
-      allElements.roundCounter.textContent = `Round ${round}`;
-      
-      clearInterval(viewTimer);
-      allElements.resultsOverlay.classList.add('is-faded-out');
-      allElements.nextBtn.classList.add('hidden');
-      allElements.answeringPhase.classList.add('is-faded-out');
-      
-      triggerFanfare();
-      
-      setTimeout(() => {
-          if (isGameOver) return;
-          buildScene();
-          allElements.viewingPhase.classList.remove('is-faded-out');
-          
-          allElements.readyBtn.disabled = true;
-          setTimeout(() => { allElements.readyBtn.disabled = false; }, 10000);
-
-          let timeLeft = VIEWING_TIME;
-          allElements.viewingCountdown.textContent = timeLeft;
-          viewTimer = setInterval(() => {
-              if(isGameOver) { clearInterval(viewTimer); return; }
-              timeLeft--;
-              allElements.viewingCountdown.textContent = timeLeft;
-              if (timeLeft <= 0) { showAnsweringPhase(); }
-          }, 1000);
-      }, 1500);
-    }
-    
-    function buildScene() {
-      const itemsToMemorise = 3 + currentLevel;
-      const shuffled = [...allItems].sort(() => 0.5 - Math.random());
-      recallObjects = shuffled.slice(0, itemsToMemorise);
-      
-      allElements.Phase.classList.add('is-faded-out');
-        allElements.answeringPhase.classList.remove('is-faded-out');
-        
-        correctChoice = recallObjects[Math.floor(Math.random() * recallObjects.length)];
-        const distractors = allItems.filter(item => !recallObjects.includes(item));
-        const incorrectChoice = distractors[Math.floor(Math.random() * distractors.length)];
-        
-        const choices = [correctChoice, incorrectChoice].sort(() => 0.5 - Math.random());
-        
-        allElements.choices.innerHTML = '';
-        
-        choices.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'item';
-            div.textContent = item;
-            div.addEventListener('click', () => handleChoice(div, item === correctChoice));
-            allElements.choices.appendChild(div);
-        });
-    }
-    
-    function handleChoice(element, isCorrect) {
-        if (isGameOver) return;
-        
-        element.classList.add(isCorrect ? 'correct' : 'incorrect');
-        
-        const choiceElements = allElements.choices.children;
-        for(const el of choiceElements) {
-            if (el.classList.contains('item')) {
-                el.style.pointerEvents = 'none';
-                if (el.textContent === correctChoice && !isCorrect) {
-                    setTimeout(() => el.classList.add('correct'), 500);
-                }
-            }
-        }
-        
-        endRound(isCorrect);
-    }
-
-    function endRound(wasCorrect) {
-        if (isGameOver) return;
-        
-        const roundScore = wasCorrect ? 1 : 0;
-        score += roundScore;
-        roundScores.push({ roundscene.innerHTML = '';
-      // --- NEW: Dynamic Grid Layout ---
-      const columns = itemsToMemorise > 5 ? Math.ceil(itemsToMemorise / 2) : itemsToMemorise;
-      allElements.scene.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+      allElements.scene.style.gridTemplateColumns = `repeat(${itemsToMemorise}, 1fr)`;
 
       recallObjects.forEach(item => {
         const div = document.createElement('div');
@@ -595,52 +272,7 @@ This is a targeted change to the CSS and the `buildScene` function only. The res
             div.textContent = item;
             div.addEventListener('click', () => handleChoice(div, item === correctChoice));
             allElements.choices.appendChild(div);
-        , score: roundScore, level: currentLevel });
-
-        let feedbackHTML = '';
-        if (wasCorrect) {
-            correctStreak++;
-            feedbackHTML = `<h2>Correct! Great memory! 🎉</h2>`;
-            if (correctStreak >= 2 && currentLevel < MAX_LEVEL) {
-                currentLevel++;
-                correctStreak = 0;
-                feedbackHTML += `<p style="color: #28a745; font-weight: bold;">LEVEL UP!</p>`;
-            }
-        } else {
-            correctStreak = 0;
-            if (currentLevel > 1) {
-                currentLevel--;
-            }
-            feedbackHTML = `<h2>Almost! Let's try another one.</h2>`;
-        }
-        
-        allElements.resultContent.innerHTML = feedbackHTML;
-        allElements.result.classList.remove('celebrate');
-        if (wasCorrect) {
-            setTimeout(() => allElements.result.classList.add('celebrate'), 10);
-        }
-        
-        allElements.answeringPhase.classList.add('is-faded-out');
-        allElements.resultsOverlay.classList.remove('is-faded-out');
-        allElements.nextBtn.classList.remove('hidden');
-        
-        let countdown = 3;
-        allElements.nextBtn.textContent = `Next Round in ${countdown}`;
-        allElements.nextBtn.disabled = true;
-        clearInterval(nextBtnTimer);
-        nextBtnTimer = setInterval(() => {
-            countdown--;
-            allElements.nextBtn.textContent = `Next Round in ${countdown}`;
-            if (countdown <= 0) {
-                clearInterval(nextBtnTimer);
-                allElements.nextBtn.textContent = 'Next Round';
-                allElements.nextBtn.disabled = false;
-            }
-        }, 1000);
-    }
-    
-    function showFinalSummary() {
-      if (isGameOver) return;});
+        });
     }
     
     function handleChoice(element, isCorrect) {
@@ -712,14 +344,6 @@ This is a targeted change to the CSS and the `buildScene` function only. The res
     
     function showFinalSummary() {
       if (isGameOver) return;
-      isGameOver = true;
-      resetAllTimers();
-      
-      allElements.game.classList.add('hidden');
-      allElements.resultsOverlay.classList.add('is-faded-out');
-      allElements.finalSummary.classList.remove('hidden');
-      
-      const total
       isGameOver = true;
       resetAllTimers();
       
