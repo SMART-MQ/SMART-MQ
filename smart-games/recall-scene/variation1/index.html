@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-  <title>SMART memory game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SMART Memory Game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     body {
-      background-color: #f0f8ff;
-      font-family: 'Balsamiq Sans', cursive;
-      color: #333;
+      background-color: #f3e8ff;
+      font-family: 'Fredoka One', cursive;
+      color: #3d3d3d;
       text-align: center;
       margin: 0;
       padding: 10px 5px;
@@ -20,22 +20,22 @@
 
     .hidden { display: none !important; }
     
-    .fadeable { transition: opacity 0.4s ease-in-out, visibility 0.4s; }
-    .is-faded-out { opacity: 0; visibility: hidden; }
+    .fadeable { transition: opacity 0.4s ease-in-out; }
+    .is-faded-out { opacity: 0; pointer-events: none; }
 
     #instructions-container { padding: 20px; max-width: 550px; margin: 20px auto; }
 
-    h1 { margin-top: 15px; font-size: 3em; color: #0077b6; text-shadow: 3px 3px 0px #ffc300; }
+    h1 { margin-top: 15px; font-size: 3em; color: #4b0082; text-shadow: 3px 3px 0px #ff7f50; }
     
     h2.welcome-title {
         display: inline-block;
         font-size: 1.3em;
         font-weight: 700;
-        color: #0077b6;
-        background-color: #e0f2fe;
+        color: #4b0082;
+        background-color: #e6e6fa;
         padding: 8px 20px;
         border-radius: 30px;
-        border: 2px solid #bae6fd;
+        border: 2px solid #d8bfd8;
         margin-bottom: 0;
     }
     
@@ -44,80 +44,72 @@
 
     .game-area { margin: 10px auto; width: 95%; max-width: 500px; position: relative; }
 
-    .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #0077b6; margin: 10px auto 15px auto; overflow: hidden; }
-    .timer-bar { height: 100%; width: 100%; background-color: #f94144; border-radius: 8px 0 0 8px; transition: width 1s linear; }
+    .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #4b0082; margin: 10px auto 15px auto; overflow: hidden; }
+    .timer-bar { height: 100%; width: 100%; background-color: #32cd32; border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
-    #viewing-phase .message { font-size: 1.1em; font-weight: 700; color: #0077b6; margin-bottom: 15px; }
+    #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; }
     
-    .scene { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-    .object { width: 100%; aspect-ratio: 1 / 1; display: flex; justify-content: center; align-items: center; border-radius: 12px; background-color: white; border: 3px solid #caf0f8; box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
-    .object.highlight-border { border: 4px solid #f94144; }
-    .object img { width: 85%; height: 85%; }
+    .scene { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     
-    /* --- THE PERMANENT KEYBOARD-SCROLL FIX --- */
+    .item {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 15px;
+      background-color: white;
+      border: 3px solid #d8bfd8;
+      box-shadow: 0 6px 0 #b39db3;
+      font-size: clamp(24px, 10vw, 40px);
+      cursor: pointer;
+      transition: all 0.1s ease-out;
+    }
+    
+    #test-item { font-size: 5em; margin: 20px 0; }
+    
+    .choice-buttons { display: flex; justify-content: center; gap: 20px; }
+    
     .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.6);
-        z-index: 1000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 15px;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.6); z-index: 1000; display: flex;
+        justify-content: center; align-items: center; padding: 15px;
     }
-    
     .overlay-content {
-        background-color: #e9f5ff; 
-        padding: 20px; 
-        border-radius: 15px; 
-        border: 3px solid #0077b6; 
-        width: 100%;
-        max-width: 500px;
-        max-height: 90vh;
-        overflow-y: auto;
+        background-color: #e6e6fa; padding: 20px; border-radius: 15px; 
+        border: 3px solid #4b0082; width: 100%; max-width: 500px;
+        max-height: 90vh; overflow-y: auto;
     }
     
-    #answering-phase p { font-weight: 700; font-size: 1.1em; }
-    
-    button { background-color: #ffc300; border: none; color: #333; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Balsamiq Sans', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e0a800; text-transform: uppercase; }
-    button:hover:not(:disabled) { background-color: #ffd60a; transform: translateY(-2px); box-shadow: 0 7px 0 #e0a800; }
+    button { background-color: #ff7f50; border: none; color: white; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Fredoka One', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e06c3a; text-transform: uppercase; }
+    button:hover:not(:disabled) { background-color: #ff9066; transform: translateY(-2px); box-shadow: 0 7px 0 #e06c3a; }
     button:disabled { background-color: #cccccc; color: #888888; box-shadow: 0 5px 0 #aaaaaa; cursor: not-allowed; }
-    #submitAnswerBtn { background-color: #f94144; color: white; box-shadow: 0 5px 0 #c22528; }
-
-    input[type="text"] { padding: 10px; font-size: 1em; font-family: 'Balsamiq Sans', cursive; margin: 10px; border-radius: 8px; border: 2px solid #ccc; width: 80%; max-width: 300px; }
-
-    #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
-    #finalSummary { font-size: 1.2em; background: #ffffff; border: 3px solid #0077b6; border-radius: 15px; padding: 30px; }
-    #finalSummary ul { list-style-type: none; padding: 0; margin: 20px 0; text-align: left; display: inline-block; }
-    #finalSummary li { font-size: 0.9em; margin-bottom: 8px; }
     
-    #result p { margin: 8px 0; }
+    #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
+    #finalSummary { font-size: 1.2em; background: #ffffff; border: 3px solid #4b0082; border-radius: 15px; padding: 30px; }
+    #finalSummary p { margin: 12px 0; } /* Spacing for the scorecard */
+    
+    #result p, #result h2 { margin: 8px 0; }
     
     @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .celebrate { animation: celebrate 0.5s ease-in-out; }
     
-    #round-fanfare { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 119, 182, 0.9); color: white; padding: 20px 40px; border-radius: 20px; font-size: 3em; font-weight: 700; z-index: 9999; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+    #round-fanfare { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(75, 0, 130, 0.9); color: white; padding: 20px 40px; border-radius: 20px; font-size: 3em; font-weight: 700; z-index: 9999; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
     @keyframes fanfare-anim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
 
-    .answer-display { margin-top: 10px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
-    .answer-display img { width: 50px; height: 50px; border-radius: 10px; }
-    .answer-label { font-weight: 700; margin-bottom: 5px; font-size: 1em; color: #003049; }
-    
   </style>
 </head>
 <body>
 
   <div id="instructions-container">
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
-    <h1>Picture Perfect Memory</h1>
+    <h1>True or False?</h1>
     <ul class="instructions-list">
         <li>⭐ This is a challenge <strong>just for you.</strong></li>
-        <li>🧠 Your mission: Memorise the 4 highlighted pictures in 30 seconds!</li>
-        <li>🏆 Score as many points as you can before the 10 minutes are up!</li>
+        <li>🧠 Memorise the items you see.</li>
+        <li>🤔 Then, decide if the item shown was in the scene!</li>
+        <li>🏆 Score as many points as you can before time runs out!</li>
     </ul>
     <button id="startBtn">Let's Play!</button>
   </div>
@@ -129,22 +121,21 @@
       <div id="roundCounter">Round 1</div>
       <div class="game-area">
         <div id="viewing-phase" class="fadeable is-faded-out">
-            <div class="message">Memorise the highlighted items! You have <span id="viewingCountdown">30</span>s</div>
+            <div class="message">Memorise these items! (<span id="viewingCountdown">30</span>s)</div>
             <div id="scene" class="scene"></div>
             <button id="readyBtn">I've Memorised It!</button>
+        </div>
+        <div id="answering-phase" class="fadeable is-faded-out">
+            <div class="message">Was this item in the scene?</div>
+            <div id="test-item" class="item"></div>
+            <div class="choice-buttons">
+                <button id="trueBtn">True</button>
+                <button id="falseBtn">False</button>
+            </div>
         </div>
       </div>
   </div>
   
-  <div id="answering-overlay" class="overlay fadeable is-faded-out">
-      <div id="answering-phase" class="overlay-content">
-          <p>What did you see in the highlighted line?</p>
-          <p class="message">⏳ Time left: <span id="answerCountdown">60</span>s</p>
-          <input type="text" id="answer" placeholder="e.g. apple book ball"/>
-          <button id="submitAnswerBtn">Submit</button>
-      </div>
-  </div>
-
   <div id="results-overlay" class="overlay fadeable is-faded-out">
     <div id="result" class="overlay-content">
         <div id="result-content"></div>
@@ -156,41 +147,36 @@
   <div id="finalSummary" class="hidden"></div>
 
   <script>
-    const objectLibrary = { apple: "https://img.icons8.com/color/96/apple.png", book: "https://img.icons8.com/color/96/book.png", ball: "https://img.icons8.com/emoji/96/soccer-ball-emoji.png", cat: "https://img.icons8.com/color/96/cat.png", car: "https://img.icons8.com/color/96/car.png", hat: "https://img.icons8.com/emoji/96/top-hat-emoji.png", star: "https://img.icons8.com/color/96/star.png", fish: "https://img.icons8.com/color/96/fish.png", pen: "https://img.icons8.com/emoji/96/pen-emoji.png", leaf: "https://img.icons8.com/color/96/leaf.png", cake: "https://img.icons8.com/color/96/birthday-cake.png", dog: "https://img.icons8.com/color/96/dog.png", flower: "https://img.icons8.com/color/96/flower.png", globe: "https://img.icons8.com/color/96/globe.png", kite: "https://img.icons8.com/color/96/kite.png", moon: "https://img.icons8.com/emoji/96/crescent-moon-emoji.png" };
-    const acceptableAnswers = { apple: ["apple", "red apple", "apple seed", "half apple"], book: ["book", "notebook"], ball: ["ball", "soccer ball", "football", "soccer"], cat: ["cat", "kitten"], car: ["car", "automobile"], hat: ["hat", "top hat", "magician", "magic"], star: ["star", "night"], fish: ["fish"], pen: ["pen", "pencil"], leaf: ["leaf", "tree", "plant"], cake: ["cake", "birthday cake", "birthday"], dog: ["dog", "puppy"], flower: ["flower"], globe: ["globe", "world", "earth", "planet"], kite: ["kite"], moon: ["moon", "crescent moon", "crescent", "night"] };
-
-    const allObjects = Object.keys(objectLibrary);
+    const allItems = ['🍎','🐶','🧸','🎈','📚','🚲','🎮','🧃','🎩','🖍️','🧼','🎵', '⭐', '🚗', '🏠', '🌳'];
     let recallObjects = [], roundScores = [];
     let round = 0, score = 0;
-    let viewTimer, answerTimer, mainGameTimer, nextBtnTimer;
+    let viewTimer, mainGameTimer, nextBtnTimer;
     let isGameOver = false;
+    let testItem = '', wasInScene = false;
     
     const VIEWING_TIME = 30;
-    const ANSWERING_TIME = 60;
     const TOTAL_GAME_TIME = 600;
 
     const allElements = {
         instructions: document.getElementById('instructions-container'), game: document.getElementById('game-container'),
         roundCounter: document.getElementById('roundCounter'), finalSummary: document.getElementById('finalSummary'),
         startBtn: document.getElementById('startBtn'), nextBtn: document.getElementById('nextBtn'),
-        submitBtn: document.getElementById('submitAnswerBtn'), scene: document.getElementById('scene'),
-        answerInput: document.getElementById('answer'), result: document.getElementById('result'),
+        scene: document.getElementById('scene'), result: document.getElementById('result'), 
         resultContent: document.getElementById('result-content'), viewingCountdown: document.getElementById('viewingCountdown'),
-        answerCountdown: document.getElementById('answerCountdown'), viewingPhase: document.getElementById('viewing-phase'),
-        answeringOverlay: document.getElementById('answering-overlay'), roundFanfare: document.getElementById('round-fanfare'),
-        mainTimerBar: document.getElementById('main-timer-bar'), resultsOverlay: document.getElementById('results-overlay'),
-        readyBtn: document.getElementById('readyBtn')
+        viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
+        roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
+        resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn'),
+        testItem: document.getElementById('test-item'), trueBtn: document.getElementById('trueBtn'), falseBtn: document.getElementById('falseBtn')
     };
 
     allElements.startBtn.addEventListener('click', startGame);
     allElements.nextBtn.addEventListener('click', nextRound);
-    allElements.submitBtn.addEventListener('click', checkAnswer);
-    allElements.answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
     allElements.readyBtn.addEventListener('click', showAnsweringPhase);
+    allElements.trueBtn.addEventListener('click', () => handleChoice(true));
+    allElements.falseBtn.addEventListener('click', () => handleChoice(false));
 
     function resetAllTimers() {
       clearInterval(viewTimer);
-      clearInterval(answerTimer);
       clearInterval(mainGameTimer);
       clearInterval(nextBtnTimer);
     }
@@ -207,7 +193,6 @@
           allElements.mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
           if (mainTimeLeft <= 0 && !isGameOver) { showFinalSummary(); }
       }, 1000);
-
       nextRound();
     }
     
@@ -223,10 +208,10 @@
       round++;
       allElements.roundCounter.textContent = `Round ${round}`;
       
-      clearInterval(viewTimer); clearInterval(answerTimer);
+      clearInterval(viewTimer);
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.nextBtn.classList.add('hidden');
-      allElements.answeringOverlay.classList.add('is-faded-out');
+      allElements.answeringPhase.classList.add('is-faded-out');
       
       triggerFanfare();
       
@@ -244,119 +229,66 @@
               if(isGameOver) { clearInterval(viewTimer); return; }
               timeLeft--;
               allElements.viewingCountdown.textContent = timeLeft;
-              if (timeLeft <= 0) {
-                  clearInterval(viewTimer);
-                  showAnsweringPhase();
-              }
+              if (timeLeft <= 0) { showAnsweringPhase(); }
           }, 1000);
       }, 1500);
     }
     
     function buildScene() {
-      const gridItems = [...allObjects].sort(() => 0.5 - Math.random()).slice(0, 16);
+      const shuffled = [...allItems].sort(() => 0.5 - Math.random());
+      recallObjects = shuffled.slice(0, 5);
       allElements.scene.innerHTML = '';
-      const isRow = Math.random() < 0.5;
-      const index = Math.floor(Math.random() * 4);
-      let currentRecallObjects = [];
-      gridItems.forEach((item, i) => {
+      recallObjects.forEach(item => {
         const div = document.createElement('div');
-        div.className = 'object';
-        const shouldHighlight = (isRow && Math.floor(i / 4) === index) || (!isRow && i % 4 === index);
-        if (shouldHighlight) {
-          div.classList.add('highlight-border');
-          currentRecallObjects.push(item);
-        }
-        const img = document.createElement('img');
-        img.src = objectLibrary[item];
-        img.alt = item;
-        div.appendChild(img);
+        div.className = 'item';
+        div.textContent = item;
         allElements.scene.appendChild(div);
       });
-      recallObjects = currentRecallObjects;
     }
 
     function showAnsweringPhase() {
         if (isGameOver) return;
         clearInterval(viewTimer);
         allElements.viewingPhase.classList.add('is-faded-out');
-        allElements.answeringOverlay.classList.remove('is-faded-out');
-        allElements.answerInput.value = '';
-        allElements.answerInput.focus();
+        allElements.answeringPhase.classList.remove('is-faded-out');
         
-        let timeLeft = ANSWERING_TIME;
-        allElements.answerCountdown.textContent = timeLeft;
-        answerTimer = setInterval(() => {
-            if(isGameOver) { clearInterval(answerTimer); return; }
-            timeLeft--;
-            allElements.answerCountdown.textContent = timeLeft;
-            if (timeLeft <= 0) {
-                clearInterval(answerTimer);
-                checkAnswer();
-            }
-        }, 1000);
+        wasInScene = Math.random() < 0.5;
+        if (wasInScene) {
+            testItem = recallObjects[Math.floor(Math.random() * recallObjects.length)];
+        } else {
+            const distractors = allItems.filter(item => !recallObjects.includes(item));
+            testItem = distractors[Math.floor(Math.random() * distractors.length)];
+        }
+        allElements.testItem.textContent = testItem;
     }
     
-    function checkAnswer() {
-      if (isGameOver) return;
-      clearInterval(answerTimer);
-      
-      const userAnswersProvided = allElements.answerInput.value.toLowerCase().replace(/,/g, ' ').split(' ').filter(s => s.trim().length > 0);
-      
-      let matchedObjects = new Set();
-      let tempUserInput = " " + allElements.answerInput.value.toLowerCase().replace(/,/g, ' ') + " ";
+    function handleChoice(playerChoice) {
+        if (isGameOver) return;
+        const isCorrect = (playerChoice === wasInScene);
+        endRound(isCorrect);
+    }
 
-      recallObjects.forEach(correctObj => {
-          const variants = acceptableAnswers[correctObj];
-          for (const variant of variants) {
-              if (tempUserInput.includes(" " + variant + " ")) {
-                  if (!matchedObjects.has(correctObj)) {
-                      matchedObjects.add(correctObj);
-                      tempUserInput = tempUserInput.replace(" " + variant + " ", " ");
-                  }
-              }
-          }
-      });
-      
-      const roundScore = matchedObjects.size;
-      score += roundScore;
-      roundScores.push({ round: round, score: roundScore });
+    function endRound(wasCorrect) {
+        if (isGameOver) return;
+        const roundScore = wasCorrect ? 1 : 0;
+        score += roundScore;
+        roundScores.push({ round, score: roundScore });
 
-      const correctAnswerImages = recallObjects.map(obj => `<img src="${objectLibrary[obj]}" title="${obj}">`).join("");
-      let playerAnswerImages = userAnswersProvided.map(ans => {
-        let foundKey = null;
-        for(const [key, variants] of Object.entries(acceptableAnswers)) {
-            if(variants.includes(ans)) { foundKey = key; break; }
+        let feedbackHTML = '';
+        if (wasCorrect) {
+            feedbackHTML = `<h2>Correct! Great memory! 🎉</h2>`;
+        } else {
+            feedbackHTML = `<h2>Almost! Let's get the next one.</h2>`;
         }
-        return foundKey ? `<img src="${objectLibrary[foundKey]}" title="${ans}">` 
-                      : `<img src="https://img.icons8.com/fluency/96/question-mark.png" class="unknown" title="Unknown: ${ans}">`;
-      }).join("");
-
-      let feedbackHTML;
-      if (userAnswersProvided.length === 0) {
-        feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
-        playerAnswerImages = '';
-      } else if (roundScore > 0) {
-          let scoreText = '';
-          if (roundScore === 4) scoreText = "PERFECT SCORE!";
-          else if (roundScore === 3) scoreText = "Awesome!";
-          else if (roundScore === 2) scoreText = "Great job!";
-          else if (roundScore === 1) scoreText = "Nice one!";
-          feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}! ${scoreText}</p>`;
-      } else {
-          feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
-      }
-      
-      allElements.resultContent.innerHTML = `${feedbackHTML}<div><div class="answer-label">Correct answer:</div><div class="answer-display">${correctAnswerImages}</div></div>` + 
-                            (playerAnswerImages ? `<div style="margin-top:12px;"><div class="answer-label">Your answer:</div><div class="answer-display">${playerAnswerImages}</div></div>` : '');
-      
-      allElements.result.classList.remove('celebrate');
-      if (roundScore >= 3) {
-          setTimeout(() => allElements.result.classList.add('celebrate'), 10);
-      }
-      
-      allElements.answeringOverlay.classList.add('is-faded-out');
-      allElements.resultsOverlay.classList.remove('is-faded-out');
-      if (!isGameOver) {
+        allElements.resultContent.innerHTML = feedbackHTML;
+        
+        allElements.result.classList.remove('celebrate');
+        if (wasCorrect) {
+            setTimeout(() => allElements.result.classList.add('celebrate'), 10);
+        }
+        
+        allElements.answeringPhase.classList.add('is-faded-out');
+        allElements.resultsOverlay.classList.remove('is-faded-out');
         allElements.nextBtn.classList.remove('hidden');
         
         let countdown = 3;
@@ -372,7 +304,6 @@
                 allElements.nextBtn.disabled = false;
             }
         }, 1000);
-      }
     }
     
     function showFinalSummary() {
@@ -384,15 +315,16 @@
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.finalSummary.classList.remove('hidden');
       
-      const bestRoundScore = roundScores.length > 0 ? Math.max(...roundScores.map(r => r.score)) : 0;
-      const roundDetailsHTML = roundScores.map(r => 
-        `<li>Round ${r.round}: ${r.score} point(s) ${r.score === bestRoundScore && bestRoundScore > 0 ? '⭐' : ''}</li>`
-      ).join('');
+      const totalRoundsPlayed = roundScores.length;
+      const incorrectAnswers = totalRoundsPlayed - score;
+      const accuracy = totalRoundsPlayed > 0 ? Math.round((score / totalRoundsPlayed) * 100) : 0;
 
+      // --- NEW: Scorecard Summary ---
       allElements.finalSummary.innerHTML = `
         <h2>Time's Up!</h2>
-        <p><strong>Your Round Scores:</strong></p>
-        <ul>${roundDetailsHTML}</ul>
+        <p>Correct Answers: <strong style="color: #28a745;">${score} ⭐</strong></p>
+        <p>Incorrect Answers: <strong style="color: #dc3545;">${incorrectAnswers}</strong></p>
+        <p>Accuracy: <strong>${accuracy}%</strong></p>
         <p>Great job! Thanks for playing! 🎉</p>
         <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
         <button onclick="location.reload()">Play Again</button>
