@@ -10,7 +10,7 @@
   <style>
     * { box-sizing: border-box; }
     body {
-      background-color: #f3e8ff; /* Light Lavender */
+      background-color: #f3e8ff;
       font-family: 'Fredoka One', cursive;
       color: #3d3d3d;
       text-align: center;
@@ -25,7 +25,7 @@
 
     #instructions-container { padding: 20px; max-width: 550px; margin: 20px auto; }
 
-    h1 { margin-top: 15px; font-size: 3em; color: #4b0082; /* Indigo */ text-shadow: 3px 3px 0px #ff7f50; /* Coral */ }
+    h1 { margin-top: 15px; font-size: 3em; color: #4b0082; text-shadow: 3px 3px 0px #ff7f50; }
     
     h2.welcome-title {
         display: inline-block;
@@ -45,7 +45,7 @@
     .game-area { margin: 10px auto; width: 95%; max-width: 500px; position: relative; }
 
     .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #4b0082; margin: 10px auto 15px auto; overflow: hidden; }
-    .timer-bar { height: 100%; width: 100%; background-color: #32cd32; /* Lime Green */ border-radius: 8px 0 0 8px; transition: width 1s linear; }
+    .timer-bar { height: 100%; width: 100%; background-color: #32cd32; border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
     #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; }
     
@@ -60,13 +60,13 @@
       background-color: white;
       border: 3px solid #d8bfd8;
       box-shadow: 0 6px 0 #b39db3;
-      font-size: clamp(24px, 10vw, 40px); /* Responsive emoji size */
+      font-size: clamp(24px, 10vw, 40px);
       cursor: pointer;
       transition: all 0.1s ease-out;
     }
     .item:active { transform: translateY(4px); box-shadow: 0 2px 0 #b39db3; }
 
-    .item.correct { border-color: #32cd32; background-color: #d4edda; pointer-events: none; transform: translateY(4px); box-shadow: 0 2px 0 #28a745; }
+    .item.correct { border-color: #32cd32; background-color: #d4edda; transform: translateY(4px); box-shadow: 0 2px 0 #28a745; }
     .item.incorrect { border-color: #dc3545; animation: shake 0.5s; }
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
@@ -103,6 +103,8 @@
     @keyframes fanfare-anim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
 
+    .answer-display { margin-top: 10px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+    .answer-display div { width: 50px; height: 50px; border-radius: 10px; font-size: 2em; display: flex; justify-content: center; align-items: center; background-color: white; border: 2px solid #ccc;}
     .answer-label { font-weight: 700; margin-bottom: 5px; font-size: 1em; color: #4b0082; }
     
   </style>
@@ -134,6 +136,8 @@
         </div>
         <div id="answering-phase" class="fadeable is-faded-out">
             <div class="message">Find the items you saw! (<span id="answerCountdown">60</span>s)</div>
+            <!-- --- NEW: Tally Counter --- -->
+            <div class="message" id="tallyCounter">Found: 0 / 4</div>
             <div id="choices" class="scene"></div>
         </div>
       </div>
@@ -156,7 +160,7 @@
     let viewTimer, answerTimer, mainGameTimer, nextBtnTimer;
     let isGameOver = false;
     let correctFound = 0;
-    let mistakeMade = false; // --- NEW: To track the first mistake ---
+    let totalClicks = 0;
     
     const VIEWING_TIME = 30;
     const ANSWERING_TIME = 60;
@@ -171,7 +175,8 @@
         viewingCountdown: document.getElementById('viewingCountdown'), answerCountdown: document.getElementById('answerCountdown'),
         viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
         roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
-        resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn')
+        resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn'),
+        tallyCounter: document.getElementById('tallyCounter') // Tally counter reference
     };
 
     allElements.startBtn.addEventListener('click', startGame);
@@ -262,7 +267,8 @@
         
         allElements.choices.innerHTML = '';
         correctFound = 0;
-        mistakeMade = false; // Reset mistake tracker for the new round
+        totalClicks = 0; // Reset click counter for the round
+        allElements.tallyCounter.textContent = `Found: 0 / 4`;
         
         choices.forEach(item => {
             const div = document.createElement('div');
@@ -283,36 +289,46 @@
     }
     
     function handleChoice(element, item) {
+        if (element.classList.contains('correct') || element.classList.contains('incorrect')) return;
+        
+        totalClicks++;
         if (recallObjects.includes(item)) {
             element.classList.add('correct');
-            // --- NEW: Only increment score if no mistake has been made ---
-            if (!mistakeMade) {
-                correctFound++;
-            }
-            if (document.querySelectorAll('.item.correct').length === recallObjects.length) {
-                endRound();
-            }
+            correctFound++;
+            allElements.tallyCounter.textContent = `Found: ${correctFound} / 4`;
         } else {
-            // --- NEW: A mistake locks the score ---
-            mistakeMade = true;
             element.classList.add('incorrect');
             setTimeout(() => element.classList.remove('incorrect'), 500);
+        }
+
+        if (totalClicks === 4) {
+            endRound();
         }
     }
 
     function endRound() {
         if (isGameOver) return;
         clearInterval(answerTimer);
-        const roundScore = correctFound; // The final score is what was found before any mistake
+        
+        const roundScore = correctFound;
         score += roundScore;
         roundScores.push({ round, score: roundScore });
 
-        let feedbackHTML = '';
-        if (roundScore === 4) feedbackHTML = "<h2>PERFECT SCORE!</h2>";
-        else if (roundScore > 0) feedbackHTML = `<h2>You found ${roundScore} correctly!</h2>`;
-        else feedbackHTML = `<h2>Oops! Let's try the next one!</h2>`;
-        
-        allElements.resultContent.innerHTML = `${feedbackHTML}<p>Great effort!</p>`;
+        let feedbackHTML;
+        if (roundScore > 0) {
+            let scoreText = '';
+            if (roundScore === 4) scoreText = "PERFECT SCORE!";
+            else if (roundScore === 3) scoreText = "Awesome!";
+            else if (roundScore === 2) scoreText = "Great job!";
+            else if (roundScore === 1) scoreText = "Nice one!";
+            feedbackHTML = `<p>You scored <strong>${roundScore}</strong> point${roundScore !== 1 ? "s" : ""}! ${scoreText}</p>`;
+        } else {
+            feedbackHTML = `<p><strong>Almost!</strong> Let's get the next one.</p>`;
+        }
+
+        const correctAnswersHTML = recallObjects.map(item => `<div>${item}</div>`).join('');
+
+        allElements.resultContent.innerHTML = `${feedbackHTML}<div><div class="answer-label">The correct items were:</div><div class="answer-display">${correctAnswersHTML}</div></div>`;
         
         allElements.result.classList.remove('celebrate');
         if (roundScore >= 3) {
