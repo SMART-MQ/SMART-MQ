@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
   <title>SMART memory game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,8 +20,8 @@
 
     .hidden { display: none !important; }
     
-    .fadeable { transition: opacity 0.4s ease-in-out; }
-    .is-faded-out { opacity: 0; pointer-events: none; }
+    .fadeable { transition: opacity 0.4s ease-in-out, visibility 0.4s; }
+    .is-faded-out { opacity: 0; visibility: hidden; }
 
     #instructions-container { padding: 20px; max-width: 550px; margin: 20px auto; }
 
@@ -47,14 +47,14 @@
     .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #0077b6; margin: 10px auto 15px auto; overflow: hidden; }
     .timer-bar { height: 100%; width: 100%; background-color: #f94144; border-radius: 8px 0 0 8px; transition: width 1s linear; }
 
-    #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #0077b6; margin-bottom: 15px; }
-    #answering-phase .message { margin-top: 0; }
-
+    #viewing-phase .message { font-size: 1.1em; font-weight: 700; color: #0077b6; margin-bottom: 15px; }
+    
     .scene { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
     .object { width: 100%; aspect-ratio: 1 / 1; display: flex; justify-content: center; align-items: center; border-radius: 12px; background-color: white; border: 3px solid #caf0f8; box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
     .object.highlight-border { border: 4px solid #f94144; }
     .object img { width: 85%; height: 85%; }
     
+    /* --- THE PERMANENT KEYBOARD-SCROLL FIX --- */
     .overlay {
         position: fixed;
         top: 0;
@@ -90,7 +90,7 @@
     input[type="text"] { padding: 10px; font-size: 1em; font-family: 'Balsamiq Sans', cursive; margin: 10px; border-radius: 8px; border: 2px solid #ccc; width: 80%; max-width: 300px; }
 
     #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
-    #finalSummary { margin-top: 40px; font-size: 1.2em; background: #ffffff; border: 3px solid #0077b6; border-radius: 15px; padding: 30px; }
+    #finalSummary { font-size: 1.2em; background: #ffffff; border: 3px solid #0077b6; border-radius: 15px; padding: 30px; }
     #finalSummary ul { list-style-type: none; padding: 0; margin: 20px 0; text-align: left; display: inline-block; }
     #finalSummary li { font-size: 0.9em; margin-bottom: 8px; }
     
@@ -331,7 +331,6 @@
                       : `<img src="https://img.icons8.com/fluency/96/question-mark.png" class="unknown" title="Unknown: ${ans}">`;
       }).join("");
 
-      // --- THE FINAL, SIMPLIFIED FEEDBACK LOGIC ---
       let feedbackHTML;
       if (userAnswersProvided.length === 0) {
         feedbackHTML = `<p><i>No answer submitted. Here's what was in the row.</i></p>`;
