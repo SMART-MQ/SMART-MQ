@@ -250,14 +250,15 @@
     <ul>
       <li>⭐ This is a challenge <strong>just for you.</strong></li>
       <li>🧠 The numbers will flash one by one. Try to remember them <strong>in the correct order!</strong></li>
-      <li>🏆 Try to see how high a level you can reach before the <strong>10-minute timer</strong> runs out.</li>
+      <li>🏆 Try to see how high a level you can reach before the <strong>5-minute timer</strong> runs out.</li>
     </ul>
     <button id="instructions-btn">Let's go!</button>
   </div>
 
   <div class="container hidden" id="game">
     <div class="main">
-      <div id="info-bar">Time: <span id="timer-display">10:00</span></div>
+      <!-- --- CHANGE: Timer display updated to 5 minutes --- -->
+      <div id="info-bar">Time: <span id="timer-display">05:00</span></div>
       <div class="digit-display" id="digit-display"></div>
       <div id="answer-display"></div>
       <div class="option-buttons hidden" id="option-buttons"></div>
@@ -282,14 +283,16 @@
     var correctMessages = ["Correct!", "Nice!", "Good job!", "You got it!", "Perfect!", "Excellent!", "You're on a roll!"];
     var encouragementMessages = [ "Try again!", "Let's try a different one!", "You got this!", "Almost!" ];
 
-    var currentLength = 2;
+    // --- CHANGE: Starting length is now 3 ---
+    var currentLength = 3; 
     var consecutiveCorrect = 0;
     var personalBest = 0;
     var earnedBadges = {};
     var isChecking = false;
     var isGameOver = false;
     var gameTimerInterval = null;
-    const GAME_DURATION = 600;
+    // --- CHANGE: Game duration is now 5 minutes (300 seconds) ---
+    const GAME_DURATION = 300; 
     
     var instructionsContainer = document.getElementById('instructions-container');
     var instructionsBtn = document.getElementById('instructions-btn');
@@ -344,12 +347,13 @@
       setTimeout(function() { badgePopup.classList.remove('show'); }, 3500);
     }
     
+    // --- CHANGE: Updated countdown to be more instructional ---
     function getReadyCountdown(callback) {
-      digitDisplay.textContent = 'Ready?';
+      digitDisplay.textContent = 'Remember these numbers...';
       setTimeout(function() {
         digitDisplay.textContent = ''; 
         callback();
-      }, 1200);
+      }, 1500); // Increased time slightly for readability
     }
 
     function showDigits() {
@@ -365,11 +369,15 @@
       });
     }
 
+    // --- CHANGE: Added "Your turn!" prompt ---
     function flashNextDigit(index) {
         if (isGameOver) return;
         if (index >= sequence.length) {
-            displayOptions();
-            isChecking = false;
+            digitDisplay.textContent = "Your turn!";
+            setTimeout(function() {
+                displayOptions();
+                isChecking = false;
+            }, 1000); // Wait 1 second before showing buttons
             return;
         }
         digitDisplay.textContent = sequence[index];
@@ -381,8 +389,10 @@
         }, 750);
     }
 
+    // --- CHANGE: Added line to clear "Your turn!" message ---
     function displayOptions() {
       if (isGameOver) return;
+      digitDisplay.textContent = ''; // Clear the display area
       optionButtons.innerHTML = '';
       digits.split('').forEach(function(d) {
         var btn = document.createElement('button');
@@ -451,7 +461,8 @@
         updateStreakVisual();
         var randomIndex = Math.floor(Math.random() * encouragementMessages.length);
         message.textContent = encouragementMessages[randomIndex];
-        currentLength = Math.max(2, currentLength - 1);
+        // --- CHANGE: Ensure level doesn't drop below the start of 3 ---
+        currentLength = Math.max(3, currentLength - 1);
       }
       setTimeout(moveToNextTurn, delayForNextTurn);
     }
@@ -506,7 +517,8 @@
     
     function startGame() {
       isGameOver = false;
-      currentLength = 2;
+      // --- CHANGE: Starting length is 3 ---
+      currentLength = 3;
       consecutiveCorrect = 0;
       personalBest = 0;
       earnedBadges = {};
