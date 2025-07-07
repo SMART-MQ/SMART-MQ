@@ -55,36 +55,61 @@
   .active { display: flex; animation: zoomIn 0.4s ease-out; }
   .hidden { display: none !important; }
 
-  h1 { font-size: 3.2em; color: var(--primary-blue); margin-bottom: 0; margin-top: 10px; }
-  h2 { font-size: 2.5em; color: var(--primary-blue); }
-  .welcome-subtitle { font-size: 1.5em; color: var(--text-color); margin-bottom: 10px; }
+  /* --- Start Screen Redesign --- */
+  .start-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* Adds space between elements */
+  }
+  
+  h1 {
+    /* Responsive font size: Stays on one line on mobile */
+    font-size: clamp(2.2em, 10vw, 3.2em);
+    color: var(--primary-blue);
+    margin: 0;
+  }
+
+  h2 { font-size: 2.5em; color: var(--primary-blue); margin: 0; }
+  .welcome-subtitle { font-size: 1.5em; color: var(--text-color); margin-bottom: 0; }
+  
+  .instructions-box {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 15px;
+    padding: 15px 25px;
+    margin-top: 10px;
+    max-width: 450px;
+    width: 90%;
+  }
+
+  .instructions-box p {
+    font-size: 1.2em;
+    margin: 0;
+    color: var(--primary-blue);
+  }
+
+  .how-to-play {
+    text-align: left;
+    margin-top: 10px;
+    font-size: 1.1em;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  /* End Start Screen Redesign */
 
   p { font-size: 1.2em; max-width: 550px; line-height: 1.5; }
 
   .play-button {
-    background-color: var(--accent-orange);
-    border: none;
-    color: var(--text-color);
-    padding: 15px 40px;
-    margin-top: 20px;
-    font-size: 1.5em;
-    font-family: 'Fredoka One', cursive;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 5px 0 var(--accent-orange-dark);
-    text-transform: uppercase;
-    font-weight: 600;
+    background-color: var(--accent-orange); border: none; color: var(--text-color);
+    padding: 15px 40px; margin-top: 20px; font-size: 1.5em; font-family: 'Fredoka One', cursive;
+    border-radius: 50px; cursor: pointer; transition: all 0.2s ease;
+    box-shadow: 0 5px 0 var(--accent-orange-dark); text-transform: uppercase; font-weight: 600;
   }
   .play-button:hover:not(:disabled) {
-    background-color: #ffd54f;
-    transform: translateY(-2px);
-    box-shadow: 0 7px 0 var(--accent-orange-dark);
+    background-color: #ffd54f; transform: translateY(-2px); box-shadow: 0 7px 0 var(--accent-orange-dark);
   }
-  .play-button:active:not(:disabled) {
-    transform: translateY(2px);
-    box-shadow: 0 3px 0 var(--accent-orange-dark);
-  }
+  .play-button:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 3px 0 var(--accent-orange-dark); }
 
   .game-container { width: 100%; max-width: 480px; }
   .timer-bar-container { width: 100%; height: 20px; background-color: #b0bec5; border-radius: 20px; border: 3px solid var(--white); margin: 0 auto 20px auto; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -104,47 +129,28 @@
   .final-summary { font-size: 1.2em; background: var(--white); border: 3px solid var(--primary-blue); border-radius: 15px; padding: 20px 30px; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
   .final-score { font-size: 1.8em; color: var(--accent-orange); font-weight: 600; }
 
-  /* --- INSTRUCTIONS / PAUSE OVERLAY --- */
   .help-button {
-    position: fixed;
-    bottom: 15px;
-    left: 15px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    font-size: 1.8em;
-    font-family: 'Fredoka One', cursive;
-    background-color: var(--primary-blue);
-    color: var(--white);
-    border: 3px solid var(--white);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    z-index: 1000;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    line-height: 1;
-  }
-  .overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.6);
-    display: flex; justify-content: center; align-items: center;
-    z-index: 2000;
-    padding: 15px;
-  }
-  .overlay-content {
-    background-color: var(--card-back-color);
-    padding: 20px 30px;
-    border-radius: 20px;
-    border: 3px solid var(--primary-blue);
-    width: 100%;
-    max-width: 500px;
-  }
+    position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px; border-radius: 50%;
+    font-size: 1.8em; font-family: 'Fredoka One', cursive; background-color: var(--primary-blue); color: var(--white);
+    border: 3px solid var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0. font-size: 3rem; }
+  .card-front::before { content: '⭐'; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+  .card-back { background-color: var(--card-back-color); color: var(--text-color); transform: rotateY(180deg); font-size: 2.8rem; }
+  .card.shake { animation: shake 0.5s; }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+  .countdown { font-size: 8rem; color: var(--primary-blue); opacity: 0; transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; transform: scale(0.5); }
+  .fade-in { opacity: 1 !important; transform: scale(1); }
+  .final-summary { font-size: 1.2em; background: var(--white); border: 3px solid var(--primary-blue); border-radius: 15px; padding: 20px 30px; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+  .final-score { font-size: 1.8em; color: var(--accent-orange); font-weight: 600; }
+
+  .help-button { position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px; border-radius: 50%; font-size: 1.8em; font-family: 'Fredoka One', cursive; background-color: var(--primary-blue); color: var(--white); border: 3px solid var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; display: flex; justify-content: center; align-items: center; line-height: 1; }
+  .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 15px; }
+  .overlay-content { background-color: var(--card-back-color); padding: 20px 30px; border-radius: 20px; border: 3px solid var(--primary-blue); width: 100%; max-width: 500px; }
   .overlay-content h2 { margin-top: 0; }
 
+  /* MODIFICATION: Reduced font size for mobile to keep title on one line */
   @media (max-width: 600px) {
-    h1 { font-size: 2.5em; }
-    p { font-size: 1em; }
+    h1 { font-size: 2.4em; }
+    p, .instructions-list li { font-size: 1em; }
     .play-button { font-size: 1.2em; }
     .card-back { font-size: 2rem; }
     .countdown { font-size: 6rem; }
@@ -157,7 +163,11 @@
   <div class="screen active" id="startScreen">
     <h2 class="welcome-subtitle">Welcome to the SMART Challenge!</h2>
     <h1>Emoji Match-Up</h1>
-    <p>This is a game just for you. Your goal is to match the emoji pairs to clear the board. Try and complete as many rounds as you can before the timer runs out!</p>
+    <ul class="instructions-list">
+      <li>This is a challenge just for you.</li>
+      <li>Match all the emoji pairs to clear the board.</li>
+      <li>Complete as many rounds as you can!</li>
+    </ul>
     <button class="play-button" onclick="startCountdown()">Start Game</button>
   </div>
 
@@ -178,7 +188,8 @@
 
   <!-- ROUND COMPLETE -->
   <div class="screen" id="roundEndScreen">
-    <h2>Round Cleared!</h2>
+    <!-- MODIFICATION: More encouraging message -->
+    <h2>Awesome! 🎉</h2>
     <p id="roundResultText"></p>
     <button class="play-button" id="nextRoundBtn" onclick="startNextRound()">Next Round</button>
   </div>
@@ -244,7 +255,6 @@
 
     function startCountdown() {
       switchScreen(startScreen, countdownScreen);
-      // Reset game state for a new game
       timeRemaining = totalGameTime;
       roundsCompleted = 0;
       roundNumber = 1;
@@ -295,7 +305,7 @@
 
     function resumeGame() {
       helpOverlay.classList.add('hidden');
-      startGameTimer(); // This will resume the timer
+      startGameTimer();
     }
 
     function updateTimerDisplay() {
@@ -372,7 +382,7 @@
     }
 
     function endGame() {
-      helpButton.classList.add('hidden'); // Hide help button on final screen
+      helpButton.classList.add('hidden');
       finalResults.innerHTML = `Check out your scores below!<br><span class="final-score">${roundsCompleted} Rounds Completed!</span>`;
       switchScreen(gameScreen, finalScreen);
       window.parent.postMessage("showNext", "*");
