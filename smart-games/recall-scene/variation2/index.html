@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
   <style>
-    /* CSS is identical to the previous version, no changes needed */
     * { box-sizing: border-box; }
     body { background-color: #f3e8ff; font-family: 'Fredoka One', cursive; color: #3d3d3d; text-align: center; margin: 0; padding: 10px 5px; }
     .hidden { display: none !important; }
@@ -23,40 +22,67 @@
     .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #4b0082; margin: 10px auto 15px auto; overflow: hidden; }
     .timer-bar { height: 100%; width: 100%; background-color: #32cd32; border-radius: 8px 0 0 8px; transition: width 1s linear; }
     #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; }
-    .scene { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-    #scene { grid-template-columns: repeat(4, 1fr); }
-    .item { width: 100%; aspect-ratio: 1 / 1; display: flex; justify-content: center; align-items: center; border-radius: 15px; background-color: white; border: 3px solid #d8bfd8; box-shadow: 0 6px 0 #b39db3; font-size: clamp(24px, 10vw, 36px); cursor: pointer; transition: all 0.1s ease-out; }
-    .item:active { transform: translateY(4px); box-shadow: 0 2px 0 #b39db3; }
-    .item.correct { border-color: #32cd32; background-color: #d4edda; pointer-events: none; transform: translateY(4px); box-shadow: 0 2px 0 #28a745; }
+    
+    /* CHANGE: Updated .scene CSS for responsive wrapping and smaller items */
+    .scene {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+      gap: 5px;
+      align-items: center;
+    }
+    
+    /* CHANGE: Smaller items and font size */
+    .item {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 12px;
+      background-color: white;
+      border: 2px solid #d8bfd8;
+      box-shadow: 0 4px 0 #b39db3;
+      font-size: clamp(20px, 8vw, 32px);
+      cursor: pointer;
+      transition: all 0.1s ease-out;
+    }
+    .item:active { transform: translateY(2px); box-shadow: 0 2px 0 #b39db3; }
+    .item.correct { border-color: #32cd32; background-color: #d4edda; pointer-events: none; transform: translateY(2px); box-shadow: 0 2px 0 #28a745; }
     .item.incorrect { border-color: #dc3545; animation: shake 0.5s; }
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+    
     .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 15px; }
     .overlay-content { background-color: #e6e6fa; padding: 20px; border-radius: 15px; border: 3px solid #4b0082; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    
     button { background-color: #ff7f50; border: none; color: white; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Fredoka One', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e06c3a; text-transform: uppercase; }
     button:hover:not(:disabled) { background-color: #ff9066; transform: translateY(-2px); box-shadow: 0 7px 0 #e06c3a; }
     button:disabled { background-color: #cccccc; color: #888888; box-shadow: 0 5px 0 #aaaaaa; cursor: not-allowed; }
+    
+    /* CHANGE: Added CSS for new elements */
+    .help-button { position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px; border-radius: 50%; font-size: 1.8em; z-index: 2000; padding: 0; line-height: 1; }
+    #best-score { font-size: 1.8em; color: #4b0082; margin: 20px 0; }
+    
     #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
     #finalSummary { font-size: 1.2em; background: #ffffff; border: 3px solid #4b0082; border-radius: 15px; padding: 30px; }
-    #finalSummary ul { list-style-type: none; padding: 0; margin: 20px 0; text-align: left; display: inline-block; }
-    #finalSummary li { font-size: 0.9em; margin-bottom: 8px; }
+    #finalSummary p { margin: 12px 0; }
     #result p { margin: 8px 0; }
     @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .celebrate { animation: celebrate 0.5s ease-in-out; }
     #round-fanfare { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(75, 0, 130, 0.9); color: white; padding: 20px 40px; border-radius: 20px; font-size: 3em; font-weight: 700; z-index: 9999; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
     @keyframes fanfare-anim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
-    .answer-label { font-weight: 700; margin-bottom: 5px; font-size: 1em; color: #4b0082; }
   </style>
 </head>
 <body>
 
   <div id="instructions-container">
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
-    <h1>Spot The New Item Game</h1>
+    <h1>Spot The New Item</h1>
     <ul class="instructions-list">
         <li>⭐ This is a challenge <strong>just for you.</strong></li>
         <li>🧠 Memorise the items you see.</li>
-        <li>🤔 Then, spot the <strong>new item</strong> that's been added to the mix!</li>
+        <!-- CHANGE: Wording changed from "spot" to "press" -->
+        <li>🤔 Then, <strong>press</strong> the <strong>new item</strong> that's been added to the mix!</li>
         <li>🏆 Score as many points as you can before time runs out!</li>
     </ul>
     <button id="startBtn">Let's Play!</button>
@@ -74,7 +100,8 @@
             <button id="readyBtn">I've Memorised It!</button>
         </div>
         <div id="answering-phase" class="fadeable is-faded-out">
-            <div class="message">Click the <strong>one new item</strong>! (<span id="answerCountdown">60</span>s)</div>
+            <!-- CHANGE: Wording changed from "Click" to "Press" -->
+            <div class="message"><strong>Press</strong> the <strong>one new item</strong>! (<span id="answerCountdown">60</span>s)</div>
             <div id="choices" class="scene"></div>
         </div>
       </div>
@@ -89,23 +116,39 @@
   
   <div id="round-fanfare" class="hidden"></div>
   <div id="finalSummary" class="hidden"></div>
+  
+  <!-- CHANGE: Added Help Button and Help Overlay -->
+  <button id="helpBtn" class="help-button hidden">?</button>
+  <div id="help-overlay" class="overlay fadeable is-faded-out">
+      <div class="overlay-content">
+          <h2 class="welcome-title">How to Play</h2>
+          <ul class="instructions-list">
+              <li>⭐ This is a challenge <strong>just for you.</strong></li>
+              <li>🧠 Memorise the items you see.</li>
+              <li>🤔 Then, <strong>press</strong> the <strong>new item</strong> that's been added to the mix!</li>
+              <li>🏆 Score as many points as you can before time runs out!</li>
+          </ul>
+          <button id="closeHelpBtn">Close</button>
+      </div>
+  </div>
 
   <script>
-    const allItems = ['🍎','🐶','🧸','🎈','📚','🚲','🎮','🧃','🎩','🖍️','🧼','🎵', '⭐', '🚗', '🏠', '🌳'];
+    // CHANGE: Added more items for higher levels
+    const allItems = ['🍎','🐶','🧸','🎈','📚','🚲','🎮','🧃','🎩','🖍️','🧼','🎵', '⭐', '🚗', '🏠', '🌳', '🧩', '🚀', '🤖', '👑'];
     let recallObjects = [], roundScores = [];
     let round = 0, score = 0;
     let viewTimer, answerTimer, mainGameTimer, nextBtnTimer;
-    let isGameOver = false;
+    let isGameOver = false, isPaused = false; // CHANGE: Added isPaused flag
     let newItem = '';
-    
-    // --- NEW: Dynamic Difficulty Variables ---
+    let mainTimeLeft; // CHANGE: Made global for pausing
+
     let currentLevel = 1;
     let correctStreak = 0;
-    const MAX_LEVEL = 4;
+    const MAX_LEVEL = 12; // CHANGE: Increased max level
 
     const VIEWING_TIME = 30;
     const ANSWERING_TIME = 60;
-    const TOTAL_GAME_TIME = 600;
+    const TOTAL_GAME_TIME = 300; // CHANGE: Reduced to 5 minutes
 
     const allElements = {
         instructions: document.getElementById('instructions-container'), game: document.getElementById('game-container'),
@@ -116,12 +159,19 @@
         viewingCountdown: document.getElementById('viewingCountdown'), answerCountdown: document.getElementById('answerCountdown'),
         viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
         roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
-        resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn')
+        resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn'),
+        // CHANGE: Added help elements
+        helpBtn: document.getElementById('helpBtn'),
+        helpOverlay: document.getElementById('help-overlay'),
+        closeHelpBtn: document.getElementById('closeHelpBtn')
     };
 
     allElements.startBtn.addEventListener('click', startGame);
     allElements.nextBtn.addEventListener('click', nextRound);
     allElements.readyBtn.addEventListener('click', showAnsweringPhase);
+    // CHANGE: Added help event listeners
+    allElements.helpBtn.addEventListener('click', pauseGame);
+    allElements.closeHelpBtn.addEventListener('click', resumeGame);
 
     function resetAllTimers() {
       clearInterval(viewTimer);
@@ -129,16 +179,41 @@
       clearInterval(mainGameTimer);
       clearInterval(nextBtnTimer);
     }
+
+    // CHANGE: New pause and resume functions
+    function pauseGame() {
+        if (isGameOver) return;
+        isPaused = true;
+        clearInterval(mainGameTimer);
+        allElements.helpOverlay.classList.remove('is-faded-out');
+        allElements.helpBtn.disabled = true;
+    }
+
+    function resumeGame() {
+        if (isGameOver || !isPaused) return;
+        isPaused = false;
+        allElements.helpOverlay.classList.add('is-faded-out');
+        allElements.helpBtn.disabled = false;
+        
+        mainGameTimer = setInterval(() => {
+            if (isPaused) return; 
+            mainTimeLeft--;
+            allElements.mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
+            if (mainTimeLeft <= 0 && !isGameOver) { showFinalSummary(); }
+        }, 1000);
+    }
     
     function startGame() {
       allElements.instructions.classList.add('hidden');
       allElements.game.classList.remove('hidden');
-      isGameOver = false; score = 0; round = 0; roundScores = [];
-      currentLevel = 1; correctStreak = 0; // Reset difficulty
+      allElements.helpBtn.classList.remove('hidden'); // CHANGE: Show help button
+      isGameOver = false; isPaused = false; score = 0; round = 0; roundScores = [];
+      currentLevel = 1; correctStreak = 0;
       allElements.finalSummary.classList.add('hidden');
       
-      let mainTimeLeft = TOTAL_GAME_TIME;
+      mainTimeLeft = TOTAL_GAME_TIME;
       mainGameTimer = setInterval(() => {
+          if (isPaused) return; // CHANGE: Check for pause
           mainTimeLeft--;
           allElements.mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
           if (mainTimeLeft <= 0 && !isGameOver) { showFinalSummary(); }
@@ -177,6 +252,7 @@
           allElements.viewingCountdown.textContent = timeLeft;
           viewTimer = setInterval(() => {
               if(isGameOver) { clearInterval(viewTimer); return; }
+              if(isPaused) return; // CHANGE: Check for pause
               timeLeft--;
               allElements.viewingCountdown.textContent = timeLeft;
               if (timeLeft <= 0) { showAnsweringPhase(); }
@@ -185,14 +261,13 @@
     }
     
     function buildScene() {
-      // --- NEW: Difficulty is based on currentLevel ---
-      const itemsToMemorise = 2 + currentLevel; // Level 1 = 3 items, Level 2 = 4, etc.
+      const itemsToMemorise = 2 + currentLevel;
       
       const shuffled = [...allItems].sort(() => 0.5 - Math.random());
       recallObjects = shuffled.slice(0, itemsToMemorise);
       
       allElements.scene.innerHTML = '';
-      allElements.scene.style.gridTemplateColumns = `repeat(${itemsToMemorise}, 1fr)`;
+      // CHANGE: Removed line setting grid-template-columns. CSS handles this now.
 
       recallObjects.forEach(item => {
         const div = document.createElement('div');
@@ -213,7 +288,7 @@
         const choices = [...recallObjects, newItem].sort(() => 0.5 - Math.random());
         
         allElements.choices.innerHTML = '';
-        allElements.choices.style.gridTemplateColumns = `repeat(${choices.length}, 1fr)`;
+        // CHANGE: Removed line setting grid-template-columns. CSS handles this now.
         
         choices.forEach(item => {
             const div = document.createElement('div');
@@ -227,6 +302,7 @@
         allElements.answerCountdown.textContent = timeLeft;
         answerTimer = setInterval(() => {
             if(isGameOver) { clearInterval(answerTimer); return; }
+            if(isPaused) return; // CHANGE: Check for pause
             timeLeft--;
             allElements.answerCountdown.textContent = timeLeft;
             if (timeLeft <= 0) { endRound(false); }
@@ -238,11 +314,7 @@
         clearInterval(answerTimer);
         const isCorrect = (item === newItem);
         
-        if (isCorrect) {
-            element.classList.add('correct');
-        } else {
-            element.classList.add('incorrect');
-        }
+        element.classList.add(isCorrect ? 'correct' : 'incorrect');
         
         const choiceElements = allElements.choices.children;
         for(const el of choiceElements) {
@@ -258,14 +330,13 @@
         
         const roundScore = wasCorrect ? 1 : 0;
         score += roundScore;
-        roundScores.push({ round, score: roundScore, level: currentLevel });
+        // CHANGE: Store number of items for this round to calculate best score
+        roundScores.push({ round, score: roundScore, level: currentLevel, items: 2 + currentLevel });
 
         let feedbackHTML = '';
-        
-        // --- NEW: Dynamic Difficulty Adjustment ---
         if (wasCorrect) {
             correctStreak++;
-            feedbackHTML = `<p>Correct! You spotted the new item!</p>`;
+            feedbackHTML = `<h2>Correct! Great job! 🎉</h2>`;
             if (correctStreak >= 2 && currentLevel < MAX_LEVEL) {
                 currentLevel++;
                 correctStreak = 0;
@@ -273,14 +344,13 @@
             }
         } else {
             correctStreak = 0;
-            feedbackHTML = `<p>Almost! The new item was ${newItem}.</p>`;
+            feedbackHTML = `<h2>Almost! The new item was ${newItem}.</h2>`;
             if (currentLevel > 1) {
                 currentLevel--;
             }
         }
         
         allElements.resultContent.innerHTML = feedbackHTML;
-        
         allElements.result.classList.remove('celebrate');
         if (wasCorrect) {
             setTimeout(() => allElements.result.classList.add('celebrate'), 10);
@@ -295,6 +365,7 @@
         allElements.nextBtn.disabled = true;
         clearInterval(nextBtnTimer);
         nextBtnTimer = setInterval(() => {
+            if (isPaused) return; // CHANGE: Check for pause
             countdown--;
             allElements.nextBtn.textContent = `Next Round in ${countdown}`;
             if (countdown <= 0) {
@@ -313,20 +384,20 @@
       allElements.game.classList.add('hidden');
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.finalSummary.classList.remove('hidden');
+      allElements.helpBtn.classList.add('hidden'); // CHANGE: Hide help button
       
-      const bestRoundScore = 1;
-      const roundDetailsHTML = roundScores.map(r => 
-        `<li>Round ${r.round}: ${r.score} point(s) ${r.score === bestRoundScore ? '⭐' : ''}</li>`
-      ).join('');
-
+      // CHANGE: Calculate the new "best score" metric
+      let maxItemsMemorized = 0;
+      const correctRounds = roundScores.filter(r => r.score === 1);
+      if (correctRounds.length > 0) {
+        maxItemsMemorized = Math.max(...correctRounds.map(r => r.items));
+      }
+      
+      // CHANGE: Updated the final summary to be simple and direct
       allElements.finalSummary.innerHTML = `
-        <h2>Time's Up!</h2>
-        <p>Your final score: <strong>${score}</strong></p>
-        <p>You completed <strong>${round}</strong> rounds!</p>
-        <p><strong>Your Round Scores:</strong></p>
-        <ul>${roundDetailsHTML}</ul>
-        <p>Great job! Thanks for playing! 🎉</p>
-        <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
+        <h2>Good Job!</h2>
+        <p id="best-score">Your best score:<br><strong>${maxItemsMemorized} items!</strong> ⭐</p>
+        <p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>
         <button onclick="location.reload()">Play Again</button>
       `;
 
