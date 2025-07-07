@@ -98,7 +98,7 @@
         <li>⭐ This is a challenge <strong>just for you.</strong></li>
         <li>🧠 Memorise the items you see.</li>
         <!-- CHANGE: Wording changed to "press" -->
-        <li>🔍 Then, <strong>press</strong> them in the big mix-up!</li>
+        <li>🔍 Then, <strong>find</strong> them in the big mix-up!</li>
         <li>🏆 Score as many points as you can before time runs out!</li>
     </ul>
     <button id="startBtn">Let's Play!</button>
@@ -117,7 +117,7 @@
         </div>
         <div id="answering-phase" class="fadeable is-faded-out">
             <!-- CHANGE: Wording changed to "press" -->
-            <div class="message"><strong>Press</strong> the items you saw! (<span id="answerCountdown">60</span>s)</div>
+            <div class="message"><strong>Find</strong> the items you saw! (<span id="answerCountdown">60</span>s)</div>
             <div class="message" id="tallyCounter">Found: 0 / 4</div>
             <div id="choices" class="scene"></div>
         </div>
@@ -360,9 +360,9 @@
 
         let feedbackHTML;
         if (roundScore === 4) {
-            feedbackHTML = `<p>PERFECT SCORE! You pressed all 4 in just 4 clicks!</p>`;
+            feedbackHTML = `<p>PERFECT SCORE! You found all 4 in just 4 clicks!</p>`;
         } else if (roundScore > 0) {
-            feedbackHTML = `<p>Great job! You pressed them all in ${totalClicks} clicks.</p><p>Your score is <strong>${roundScore}</strong> points.</p>`;
+            feedbackHTML = `<p>Great job! You found them all in ${totalClicks} clicks.</p><p>Your score is <strong>${roundScore}</strong> points.</p>`;
         } else {
             feedbackHTML = `<p>That was a tricky one! Let's get the next one.</p>`;
         }
