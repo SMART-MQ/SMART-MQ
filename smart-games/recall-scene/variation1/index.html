@@ -49,7 +49,14 @@
 
     #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; }
     
-    .scene { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; align-items: center; }
+    /* CHANGE: Updated .scene CSS for responsive wrapping */
+    .scene {
+      display: grid;
+      /* This allows items to wrap to the next line on smaller screens */
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 10px;
+      align-items: center;
+    }
     
     .item {
       width: 100%;
@@ -87,6 +94,20 @@
     button:hover:not(:disabled) { background-color: #ff9066; transform: translateY(-2px); box-shadow: 0 7px 0 #e06c3a; }
     button:disabled { background-color: #cccccc; color: #888888; box-shadow: 0 5px 0 #aaaaaa; cursor: not-allowed; }
     
+    /* CHANGE: Added CSS for the new help button */
+    .help-button {
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      font-size: 1.8em;
+      z-index: 2000;
+      padding: 0;
+      line-height: 1;
+    }
+
     #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
     #finalSummary { font-size: 1.2em; background: #ffffff; border: 3px solid #4b0082; border-radius: 15px; padding: 30px; }
     #finalSummary p { margin: 12px 0; }
@@ -110,7 +131,8 @@
     <ul class="instructions-list">
         <li>⭐ This is a challenge <strong>just for you.</strong></li>
         <li>🧠 Memorise the items you see.</li>
-        <li>🤔 Then, choose which of the two items was in the original scene!</li>
+        <!-- CHANGE: Wording changed from "choose" to "press" -->
+        <li>🤔 Then, <strong>press</strong> the item that was in the original scene!</li>
         <li>🏆 Score as many points as you can before time runs out!</li>
     </ul>
     <button id="startBtn">Let's Play!</button>
@@ -144,20 +166,36 @@
   <div id="round-fanfare" class="hidden"></div>
   <div id="finalSummary" class="hidden"></div>
 
+  <!-- CHANGE: Added Help Button and Help Overlay -->
+  <button id="helpBtn" class="help-button hidden">?</button>
+  <div id="help-overlay" class="overlay fadeable is-faded-out">
+      <div class="overlay-content">
+          <h2 class="welcome-title">How to Play</h2>
+          <ul class="instructions-list">
+              <li>⭐ This is a challenge <strong>just for you.</strong></li>
+              <li>🧠 Memorise the items you see.</li>
+              <li>🤔 Then, <strong>press</strong> the item that was in the original scene!</li>
+              <li>🏆 Score as many points as you can before time runs out!</li>
+          </ul>
+          <button id="closeHelpBtn">Close</button>
+      </div>
+  </div>
+
   <script>
     const allItems = ['🍎','🐶','🧸','🎈','📚','🚲','🎮','🧃','🎩','🖍️','🧼','🎵', '⭐', '🚗', '🏠', '🌳'];
     let recallObjects = [], roundScores = [];
     let round = 0, score = 0;
     let viewTimer, mainGameTimer, nextBtnTimer;
-    let isGameOver = false;
+    let isGameOver = false, isPaused = false; // CHANGE: Added isPaused flag
     let correctChoice = '';
+    let mainTimeLeft; // CHANGE: Made this global for pause/resume functionality
     
     let currentLevel = 1;
     let correctStreak = 0;
-    const MAX_LEVEL = 4;
+    const MAX_LEVEL = 8; // CHANGE: Increased max level from 4 to 8
     
     const VIEWING_TIME = 30;
-    const TOTAL_GAME_TIME = 600;
+    const TOTAL_GAME_TIME = 300; // CHANGE: Timer changed from 600s (10 min) to 300s (5 min)
 
     const allElements = {
         instructions: document.getElementById('instructions-container'), game: document.getElementById('game-container'),
@@ -168,12 +206,19 @@
         viewingCountdown: document.getElementById('viewingCountdown'),
         viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
         roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
-        resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn')
+        resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn'),
+        // CHANGE: Added new elements for help functionality
+        helpBtn: document.getElementById('helpBtn'),
+        helpOverlay: document.getElementById('help-overlay'),
+        closeHelpBtn: document.getElementById('closeHelpBtn')
     };
 
     allElements.startBtn.addEventListener('click', startGame);
     allElements.nextBtn.addEventListener('click', nextRound);
     allElements.readyBtn.addEventListener('click', showAnsweringPhase);
+    // CHANGE: Added event listeners for help functionality
+    allElements.helpBtn.addEventListener('click', pauseGame);
+    allElements.closeHelpBtn.addEventListener('click', resumeGame);
 
     function resetAllTimers() {
       clearInterval(viewTimer);
@@ -181,15 +226,41 @@
       clearInterval(nextBtnTimer);
     }
     
+    // CHANGE: New functions to pause and resume the game
+    function pauseGame() {
+        if (isGameOver) return;
+        isPaused = true;
+        clearInterval(mainGameTimer); // Pausing the main timer is most important
+        allElements.helpOverlay.classList.remove('is-faded-out');
+        allElements.helpBtn.disabled = true;
+    }
+
+    function resumeGame() {
+        if (isGameOver || !isPaused) return;
+        isPaused = false;
+        allElements.helpOverlay.classList.add('is-faded-out');
+        allElements.helpBtn.disabled = false;
+        
+        // Resume the main timer from where it left off
+        mainGameTimer = setInterval(() => {
+            if (isPaused) return; 
+            mainTimeLeft--;
+            allElements.mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
+            if (mainTimeLeft <= 0 && !isGameOver) { showFinalSummary(); }
+        }, 1000);
+    }
+
     function startGame() {
       allElements.instructions.classList.add('hidden');
       allElements.game.classList.remove('hidden');
-      isGameOver = false; score = 0; round = 0; roundScores = [];
+      allElements.helpBtn.classList.remove('hidden'); // CHANGE: Show the help button
+      isGameOver = false; isPaused = false; score = 0; round = 0; roundScores = [];
       currentLevel = 1; correctStreak = 0;
       allElements.finalSummary.classList.add('hidden');
       
-      let mainTimeLeft = TOTAL_GAME_TIME;
+      mainTimeLeft = TOTAL_GAME_TIME; // CHANGE: Initialize global timer variable
       mainGameTimer = setInterval(() => {
+          if (isPaused) return; // CHANGE: Don't count down if paused
           mainTimeLeft--;
           allElements.mainTimerBar.style.width = (mainTimeLeft / TOTAL_GAME_TIME) * 100 + '%';
           if (mainTimeLeft <= 0 && !isGameOver) { showFinalSummary(); }
@@ -228,6 +299,7 @@
           allElements.viewingCountdown.textContent = timeLeft;
           viewTimer = setInterval(() => {
               if(isGameOver) { clearInterval(viewTimer); return; }
+              if(isPaused) return; // CHANGE: Pause view timer
               timeLeft--;
               allElements.viewingCountdown.textContent = timeLeft;
               if (timeLeft <= 0) { showAnsweringPhase(); }
@@ -241,7 +313,7 @@
       recallObjects = shuffled.slice(0, itemsToMemorise);
       
       allElements.scene.innerHTML = '';
-      allElements.scene.style.gridTemplateColumns = `repeat(${itemsToMemorise}, 1fr)`;
+      // CHANGE: The line that set grid-template-columns in JS was REMOVED. CSS now handles responsiveness.
 
       recallObjects.forEach(item => {
         const div = document.createElement('div');
@@ -332,6 +404,7 @@
         allElements.nextBtn.disabled = true;
         clearInterval(nextBtnTimer);
         nextBtnTimer = setInterval(() => {
+            if (isPaused) return; // CHANGE: Pause next round countdown
             countdown--;
             allElements.nextBtn.textContent = `Next Round in ${countdown}`;
             if (countdown <= 0) {
@@ -350,18 +423,19 @@
       allElements.game.classList.add('hidden');
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.finalSummary.classList.remove('hidden');
+      allElements.helpBtn.classList.add('hidden'); // CHANGE: Hide the help button on final screen
       
       const totalRoundsPlayed = roundScores.length;
       const incorrectAnswers = totalRoundsPlayed - score;
       const accuracy = totalRoundsPlayed > 0 ? Math.round((score / totalRoundsPlayed) * 100) : 0;
 
+      // CHANGE: Updated the final summary text
       allElements.finalSummary.innerHTML = `
-        <h2>Time's Up!</h2>
+        <h2>Good job - Check out your scores below!</h2>
         <p>Correct Answers: <strong style="color: #28a745;">${score} ⭐</strong></p>
         <p>Incorrect Answers: <strong style="color: #dc3545;">${incorrectAnswers}</strong></p>
         <p>Accuracy: <strong>${accuracy}%</strong></p>
-        <p>Great job! Thanks for playing! 🎉</p>
-        <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
+        <p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>
         <button onclick="location.reload()">Play Again</button>
       `;
 
