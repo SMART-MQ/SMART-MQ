@@ -140,7 +140,6 @@
       digitDisplay.textContent = 'Remember these numbers...';
       setTimeout(function() {
         digitDisplay.textContent = '';
-        digitDisplay.classList.remove('digit-display-instruction');
         callback(); 
       }, 1500); 
     }
@@ -153,6 +152,7 @@
       optionButtons.classList.add('hidden');
       message.textContent = '';
       getReadyCountdown(function() {
+        digitDisplay.classList.remove('digit-display-instruction');
         digitDisplay.textContent = sequence;
         var baseDuration = 500; 
         var incrementPerDigit = 250;
