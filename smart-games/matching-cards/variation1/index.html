@@ -55,7 +55,7 @@
   .active { display: flex; animation: zoomIn 0.4s ease-out; }
   .hidden { display: none !important; }
 
-  /* --- Start Screen Redesign --- */
+  /* --- MODIFICATION: Start Screen Redesign for Alignment & Clarity --- */
   .start-content {
     display: flex;
     flex-direction: column;
@@ -64,7 +64,6 @@
   }
   
   h1 {
-    /* Responsive font size: Stays on one line on mobile */
     font-size: clamp(2.2em, 10vw, 3.2em);
     color: var(--primary-blue);
     margin: 0;
@@ -72,31 +71,34 @@
 
   h2 { font-size: 2.5em; color: var(--primary-blue); margin: 0; }
   .welcome-subtitle { font-size: 1.5em; color: var(--text-color); margin-bottom: 0; }
-  
-  .instructions-box {
-    background: rgba(255, 255, 255, 0.7);
+
+  .instructions-card {
+    background: rgba(255, 255, 255, 0.75);
     border-radius: 15px;
-    padding: 15px 25px;
+    padding: 20px;
     margin-top: 10px;
     max-width: 450px;
-    width: 90%;
+    width: 95%;
+    border: 2px solid rgba(255,255,255,0.9);
   }
 
-  .instructions-box p {
-    font-size: 1.2em;
-    margin: 0;
-    color: var(--primary-blue);
-  }
-
-  .how-to-play {
-    text-align: left;
-    margin-top: 10px;
-    font-size: 1.1em;
+  .instruction-item {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    align-items: center;
+    text-align: left;
+    font-size: 1.1em;
+    line-height: 1.4;
   }
-  /* End Start Screen Redesign */
+  .instruction-item + .instruction-item {
+      margin-top: 12px; /* Space between instruction lines */
+  }
+
+  .instruction-icon {
+      font-size: 1.5em;
+      margin-right: 15px;
+      width: 30px; /* Ensures text aligns even with different icon widths */
+  }
+  /* --- End Start Screen Redesign --- */
 
   p { font-size: 1.2em; max-width: 550px; line-height: 1.5; }
 
@@ -106,9 +108,7 @@
     border-radius: 50px; cursor: pointer; transition: all 0.2s ease;
     box-shadow: 0 5px 0 var(--accent-orange-dark); text-transform: uppercase; font-weight: 600;
   }
-  .play-button:hover:not(:disabled) {
-    background-color: #ffd54f; transform: translateY(-2px); box-shadow: 0 7px 0 var(--accent-orange-dark);
-  }
+  .play-button:hover:not(:disabled) { background-color: #ffd54f; transform: translateY(-2px); box-shadow: 0 7px 0 var(--accent-orange-dark); }
   .play-button:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 3px 0 var(--accent-orange-dark); }
 
   .game-container { width: 100%; max-width: 480px; }
@@ -129,28 +129,13 @@
   .final-summary { font-size: 1.2em; background: var(--white); border: 3px solid var(--primary-blue); border-radius: 15px; padding: 20px 30px; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
   .final-score { font-size: 1.8em; color: var(--accent-orange); font-weight: 600; }
 
-  .help-button {
-    position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px; border-radius: 50%;
-    font-size: 1.8em; font-family: 'Fredoka One', cursive; background-color: var(--primary-blue); color: var(--white);
-    border: 3px solid var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0. font-size: 3rem; }
-  .card-front::before { content: '⭐'; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-  .card-back { background-color: var(--card-back-color); color: var(--text-color); transform: rotateY(180deg); font-size: 2.8rem; }
-  .card.shake { animation: shake 0.5s; }
-  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
-  .countdown { font-size: 8rem; color: var(--primary-blue); opacity: 0; transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; transform: scale(0.5); }
-  .fade-in { opacity: 1 !important; transform: scale(1); }
-  .final-summary { font-size: 1.2em; background: var(--white); border: 3px solid var(--primary-blue); border-radius: 15px; padding: 20px 30px; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-  .final-score { font-size: 1.8em; color: var(--accent-orange); font-weight: 600; }
-
   .help-button { position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px; border-radius: 50%; font-size: 1.8em; font-family: 'Fredoka One', cursive; background-color: var(--primary-blue); color: var(--white); border: 3px solid var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; display: flex; justify-content: center; align-items: center; line-height: 1; }
   .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 15px; }
   .overlay-content { background-color: var(--card-back-color); padding: 20px 30px; border-radius: 20px; border: 3px solid var(--primary-blue); width: 100%; max-width: 500px; }
   .overlay-content h2 { margin-top: 0; }
 
-  /* MODIFICATION: Reduced font size for mobile to keep title on one line */
   @media (max-width: 600px) {
-    h1 { font-size: 2.4em; }
-    p, .instructions-list li { font-size: 1em; }
+    p, .instruction-item { font-size: 1em; }
     .play-button { font-size: 1.2em; }
     .card-back { font-size: 2rem; }
     .countdown { font-size: 6rem; }
@@ -161,14 +146,25 @@
 
   <!-- START SCREEN -->
   <div class="screen active" id="startScreen">
-    <h2 class="welcome-subtitle">Welcome to the SMART Challenge!</h2>
-    <h1>Emoji Match-Up</h1>
-    <ul class="instructions-list">
-      <li>This is a challenge just for you.</li>
-      <li>Match all the emoji pairs to clear the board.</li>
-      <li>Complete as many rounds as you can!</li>
-    </ul>
-    <button class="play-button" onclick="startCountdown()">Start Game</button>
+    <div class="start-content">
+      <h2 class="welcome-subtitle">Welcome to the SMART Challenge!</h2>
+      <h1>Emoji Match-Up</h1>
+      <div class="instructions-card">
+        <div class="instruction-item">
+          <span class="instruction-icon">⭐</span>
+          <span>This is a challenge just for you.</span>
+        </div>
+        <div class="instruction-item">
+          <span class="instruction-icon">🎯</span>
+          <span>Match all the emoji pairs to clear the board.</span>
+        </div>
+        <div class="instruction-item">
+          <span class="instruction-icon">🏆</span>
+          <span>Complete as many rounds as you can!</span>
+        </div>
+      </div>
+      <button class="play-button" onclick="startCountdown()">Start Game</button>
+    </div>
   </div>
 
   <!-- COUNTDOWN -->
@@ -188,8 +184,7 @@
 
   <!-- ROUND COMPLETE -->
   <div class="screen" id="roundEndScreen">
-    <!-- MODIFICATION: More encouraging message -->
-    <h2>Awesome! 🎉</h2>
+    <h2>Great Job! 🎉</h2>
     <p id="roundResultText"></p>
     <button class="play-button" id="nextRoundBtn" onclick="startNextRound()">Next Round</button>
   </div>
