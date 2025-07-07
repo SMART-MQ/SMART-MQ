@@ -9,8 +9,46 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <style>
-    /* All CSS is correct and unchanged */
-    * { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Poppins', sans-serif; text-align: center; padding: 10px; overflow-x: hidden; color: #fff; background-color: #0d0d21; -webkit-tap-highlight-color: transparent; } #digital-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; --grid-size: 50px; --line-color: rgba(0, 183, 255, 0.1); background-image: linear-gradient(to right, var(--line-color) 1px, transparent 1px), linear-gradient(to bottom, var(--line-color) 1px, transparent 1px); background-size: var(--grid-size) var(--grid-size); animation: pan-grid 60s linear infinite; } @keyframes pan-grid { from { background-position: 0 0; } to { background-position: var(--grid-size) var(--grid-size); } } .container { max-width: 900px; margin: auto; background-color: rgba(13, 13, 33, 0.5); border: 1px solid rgba(0, 183, 255, 0.3); backdrop-filter: blur(10px); border-radius: 20px; padding: 15px 10px; box-shadow: 0 0 30px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; } .main { flex: 1; margin-bottom: 15px; width: 100%; } .main-title { font-size: clamp(22px, 6vw, 32px); font-weight: 600; color: #fff; text-shadow: 0 0 10px rgba(0, 183, 255, 0.7); margin-bottom: 8px; } #info-bar { font-size: clamp(16px, 4vw, 20px); font-weight: 600; text-shadow: 0 0 5px #fff; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; } #how-to-play-btn { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: #fff; background-color: rgba(0, 183, 255, 0.3); border: 1px solid rgba(0, 183, 255, 0.7); width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; } #how-to-play-btn:hover { background-color: #00b7ff; box-shadow: 0 0 10px #00b7ff; } .digit-display, #answer-display { font-size: clamp(28px, 8vw, 42px); font-weight: 600; color: #fff; text-shadow: 0 0 5px #fff, 0 0 10px #0ff; background-color: rgba(0,0,0,0.4); border-radius: 10px; margin: 10px 0; min-height: 55px; letter-spacing: 0.2em; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 0 10px; } .digit-display-instruction { font-family: 'Orbitron', sans-serif; font-size: clamp(18px, 5vw, 22px); font-weight: 600; letter-spacing: normal; text-shadow: none; color: rgba(255, 255, 255, 0.9); } #instructions-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 100; } #instructions-modal.show { display: flex; } .modal-content { background-color: #f9f9f9; color: #333; padding: 20px; border-radius: 15px; max-width: 90vw; width: 400px; text-align: center; } .modal-content h3 { font-size: 22px; margin-top: 0; margin-bottom: 15px; } .modal-content ul { list-style-type: none; padding: 0; text-align: left; display: inline-block; margin-bottom: 20px; } .modal-content li { margin-bottom: 10px; font-size: 16px; } #close-modal-btn { font-size: 18px; font-weight: 600; background: #0077b6; border: 2px solid #00b7ff; border-radius: 30px; padding: 10px 25px; color: white; cursor: pointer; transition: all 0.3s ease; } #close-modal-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; } #instructions-container { background: rgba(255, 255, 255, 0.94); border-radius: 20px; padding: 15px; box-shadow: 0 0 25px rgba(0,0,0,0.2); max-width: 600px; margin: 0 auto 20px auto; color: #333; } #instructions-container h3 { font-size: 20px; margin-bottom: 10px; } #instructions-container ul { list-style-type: none; padding: 0; margin: 0 auto; text-align: left; display: inline-block; } #instructions-container li { font-size: 15px; line-height: 1.5; margin-bottom: 10px; } #instructions-btn { font-size: 18px; font-weight: 600; background: #0077b6; border: 2px solid #00b7ff; border-radius: 30px; padding: 12px 30px; color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 15px; } #instructions-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; } .option-buttons { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, auto); gap: 5px; margin-top: 15px; } .option-buttons button { font-family: 'Poppins', sans-serif; font-size: 26px; width: 100%; min-width: 0; height: 55px; background-color: #0077b6; color: #fff; border: 2px solid #00b7ff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; padding: 0; } .option-buttons button:hover, .option-buttons button:active { background-color: #00b7ff; box-shadow: 0 0 15px #00b7ff; } .option-buttons button#backspace-btn { background-color: #c0392b; border-color: #e74c3c; grid-row: 4; grid-column: 1 / 2; } .option-buttons button#backspace-btn:hover { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; } .option-buttons button#btn-zero { grid-row: 4; grid-column: 2 / 3; } .option-buttons button#submit-btn { background-color: #27ae60; border-color: #2ecc71; border-radius: 12px; grid-row: 4; grid-column: 3 / 4; font-size: 24px; } .option-buttons button#submit-btn:hover { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; } .hidden { display: none; } .message { font-size: 18px; margin-top: 15px; min-height: 24px; color: #fff; font-weight: 600; } #streak-tracker { margin-top: 10px; min-height: 25px; display: flex; justify-content: center; align-items: center; gap: 8px; } .data-packet { width: 40px; height: 12px; border: 2px solid #00b7ff; border-radius: 4px; background-color: transparent; transition: all 0.5s ease; } .data-packet.filled { background-color: #00b7ff; box-shadow: 0 0 10px #00b7ff; } .badge-earned { background-color: #00b7ff; color: #fff; font-weight: 600; padding: 4px 8px; margin: 3px; border-radius: 8px; box-shadow: 0 0 8px #00b7ff; font-size: 13px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Poppins', sans-serif; text-align: center; padding: 10px; overflow-x: hidden; color: #fff; background-color: #0d0d21; -webkit-tap-highlight-color: transparent; }
+    #digital-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; --grid-size: 50px; --line-color: rgba(0, 183, 255, 0.1); background-image: linear-gradient(to right, var(--line-color) 1px, transparent 1px), linear-gradient(to bottom, var(--line-color) 1px, transparent 1px); background-size: var(--grid-size) var(--grid-size); animation: pan-grid 60s linear infinite; }
+    @keyframes pan-grid { from { background-position: 0 0; } to { background-position: var(--grid-size) var(--grid-size); } }
+    .container { max-width: 900px; margin: auto; background-color: rgba(13, 13, 33, 0.5); border: 1px solid rgba(0, 183, 255, 0.3); backdrop-filter: blur(10px); border-radius: 20px; padding: 15px 10px; box-shadow: 0 0 30px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+    .main { flex: 1; margin-bottom: 15px; width: 100%; }
+    .main-title { font-size: clamp(22px, 6vw, 32px); font-weight: 600; color: #fff; text-shadow: 0 0 10px rgba(0, 183, 255, 0.7); margin-bottom: 8px; }
+    #info-bar { font-size: clamp(16px, 4vw, 20px); font-weight: 600; text-shadow: 0 0 5px #fff; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
+    #how-to-play-btn { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: #fff; background-color: rgba(0, 183, 255, 0.3); border: 1px solid rgba(0, 183, 255, 0.7); width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; }
+    #how-to-play-btn:hover { background-color: #00b7ff; box-shadow: 0 0 10px #00b7ff; }
+    .digit-display, #answer-display { font-size: clamp(28px, 8vw, 42px); font-weight: 600; color: #fff; text-shadow: 0 0 5px #fff, 0 0 10px #0ff; background-color: rgba(0,0,0,0.4); border-radius: 10px; margin: 10px 0; min-height: 55px; letter-spacing: 0.2em; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 0 10px; }
+    .digit-display-instruction { font-family: 'Orbitron', sans-serif; font-size: clamp(18px, 5vw, 22px); font-weight: 600; letter-spacing: normal; text-shadow: none; color: rgba(255, 255, 255, 0.9); }
+    #instructions-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 100; }
+    #instructions-modal.show { display: flex; }
+    .modal-content { background-color: #f9f9f9; color: #333; padding: 20px; border-radius: 15px; max-width: 90vw; width: 400px; text-align: center; }
+    .modal-content h3 { font-size: 22px; margin-top: 0; margin-bottom: 15px; }
+    .modal-content ul { list-style-type: none; padding: 0; text-align: left; display: inline-block; margin-bottom: 20px; }
+    .modal-content li { margin-bottom: 10px; font-size: 16px; }
+    #close-modal-btn { font-size: 18px; font-weight: 600; background: #0077b6; border: 2px solid #00b7ff; border-radius: 30px; padding: 10px 25px; color: white; cursor: pointer; transition: all 0.3s ease; }
+    #close-modal-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; }
+    #instructions-container { background: rgba(255, 255, 255, 0.94); border-radius: 20px; padding: 15px; box-shadow: 0 0 25px rgba(0,0,0,0.2); max-width: 600px; margin: 0 auto 20px auto; color: #333; }
+    #instructions-container h3 { font-size: 20px; margin-bottom: 10px; }
+    #instructions-container ul { list-style-type: none; padding: 0; margin: 0 auto; text-align: left; display: inline-block; }
+    #instructions-container li { font-size: 15px; line-height: 1.5; margin-bottom: 10px; }
+    #instructions-btn { font-size: 18px; font-weight: 600; background: #0077b6; border: 2px solid #00b7ff; border-radius: 30px; padding: 12px 30px; color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 15px; }
+    #instructions-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; }
+    .option-buttons { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, auto); gap: 5px; margin-top: 15px; }
+    .option-buttons button { font-family: 'Poppins', sans-serif; font-size: 26px; width: 100%; min-width: 0; height: 55px; background-color: #0077b6; color: #fff; border: 2px solid #00b7ff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; padding: 0; }
+    .option-buttons button:hover, .option-buttons button:active { background-color: #00b7ff; box-shadow: 0 0 15px #00b7ff; }
+    .option-buttons button#backspace-btn { background-color: #c0392b; border-color: #e74c3c; grid-row: 4; grid-column: 1 / 2; }
+    .option-buttons button#backspace-btn:hover { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; }
+    .option-buttons button#btn-zero { grid-row: 4; grid-column: 2 / 3; }
+    .option-buttons button#submit-btn { background-color: #27ae60; border-color: #2ecc71; border-radius: 12px; grid-row: 4; grid-column: 3 / 4; font-size: 24px; }
+    .option-buttons button#submit-btn:hover { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
+    .hidden { display: none; }
+    .message { font-size: 18px; margin-top: 15px; min-height: 24px; color: #fff; font-weight: 600; }
+    #streak-tracker { margin-top: 10px; min-height: 25px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+    .data-packet { width: 40px; height: 12px; border: 2px solid #00b7ff; border-radius: 4px; background-color: transparent; transition: all 0.5s ease; }
+    .data-packet.filled { background-color: #00b7ff; box-shadow: 0 0 10px #00b7ff; }
+    .badge-earned { background-color: #00b7ff; color: #fff; font-weight: 600; padding: 4px 8px; margin: 3px; border-radius: 8px; box-shadow: 0 0 8px #00b7ff; font-size: 13px; }
   </style>
 </head>
 <body>
@@ -97,7 +135,6 @@
     function resumeGameTimer() { if (isGameOver) return; clearInterval(gameTimerInterval); gameTimerInterval = setInterval(updateTimer, 1000); }
     function updateTimer() { if (timeRemaining < 0) { clearInterval(gameTimerInterval); showFinalSummary(); return; } var minutes = Math.floor(timeRemaining / 60); var seconds = timeRemaining % 60; timerDisplayEl.textContent = minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0'); timeRemaining--; }
     
-    // --- FIX: Corrected the logic in this function ---
     function getReadyCountdown(callback) {
       digitDisplay.classList.add('digit-display-instruction');
       digitDisplay.textContent = 'Remember these numbers...';
@@ -120,6 +157,7 @@
         var baseDuration = 500; 
         var incrementPerDigit = 250;
         var flashDuration = baseDuration + (incrementPerDigit * (currentLength - 2));
+
         setTimeout(function() {
             if (isGameOver) return;
             digitDisplay.classList.add('digit-display-instruction');
@@ -160,8 +198,6 @@
       optionButtons.classList.remove('hidden');
     }
     
-    function triggerGlitch() { digitDisplay.classList.add('glitch'); setTimeout(function() { digitDisplay.classList.remove('glitch'); }, 500); }
-    
     function checkAnswer() {
       if (isGameOver || isChecking) return;
       isChecking = true;
@@ -175,7 +211,6 @@
           consecutiveCorrect = 0;
           currentLength = capLength(currentLength + 1);
           message.textContent = 'Level Up!';
-          triggerGlitch();
           if (badgeLevels[currentLength]) {
             showBadge(badgeLevels[currentLength]);
             delayForNextTurn = 3600;
