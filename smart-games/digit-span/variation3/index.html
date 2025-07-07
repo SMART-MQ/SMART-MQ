@@ -204,7 +204,13 @@
       optionButtons.classList.remove('hidden');
     }
     
-    function triggerGlitch() { digitDisplay.classList.add('glitch'); setTimeout(function() { digitDisplay.classList.remove('glitch'); }, 500); }
+    // --- FIX: The triggerGlitch function was missing. It is now restored. ---
+    function triggerGlitch() {
+        digitDisplay.classList.add('glitch');
+        setTimeout(function() {
+            digitDisplay.classList.remove('glitch');
+        }, 500);
+    }
     
     function checkAnswer() {
       if (isGameOver || isChecking) return;
@@ -219,7 +225,7 @@
           consecutiveCorrect = 0;
           currentLength = capLength(currentLength + 1);
           message.textContent = 'Level Up!';
-          triggerGlitch();
+          triggerGlitch(); // This call now works correctly.
           if (badgeLevels[currentLength]) {
             showBadge(badgeLevels[currentLength]);
             delayForNextTurn = 3600;
@@ -239,7 +245,11 @@
     }
     
     function moveToNextTurn() { if (isGameOver) return; if (consecutiveCorrect === 0) { setTimeout(updateStreakVisual, 500); } showDigits(); }
-    
+    function capLength(length) { return Math.min(length, 10); }
+    function generateDigits(length) { var result = ''; var availableDigits = '0123456789'.split(''); for (var i = 0; i < length; i++) { var randomIndex = Math.floor(Math.random() * availableDigits.length); result += availableDigits.splice(randomIndex, 1)[0]; } return result; }
+    function updateStreakVisual() { var packets = streakTracker.querySelectorAll('.data-packet'); packets.forEach(function(packet, index) { packet.classList.toggle('filled', index < consecutiveCorrect); }); }
+    function showBadge(name) { if (earnedBadges[name]) return; earnedBadges[name] = true; var badge = document.createElement('div'); badge.className = 'badge-earned'; badge.textContent = '🎖️ ' + name; badgesEarned.appendChild(badge); badgePopup.textContent = '🎉 Badge Unlocked: ' + name + '! 🎉'; badgePopup.classList.add('show'); setTimeout(function() { badgePopup.classList.remove('show'); }, 3500); }
+
     function showFinalSummary() {
       isGameOver = true;
       if (gameTimerInterval) clearInterval(gameTimerInterval);
