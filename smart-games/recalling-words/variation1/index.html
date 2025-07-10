@@ -6,11 +6,29 @@
     <title>Memory Game - Progressive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<!-- MODIFIED: Changed font to the more modern and playful Fredoka One -->
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
+    /* NEW: Define a color palette in CSS variables for easy changes */
+    :root {
+        --bg-color: #e0f7fa; /* Light Sky Blue */
+        --text-color: #004d40; /* Deep Teal */
+        --accent-color: #ffc107; /* Sunny Yellow */
+        --accent-shadow: #ff8f00; /* Darker Yellow for 3D effect */
+        --white: #ffffff;
+        --light-gray: #f0f0f0;
+        --correct-color: #2a9d8f;
+        --incorrect-color: #e76f51;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
     body {
-        font-family: 'Comic Neue', cursive;
+        /* MODIFIED: Using new font and color palette */
+        font-family: 'Fredoka', sans-serif;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -19,43 +37,43 @@
         margin: 0;
         text-align: center;
         font-size: 1.5rem;
-        background: linear-gradient(135deg,
-            #ffb3ba,  /* pastel red */
-            #ffdfba,  /* pastel orange */
-            #ffffba,  /* pastel yellow */
-            #baffc9,  /* pastel green */
-            #bae1ff,  /* pastel blue */
-            #e3baff   /* pastel purple */
-        );
-        background-repeat: no-repeat;
-        background-size: cover;
+        background-color: var(--bg-color);
+        color: var(--text-color);
         overflow: hidden;
-        /* NEW: Smoother font rendering */
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
 
-    #game-container {
-        display: none;
+    /* NEW: Smooth transitions for showing/hiding main containers */
+    .view {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        transition: opacity 0.4s ease-in-out;
+    }
+
+    .view.hidden {
+        opacity: 0;
+        pointer-events: none;
     }
 
     #result {
-        font-size: 20px;
-        font-weight: bold;
+        font-weight: 600;
         margin-top: 20px;
-        background-color: rgba(255, 255, 255, 0.9);
+        background-color: var(--white);
         padding: 20px 40px;
         border-radius: 15px;
-        box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
-        /* MODIFIED: Use width and max-width for better flexibility */
-        width: 90%; 
-        max-width: 400px;
-        box-sizing: border-box; /* NEW: Important for consistent padding/width calculation */
+        box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1);
+        border: 3px solid var(--text-color);
+        width: 90%;
+        max-width: 450px;
     }
 
     #words-list {
         display: grid;
-        /* Grid columns will be set by JS based on difficulty */
         gap: 25px;
         justify-items: center;
         margin-top: 20px;
@@ -64,84 +82,76 @@
         max-width: 800px;
     }
 
+    /* MODIFIED: Redesigned word cards with 3D effect */
     .word-card {
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
-        padding: 20px 20px;
-        /* MODIFIED: Let the grid cell control the width */
-        width: 100%; 
+        background-color: var(--white);
+        border: 3px solid var(--text-color);
+        border-radius: 12px;
+        box-shadow: 0 5px 0 var(--text-color);
+        padding: 20px;
+        width: 100%;
         box-sizing: border-box;
         text-align: center;
-        font-weight: normal;
+        font-weight: 400;
         font-size: 22px;
         font-family: inherit;
         text-transform: capitalize;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: transform 0.1s ease, box-shadow 0.1s ease;
+        user-select: none;
     }
 
-    /* MODIFIED: Remove hover effects on touch devices where they don't work */
-    @media (hover: hover) {
-        .word-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
-            cursor: pointer;
-        }
-
-        .recall-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .main-action-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
-        }
+    /* NEW: Shake animation for incorrect answers */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-8px); }
+        75% { transform: translateX(8px); }
     }
 
-    .recall-button {
-        background-color: white;
-        border: none;
-        border-radius: 10px;
-        box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-        padding: 20px 10px;
-        /* MODIFIED: Let flexbox handle the sizing */
-        width: 120px; 
-        font-weight: normal;
+    .word-card.shake {
+        animation: shake 0.4s;
+        border-color: var(--incorrect-color);
+    }
+
+    /* MODIFIED: Standardized button styles with 3D effect */
+    .btn {
+        background-color: var(--accent-color);
+        border: 3px solid var(--text-color);
+        border-radius: 12px;
+        box-shadow: 0 5px 0 var(--accent-shadow);
+        color: var(--text-color);
+        padding: 15px 20px;
+        font-weight: 600;
         font-size: 22px;
         font-family: inherit;
         text-transform: capitalize;
         cursor: pointer;
-        transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-        margin: 0 10px;
+        transition: transform 0.1s ease, box-shadow 0.1s ease;
         user-select: none;
+        margin: 5px;
     }
 
-    .recall-button:disabled {
+    @media (hover: hover) {
+        .btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 var(--accent-shadow);
+        }
+    }
+
+    .btn:active:not(:disabled) {
+        transform: translateY(2px);
+        box-shadow: 0 3px 0 var(--accent-shadow);
+    }
+
+    .btn:disabled {
         cursor: not-allowed;
-        background-color: #e0e0e0;
-        box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-        transform: none;
+        background-color: #d0d0d0;
+        box-shadow: 0 5px 0 #a0a0a0;
+        color: #888;
     }
 
     .main-action-button {
-        background-color: #ffffba;
-        border: none;
-        border-radius: 10px;
-        box-sizing: border-box;
-        box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-        padding: 20px 20px !important;
-        /* MODIFIED: Changed from fixed width to a more flexible approach */
         width: 90%;
-        max-width: 300px !important; /* The max-width now acts as the old width on large screens */
-        font-weight: bold;
-        font-size: 22px !important;
-        font-family: inherit;
-        text-transform: capitalize;
-        cursor: pointer;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        user-select: none;
-        display: block;
+        max-width: 300px;
         margin: 10px auto 0 auto;
     }
 
@@ -160,26 +170,27 @@
         gap: 12px;
         line-height: 1.5;
     }
-    
-    /* NEW: This is the container for the Yes/No buttons */
-    #recall-container > .recall-button {
-        width: 40%;
-        max-width: 150px;
+
+    .recall-question-layout .word-card {
+        padding: 10px 15px;
+        display: inline-block;
+        margin: 0;
+        font-weight: 600;
     }
 
     .hidden {
-        display: none;
+        display: none !important; /* Overwrite fading class */
     }
 
     .info-page-container {
-        background-color: rgba(255, 255, 255, 0.9);
+        background-color: var(--white);
         padding: 25px;
-        border-radius: 10px;
-        box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
-        /* MODIFIED: Use width and max-width for better flexibility */
+        border-radius: 20px;
+        border: 3px solid var(--text-color);
+        box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1);
         width: 95%;
         max-width: 600px;
-        box-sizing: border-box; /* NEW */
+        box-sizing: border-box;
         text-align: center;
         font-size: 17px;
         line-height: 1.5;
@@ -188,23 +199,20 @@
     .info-page-container h2 {
         text-align: center;
     }
+
     .info-page-container ul {
         padding-left: 20px;
         margin-top: 20px;
         text-align: left;
     }
 
-    .rainbow-title {
-        font-size: 2.2rem;
-        font-weight: 700;
+    /* MODIFIED: New title style - no more rainbow */
+    .pop-title {
+        font-size: 2.5rem;
+        font-weight: 600;
         line-height: 1.3;
-        background: linear-gradient(to right,
-            #e74c3c, #f39c12, #f1c40f, #2ecc71, #3498db, #9b59b6
-        );
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        color: var(--text-color);
+        text-shadow: 3px 3px 0px var(--accent-color);
     }
 
     .welcome-subtitle {
@@ -226,12 +234,14 @@
         position: fixed;
         top: 15px;
         right: 15px;
-        background-color: rgba(255, 255, 255, 0.9);
+        background-color: var(--white);
         padding: 10px 20px;
-        border-radius: 10px;
-        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        border: 3px solid var(--text-color);
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
         font-size: 1.2rem;
-        font-weight: bold;
+        font-weight: 600;
+        z-index: 100;
     }
 
     #score-list {
@@ -243,206 +253,194 @@
     }
     #score-list li.best-score {
         font-weight: bold;
-        color: #2a9d8f;
-    }
-    #score-list h3 {
-        margin: 15px 0 5px 0;
-        color: #555;
+        color: var(--correct-color);
     }
 
     #feedback-popup {
+        /* Styles remain similar, just color updates */
+        color: var(--correct-color);
+    }
+    #feedback-popup.incorrect {
+        color: var(--incorrect-color);
+    }
+
+    /* NEW: Help Button styles */
+    .help-button {
         position: fixed;
+        bottom: 15px;
+        left: 15px;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        font-size: 2rem;
+        font-weight: 600;
+        z-index: 1000;
+        padding: 0;
+        line-height: 55px;
+    }
+    
+    /* NEW: Help Overlay styles */
+    .overlay-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 2000;
+    }
+    .overlay-container .info-page-container {
+        position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%) scale(0.8);
-        background-color: rgba(255, 255, 255, 0.95);
-        padding: 30px 50px;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        font-size: 2.5rem;
-        font-weight: 700;
-        z-index: 100;
-        opacity: 0;
-        transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
-        pointer-events: none;
-        color: #2a9d8f;
+        transform: translate(-50%, -50%);
     }
 
-    #feedback-popup.show {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-
-    #feedback-popup.incorrect {
-        color: #e67e22;
-    }
-
-    /* =========================================== */
-    /* ===== MOBILE IMPROVEMENTS START HERE ====== */
-    /* =========================================== */
-
+    /* MOBILE IMPROVEMENTS */
     @media (max-width: 650px) {
         body {
-            font-size: 1.1rem; /* MODIFIED: Slightly smaller base font */
-            height: auto;
-            min-height: 100vh;
-            overflow-y: auto;
-            padding: 1rem 0;
-        }
-        body.no-scroll {
-             height: 100vh;
-             overflow: hidden;
-             padding: 0;
+            font-size: 1.1rem;
         }
         #words-list {
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px; /* MODIFIED: Slightly less gap */
+            gap: 15px;
         }
-        .info-page-container, #result {
-            padding: 20px 15px; /* MODIFIED: Less side padding */
-        }
-        .rainbow-title {
-            font-size: 1.8rem;
-        }
-        #feedback-popup {
+        .pop-title {
             font-size: 2rem;
-            /* NEW: Make popup padding smaller on mobile */
-            padding: 20px 30px;
-            width: 80%;
-            text-align: center;
         }
         .info-button-group {
             flex-direction: column;
             gap: 15px;
-            /* NEW: Make buttons in this group take full width */
-            width: 100%; 
-        }
-        #recall-word {
-            font-size: 1.25rem;
-        }
-        /* NEW: Make recall word card smaller */
-        .recall-question-layout .word-card {
-            padding: 10px 15px;
-            font-size: 1.1rem;
+            width: 100%;
         }
     }
-
-    /* NEW: Add a media query for very narrow screens */
-    @media (max-width: 400px) {
-        #words-list {
-            /* Your JS sets 3 columns, this will be tight. Let's try 2 */
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        .word-card {
-            padding: 15px 10px; /* MODIFIED: Smaller padding */
-            font-size: 1rem;    /* MODIFIED: Smaller font */
-        }
-        body {
-            font-size: 1rem; /* MODIFIED: Even smaller base font for tiny screens */
-        }
-        .rainbow-title {
-            font-size: 1.6rem;
-            line-height: 1.2;
-        }
-        .welcome-subtitle {
-            font-size: 1rem;
-        }
-    }
-
 </style>
 
 </head>
 <body class="no-scroll">
     <div id="feedback-popup"></div>
     <div id="session-timer" class="hidden">Time: 10:00</div>
-<div id="info-page-1" class="info-page-container">
-    <p>
-        <span class="rainbow-title">Welcome to the SMART Memory Game!</span>
-        <br>
-        <span class="welcome-subtitle"> This is a challenge just for you. Try to beat your best score each round!</span>
-    </p>
-    <button class="main-action-button" onclick="showInstructionsPage()">How to Play</button>
-</div>
+    <!-- NEW: Help button, hidden by default -->
+    <button id="help-btn" class="btn help-button hidden" onclick="toggleHelp(true)">?</button>
 
-<div id="info-page-2" class="info-page-container hidden">
-    <h2>How to Play</h2>
-    <ul>
-        <!-- MODIFIED: Updated instructions -->
-        <li>This game has three difficulties: Easy, Medium, and Hard. You get to play 3 rounds of each before moving to the next.</li>
-        <li>In each round, memorise the words you see.</li>
-        <li>You will then begin to see a series of words, one by one.</li>
-    <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
-        <li>You get 10 minutes to play. Try to get the best score in each difficulty!</li>
-    </ul>
-    <div class="info-button-group">
-        <button class="recall-button" onclick="showWelcomePage()">Back</button>
-        <button class="main-action-button" onclick="startGame()">Play!</button>
+<div id="info-page-1" class="view">
+    <div class="info-page-container">
+        <p>
+            <!-- MODIFIED: Changed class to pop-title -->
+            <span class="pop-title">SMART Memory Game!</span>
+            <br>
+            <span class="welcome-subtitle"> This is a challenge just for you. Try to beat your best score!</span>
+        </p>
+        <!-- MODIFIED: Buttons now use the .btn class -->
+        <button class="btn main-action-button" onclick="showInstructionsPage()">How to Play</button>
     </div>
 </div>
 
-<div id="game-container" class="hidden">
+<div id="info-page-2" class="view hidden">
+    <div class="info-page-container">
+        <h2>How to Play</h2>
+        <ul>
+            <li>This game has three difficulties: Easy, Medium, and Hard. You get to play 3 rounds of each before moving to the next.</li>
+            <li>In each round, memorise the words you see.</li>
+            <li>You will then begin to see a series of words, one by one.</li>
+            <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
+            <li>You get 10 minutes to play. Try to get the best score in each difficulty!</li>
+        </ul>
+        <div class="info-button-group">
+            <button class="btn" onclick="showWelcomePage()">Back</button>
+            <button class="btn main-action-button" onclick="startGame()">Play!</button>
+        </div>
+    </div>
+</div>
+
+<!-- NEW: Help Overlay, contains a copy of instructions -->
+<div id="help-overlay" class="overlay-container view hidden">
+    <div class="info-page-container">
+        <h2>How to Play</h2>
+        <ul>
+            <li>Memorise the words you see on the screen.</li>
+            <li>You will then see a series of words, one by one.</li>
+            <li>For each word, click <strong>"Yes"</strong> if you saw it, or <strong>"No"</strong> if you did not.</li>
+            <li>Try to get as many correct as possible!</li>
+        </ul>
+        <button class="btn main-action-button" onclick="toggleHelp(false)">Got it!</button>
+    </div>
+</div>
+
+
+<div id="game-container" class="view hidden">
     <h2 id="game-heading">Memorise these words!</h2>
     <div id="words-list"></div>
-    <p id="timer">Time left: <span id="time-left">15</span> seconds</p>
+    <p id="timer">Time left: <span id="time-left">20</span> seconds</p>
 </div>
 
-<div id="recall-container" class="hidden">
+<div id="recall-container" class="view hidden">
     <h2>Recall the words!</h2>
     <div id="recall-word"></div>
-    <button class="recall-button" onclick="answer('yes')">Yes</button>
-    <button class="recall-button" onclick="answer('no')">No</button>
+    <!-- MODIFIED: Buttons now use the .btn class -->
+    <button class="btn" onclick="answer('yes')">Yes</button>
+    <button class="btn" onclick="answer('no')">No</button>
 </div>
 
-<div id="result" class="hidden">
-    <p id="score-text"></p>
+<div id="result-container" class="view hidden">
+    <div id="result">
+        <p id="score-text"></p>
+    </div>
 </div>
 
-<!-- ADD THIS NEW DIV RIGHT AFTER YOUR #result DIV -->
-<div id="end-page-container" class="info-page-container hidden">
-    <h2>Good job! Now, select the red arrow on the survey and you will have earned an extra $2.50 for your SMART bank.</h2>
+<div id="end-page-container" class="view hidden">
+    <div class="info-page-container">
+        <h2>Good job! Now, select the red arrow on the survey and you will have earned an extra $2.50 for your SMART bank.</h2>
+    </div>
 </div>
 
 <script>
     document.body.classList.add('no-scroll');
+    
+    // NEW: Get references to new UI elements
+    const helpBtn = document.getElementById('help-btn');
+    const helpOverlay = document.getElementById('help-overlay');
+    const allViews = document.querySelectorAll('.view');
 
     const wordsPool = [ "table", "chair", "couch", "desk", "bed", "door", "window", "lamp", "shelf", "clock", "kitchen", "office", "school", "store", "market", "airport", "station", "museum", "hospital", "library", "park", "beach", "city", "island", "mountain", "garden", "street", "bridge", "tunnel", "road", "key", "phone", "book", "pen", "pencil", "paper", "bottle", "box", "cup", "plate", "fork", "knife", "spoon", "brush", "mirror", "hammer", "rope", "ladder", "button", "zipper", "car", "boat", "train", "plane", "bike", "truck", "wheel", "star", "moon", "cloud", "blanket", "pillow", "towel", "soap", "sponge", "broom", "basket", "vase", "rug", "curtain", "shirt", "pants", "dress", "skirt", "sock", "shoe", "hat", "glove", "belt", "jacket", "castle", "cabin", "cottage", "factory", "studio", "garage", "stadium", "arena", "chapel", "temple", "balloon", "candle", "trophy", "statue", "fountain", "flag", "coin", "dice", "gem", "marble", "screw", "wrench", "nail", "pliers", "battery", "cable", "drone", "laptop", "screen", "keyboard" ];
     const incorrectFeedback = ['Almost!', 'Nearly there!', 'Not Quite'];
     const SESSION_DURATION = 600000;
 
-    // NEW: Define the parameters for each difficulty level
     const difficultyLevels = [
         { name: 'Easy', memorizeCount: 6, distractorCount: 6 },
         { name: 'Medium', memorizeCount: 9, distractorCount: 7 },
         { name: 'Hard', memorizeCount: 15, distractorCount: 5 }
     ];
 
-    let sessionStartTime = null;
-    let sessionTimerInterval = null; 
+    let sessionStartTime, sessionTimerInterval;
     let totalGamesPlayed = 0;
     let sessionActive = false;
-    let initialWords = [];
-    let recallWords = [];
-    let allWordsToRecall = [];
-    let score = 0;
-    let currentWordIndex = 0;
+    let initialWords = [], recallWords = [], allWordsToRecall = [];
+    let score = 0, currentWordIndex = 0;
     let timer;
-    
-    // MODIFIED: Score tracking is now an object for each difficulty
     let bestScores = { Easy: 0, Medium: 0, Hard: 0 };
     let allSessionScores = [];
+    let wordsUsedLastRound = [], wordsUsedTwoRoundsAgo = [];
     
-    let wordsUsedLastRound = [];
-    let wordsUsedTwoRoundsAgo = [];
+    let isPaused = false; // NEW: Flag to control pausing
+
+    // NEW: Helper function to switch between views smoothly
+    function switchView(viewId) {
+        allViews.forEach(view => {
+            if (view.id === viewId) {
+                view.classList.remove('hidden');
+            } else {
+                view.classList.add('hidden');
+            }
+        });
+    }
 
     function showInstructionsPage() {
-        document.getElementById('info-page-1').classList.add('hidden');
-        document.getElementById('info-page-2').classList.remove('hidden');
+        switchView('info-page-2');
     }
 
     function showWelcomePage() {
-        document.getElementById('info-page-2').classList.add('hidden');
-        document.getElementById('info-page-1').classList.remove('hidden');
+        switchView('info-page-1');
     }
 
     function startGame() {
@@ -453,25 +451,15 @@
         } 
         
         document.body.classList.remove('no-scroll');
+        helpBtn.classList.remove('hidden'); // Show help button
 
-        document.getElementById('info-page-1').classList.add('hidden');
-        document.getElementById('info-page-2').classList.add('hidden');
-        document.getElementById('recall-container').classList.add('hidden');
-        document.getElementById('result').classList.add('hidden');
-        document.getElementById('game-container').classList.remove('hidden');
-        document.getElementById('game-container').style.display = 'block';
+        switchView('game-container');
         
-        // MODIFIED: Determine current difficulty and get its parameters
         let currentDifficulty;
-        if (totalGamesPlayed < 3) {
-            currentDifficulty = difficultyLevels[0]; // Easy
-        } else if (totalGamesPlayed < 6) {
-            currentDifficulty = difficultyLevels[1]; // Medium
-        } else {
-            currentDifficulty = difficultyLevels[2]; // Hard
-        }
+        if (totalGamesPlayed < 3) currentDifficulty = difficultyLevels[0];
+        else if (totalGamesPlayed < 6) currentDifficulty = difficultyLevels[1];
+        else currentDifficulty = difficultyLevels[2];
 
-        // Update UI with difficulty info
         document.getElementById('game-heading').textContent = `Memorise these words! (${currentDifficulty.name})`;
         document.getElementById('words-list').style.gridTemplateColumns = `repeat(3, 1fr)`;
 
@@ -493,6 +481,16 @@
         
         displayWords(initialWords);
         startTimer();
+    }
+    
+    // NEW: Function to show/hide help and pause the game
+    function toggleHelp(show) {
+        isPaused = show;
+        if (show) {
+            helpOverlay.classList.remove('hidden');
+        } else {
+            helpOverlay.classList.add('hidden');
+        }
     }
 
     function updateWordHistory() {
@@ -539,18 +537,18 @@
         let timeLeft = 20;
         document.getElementById('time-left').textContent = timeLeft;
         timer = setInterval(function() {
+            if (isPaused) return; // NEW: Don't count down if paused
             timeLeft--;
             document.getElementById('time-left').textContent = timeLeft;
             if (timeLeft <= 0) {
                 clearInterval(timer);
-                document.getElementById('game-container').style.display = 'none';
                 startRecallPhase();
             }
         }, 1000);
     }
 
     function startRecallPhase() {
-        document.getElementById('recall-container').classList.remove('hidden');
+        switchView('recall-container');
         displayRecallWord();
     }
 
@@ -560,7 +558,7 @@
             document.getElementById('recall-word').innerHTML = `
                 <div class="recall-question-layout">
                     <span>Have you seen the word</span>
-                    <div class="word-card" style="display: inline-block; margin: 0; font-weight: bold;">${word}</div>
+                    <div class="word-card">${word}</div>
                     <span>before?</span>
                 </div>
             `;
@@ -571,7 +569,7 @@
     }
 
     function toggleRecallButtons(enabled) {
-        document.querySelectorAll('.recall-button').forEach(button => {
+        document.querySelectorAll('#recall-container .btn').forEach(button => {
             button.disabled = !enabled;
         });
     }
@@ -583,7 +581,16 @@
         const currentWord = allWordsToRecall[currentWordIndex];
         const isCorrect = (initialWords.includes(currentWord) && userAnswer === 'yes') || (!initialWords.includes(currentWord) && userAnswer === 'no');
 
-        if (isCorrect) score++;
+        if (isCorrect) {
+             score++;
+        } else {
+            // NEW: Shake the word card on incorrect answer
+            const cardToShake = document.querySelector('#recall-word .word-card');
+            if (cardToShake) {
+                cardToShake.classList.add('shake');
+                setTimeout(() => cardToShake.classList.remove('shake'), 400);
+            }
+        }
 
         feedbackPopup.classList.toggle('incorrect', !isCorrect);
         feedbackPopup.textContent = isCorrect ? 'Good Job!' : incorrectFeedback[Math.floor(Math.random() * incorrectFeedback.length)];
@@ -596,9 +603,8 @@
         }, 800);
     }
 
- function endGame() {
-        document.getElementById('recall-container').classList.add('hidden');
-        document.getElementById('result').classList.remove('hidden');
+    function endGame() {
+        switchView('result-container');
 
         let currentDifficulty;
         if (totalGamesPlayed < 3) currentDifficulty = difficultyLevels[0];
@@ -619,6 +625,7 @@
             clearInterval(timer);
             clearInterval(sessionTimerInterval);
             document.getElementById('session-timer').classList.add('hidden');
+            helpBtn.classList.add('hidden'); // Hide help button at the end
 
             let finalScoreHTML = '';
             difficultyLevels.forEach(level => {
@@ -642,27 +649,24 @@
             `;
 
             setTimeout(() => {
-                document.getElementById('result').classList.add('hidden');
-                document.getElementById('end-page-container').classList.remove('hidden');
+                switchView('end-page-container');
                 window.parent.postMessage("showNext", "*");
             }, 8000); 
 
         } else {
-            document.getElementById('result').innerHTML = `<p id="score-text">Your score: ${score} / ${allWordsToRecall.length}</p>`;
+            document.getElementById('score-text').innerHTML = `Your score: ${score} / ${allWordsToRecall.length}`;
             setTimeout(() => {
                 resetGame();
                 startGame();
             }, 5000);
         }
-    } // <-- THE MISSING BRACE WAS HERE. THE FUNCTION IS NOW CLOSED.
+    }
 
-    // --- THESE FUNCTIONS ARE NOW CORRECTLY OUTSIDE endGame() ---
     function resetGame() {
         score = 0;
         currentWordIndex = 0;
         initialWords = []; 
-        document.getElementById('game-container').style.display = 'none';
-        document.getElementById('result').classList.add('hidden');
+        switchView('hidden'); // Hide all views before starting new game
     }
 
     function shuffleArray(array) {
