@@ -8,16 +8,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
 <style>
-  /* --- NEW "JUNGLE FRESH" DESIGN SYSTEM --- */
+  /* --- "JUNGLE FRESH" DESIGN SYSTEM --- */
   :root {
-    --bg-color: #e8f5e9;           /* Light Mint Green */
-    --primary-green: #2e7d32;      /* Forest Green */
-    --accent-orange: #ff9800;      /* Vibrant Orange */
-    --accent-orange-dark: #f57c00; /* Deeper orange for shadow */
+    --bg-color: #e8f5e9;
+    --primary-green: #2e7d32;
+    --accent-orange: #ff9800;
+    --accent-orange-dark: #f57c00;
     --card-back-color: #ffffff;
-    --text-color: #212121;         /* Dark Slate */
+    --text-color: #212121;
     --white: #ffffff;
-    --success-green: #8bc34a;      /* Fresh Green */
+    --success-green: #8bc34a;
     --disabled-gray: #bdbdbd;
   }
 
@@ -363,7 +363,8 @@
       card2.classList.add('shake');
       setTimeout(() => {
         card1.classList.remove('flipped', 'shake');
-        secondCard.classList.remove('flipped', 'shake');
+        // BUG FIX: The variable 'secondCard' was incorrect here. It has been changed to 'card2'.
+        card2.classList.remove('flipped', 'shake');
         firstCard = null;
         lockBoard = false;
       }, 1000);
