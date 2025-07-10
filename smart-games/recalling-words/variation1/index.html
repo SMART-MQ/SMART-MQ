@@ -45,6 +45,11 @@
         padding: 0;
     }
 
+    /* FIX: This is the new, universal hidden class that fixes the bug */
+    .hidden {
+        display: none !important;
+    }
+
     .view {
         width: 100%;
         max-width: 900px;
@@ -54,10 +59,8 @@
         justify-content: center;
         transition: opacity 0.4s ease-in-out, height 0.4s ease;
     }
-
-    .view.hidden {
-       display: none;
-    }
+    
+    /* The old .view.hidden rule is no longer needed */
 
     #result {
         font-weight: 600;
@@ -305,9 +308,10 @@
     let isPaused = false; 
 
     function switchView(viewId) {
-        allViews.forEach(view => {
-            view.classList.toggle('hidden', view.id !== viewId);
+        document.querySelectorAll('.view, .overlay-container').forEach(el => {
+            el.classList.toggle('hidden', el.id !== viewId);
         });
+
         if (viewId === 'info-page-1' || viewId === 'info-page-2') {
              document.body.classList.add('no-scroll');
         } else {
@@ -333,20 +337,14 @@
         helpBtn.classList.remove('hidden'); 
         switchView('game-container');
         
-        // ================================= //
-        // THIS IS THE PART THAT WAS UPDATED //
-        // ================================= //
         let currentDifficulty;
-        if (totalGamesPlayed < 2) { // Play 2 rounds of Easy
-            currentDifficulty = difficultyLevels[0]; // Easy
-        } else if (totalGamesPlayed < 4) { // Play 2 rounds of Medium
-            currentDifficulty = difficultyLevels[1]; // Medium
-        } else { // All subsequent rounds are Hard
-            currentDifficulty = difficultyLevels[2]; // Hard
+        if (totalGamesPlayed < 2) {
+            currentDifficulty = difficultyLevels[0];
+        } else if (totalGamesPlayed < 4) {
+            currentDifficulty = difficultyLevels[1];
+        } else {
+            currentDifficulty = difficultyLevels[2];
         }
-        // ================================= //
-        //       END OF UPDATED PART         //
-        // ================================= //
 
         document.getElementById('game-heading').textContent = `Memorise these words! (${currentDifficulty.name})`;
         
