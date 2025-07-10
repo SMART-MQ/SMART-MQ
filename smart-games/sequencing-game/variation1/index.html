@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <!-- Change: Updated page title -->
   <title>SMART Sequence Master</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,7 +28,7 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       text-align: center;
-      overflow: hidden; /* Hide scrollbars, stars will be contained */
+      overflow: hidden;
       position: relative;
     }
     
@@ -37,7 +36,6 @@
     .fadeable { transition: opacity 0.4s ease-in-out, visibility 0.4s; }
     .is-faded-out { opacity: 0; visibility: hidden; pointer-events: none; }
 
-    /* --- Animated Star Background --- */
     .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
     .star {
       position: absolute;
@@ -47,7 +45,6 @@
     }
     @keyframes twinkle { 0% { opacity: 0; transform: translateY(0); } 50% { opacity: 0.8; } 100% { opacity: 0; transform: translateY(-100px); } }
 
-    /* --- Screens & Overlays --- */
     .screen {
       min-height: 100vh;
       display: flex;
@@ -74,11 +71,12 @@
       box-shadow: 0 0 20px rgba(35, 217, 217, 0.3);
     }
 
-    /* --- Typography & Titles --- */
     h1 {
       font-size: clamp(3em, 12vw, 5em);
       color: #fff;
-      text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--primary-glow), 0 0 30px var(--primary-glow);
+      /* Change: Reduced glow and added letter-spacing for better readability */
+      text-shadow: 0 0 2px #fff, 0 0 8px var(--primary-glow), 0 0 15px var(--primary-glow);
+      letter-spacing: 2px;
       margin: 0;
       line-height: 1;
     }
@@ -86,14 +84,12 @@
     h2 { font-size: clamp(2em, 7vw, 2.5em); color: var(--primary-glow); }
     p, li { font-size: clamp(1em, 4vw, 1.2em); line-height: 1.5; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
     
-    /* Change: Style for the subtitle */
     .subtitle {
         font-size: clamp(1.2em, 5vw, 1.5em);
         color: var(--text-color);
-        margin: 20px 0;
+        margin-bottom: 20px;
     }
 
-    /* --- Game Area --- */
     #game-area { width: 100%; max-width: 600px; }
     .scoreboard { display: flex; justify-content: space-around; font-size: 1.2em; margin-bottom: 15px; }
     #message { font-size: 1.5em; color: #fff; min-height: 1.5em; margin: 20px 0; text-shadow: 0 0 5px var(--primary-glow); }
@@ -123,7 +119,7 @@
       border-radius: 20px;
       cursor: pointer;
       transition: all 0.1s ease-out;
-      background-color: transparent; /* Explicitly set */
+      background-color: transparent;
     }
     #btn1 { border-color: var(--btn1-color); box-shadow: 0 0 15px var(--btn1-color); }
     #btn2 { border-color: var(--btn2-color); box-shadow: 0 0 15px var(--btn2-color); }
@@ -134,7 +130,7 @@
       transform: scale(0.95);
       filter: brightness(2.5);
     }
-    #btn1.flash { background-color: var(--btn1-color); } /* Add fill on flash */
+    #btn1.flash { background-color: var(--btn1-color); }
     #btn2.flash { background-color: var(--btn2-color); }
     #btn3.flash { background-color: var(--btn3-color); }
     #btn4.flash { background-color: var(--btn4-color); }
@@ -144,7 +140,6 @@
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
     .shake-container { animation: shake 0.4s; }
 
-    /* --- General Buttons & Misc --- */
     .play-button {
       background: transparent;
       border: 2px solid var(--primary-glow);
@@ -169,7 +164,7 @@
     #fanfare {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       font-size: 3em; color: #fff; z-index: 9999;
-      text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--primary-glow), 0 0 30px var(--primary-glow);
+      text-shadow: 0 0 5px #fff, 0 0 10px var(--primary-glow);
     }
     @keyframes fanfare-anim { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
@@ -180,17 +175,13 @@
   
   <div class="stars"></div>
 
-  <!-- Start Screen -->
   <div id="start-screen" class="screen">
-    <!-- Change: New subtitle added -->
     <p class="subtitle">Welcome to the SMART Challenge</p>
-    <!-- Change: Game title updated -->
     <h1>Sequence Master</h1>
     <p>This is a challenge just for you. Try to beat your best score each round!</p>
     <button class="play-button" id="startBtn">Start Game</button>
   </div>
 
-  <!-- Game Screen -->
   <div id="game-screen" class="screen hidden">
     <div id="game-area">
       <div id="timer-bar-container" class="timer-bar-container">
@@ -213,7 +204,6 @@
   <button id="helpBtn" class="help-button hidden">?</button>
   <div id="fanfare" class="hidden"></div>
 
-  <!-- Help & Final Summary Overlays -->
   <div id="help-overlay" class="overlay fadeable is-faded-out">
     <div class="overlay-content">
       <h2>How To Play</h2>
@@ -226,7 +216,8 @@
     <div class="overlay-content">
       <h2>Time's Up!</h2>
       <p>Your personal best score:</p>
-      <p id="final-best-score" style="font-size: 3em; color: #fff; margin: 10px 0; text-shadow: 0 0 10px var(--primary-glow);">0</p>
+      <!-- Change: Reduced glow on final score for readability -->
+      <p id="final-best-score" style="font-size: 3em; color: #fff; margin: 10px 0; text-shadow: 0 0 8px var(--primary-glow);">0</p>
       <p>Make sure you press the red arrow on the bottom right of the screen to finish.</p>
       <button class="play-button" onclick="location.reload()">Play Again</button>
     </div>
@@ -236,7 +227,6 @@
   <audio id="wrongSound" src="https://assets.codepen.io/217233/synth_misc_1.mp3" preload="auto"></audio>
 
   <script>
-    // --- Star Background Generator ---
     const starsContainer = document.querySelector('.stars');
     for (let i = 0; i < 100; i++) {
         const star = document.createElement('div');
@@ -251,6 +241,8 @@
     }
   
     const GAME_TIME = 300;
+    // Change: Array of encouraging messages for incorrect attempts
+    const RETRY_MESSAGES = ["Let's try again!", "You got this!", "Nice try!", "Give it another shot!"];
 
     const elements = {
         startScreen: document.getElementById('start-screen'),
@@ -287,9 +279,7 @@
       elements.startScreen.classList.add('hidden');
       elements.gameScreen.classList.remove('hidden');
       elements.helpBtn.classList.remove('hidden');
-
       triggerFanfare("Get Ready", 1500);
-
       setTimeout(() => {
         isGameRunning = true;
         startTimer();
@@ -299,15 +289,12 @@
     
     function nextRound() {
       if (!isGameRunning) return;
-      
       isPlayerTurn = false;
       userSequence = [];
       updateButtonsState(true);
       elements.message.textContent = '...WATCH...';
-      
       sequence.push(Math.floor(Math.random() * 4));
       playSequence();
-      
       setTimeout(() => {
         isPlayerTurn = true;
         updateButtonsState(false);
@@ -327,15 +314,12 @@
 
     function handlePlayerInput(index) {
         if (!isPlayerTurn) return;
-        
         flashButton(elements.buttons[index]);
         userSequence.push(index);
-        
         if (userSequence[userSequence.length - 1] !== sequence[userSequence.length - 1]) {
             handleIncorrect();
             return;
         }
-        
         if (userSequence.length === sequence.length) {
             handleCorrect();
         }
@@ -355,13 +339,12 @@
     function handleIncorrect() {
         isPlayerTurn = false;
         elements.wrongSound.play();
-        elements.message.textContent = 'RESET!';
+        // Change: Select a random encouraging message
+        elements.message.textContent = RETRY_MESSAGES[Math.floor(Math.random() * RETRY_MESSAGES.length)];
         elements.buttonContainer.classList.add('shake-container');
-        
         score = 0;
         sequence = [];
         updateScoreboard();
-        
         setTimeout(() => {
             elements.buttonContainer.classList.remove('shake-container');
             nextRound();
