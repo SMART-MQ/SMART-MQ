@@ -15,243 +15,115 @@
         --accent-color: #ffc107; /* Sunny Yellow */
         --accent-shadow: #ff8f00; /* Darker Yellow for 3D effect */
         --white: #ffffff;
-        --light-gray: #f0f0f0;
         --correct-color: #2a9d8f;
         --incorrect-color: #e76f51;
     }
-
     * { box-sizing: border-box; }
-
     body {
-        font-family: 'Fredoka', sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh; 
-        margin: 0;
-        padding: 20px 10px;
-        text-align: center;
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        overflow-y: auto;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+        font-family: 'Fredoka', sans-serif; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; min-height: 100vh; 
+        margin: 0; padding: 20px 10px; text-align: center;
+        background-color: var(--bg-color); color: var(--text-color);
+        overflow-y: auto; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     }
-
-    body.no-scroll {
-        height: 100vh;
-        overflow: hidden;
-        padding: 0;
-    }
-
-    .hidden {
-        display: none !important;
-    }
-
+    body.no-scroll { height: 100vh; overflow: hidden; padding: 0; }
+    .hidden { display: none !important; }
     .view {
-        width: 100%;
-        max-width: 900px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        width: 100%; max-width: 900px; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
         transition: opacity 0.4s ease-in-out, height 0.4s ease;
     }
-
     #result {
-        font-weight: 600;
-        margin-top: 20px;
-        background-color: var(--white);
-        padding: 20px 40px;
-        border-radius: 15px;
-        box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1);
-        border: 3px solid var(--text-color);
-        width: 90%;
-        max-width: 500px; /* Increased max-width for final screen */
+        font-weight: 600; margin-top: 20px; background-color: var(--white);
+        padding: 20px 40px; border-radius: 15px;
+        box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1); border: 3px solid var(--text-color);
+        width: 90%; max-width: 500px;
     }
-
     #words-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 20px;
-        justify-items: center;
-        margin-top: 20px;
-        padding: 10px;
-        width: 100%;
-        max-width: 800px;
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 20px; justify-items: center; margin-top: 20px;
+        padding: 10px; width: 100%; max-width: 800px;
     }
-
     .word-card {
-        background-color: var(--white);
-        border: 3px solid var(--text-color);
-        border-radius: 12px;
-        box-shadow: 0 5px 0 var(--text-color);
-        padding: 20px;
-        width: 100%;
-        min-height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        font-weight: 400;
-        font-size: 22px;
-        font-family: inherit;
-        text-transform: capitalize;
-        transition: transform 0.1s ease, box-shadow 0.1s ease;
-        user-select: none;
+        background-color: var(--white); border: 3px solid var(--text-color);
+        border-radius: 12px; box-shadow: 0 5px 0 var(--text-color); padding: 20px;
+        width: 100%; min-height: 60px; display: flex; align-items: center; justify-content: center;
+        text-align: center; font-weight: 400; font-size: 22px; font-family: inherit;
+        text-transform: capitalize; transition: transform 0.1s ease, box-shadow 0.1s ease; user-select: none;
     }
-
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-8px); }
-        75% { transform: translateX(8px); }
-    }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
     .word-card.shake { animation: shake 0.4s; border-color: var(--incorrect-color); }
-
     .btn {
-        background-color: var(--accent-color);
-        border: 3px solid var(--text-color);
-        border-radius: 12px;
-        box-shadow: 0 5px 0 var(--accent-shadow);
-        color: var(--text-color);
-        padding: 15px 20px;
-        font-weight: 600;
-        font-size: 22px;
-        font-family: inherit;
-        text-transform: capitalize;
-        cursor: pointer;
-        transition: all 0.1s ease;
-        user-select: none;
-        margin: 5px;
+        background-color: var(--accent-color); border: 3px solid var(--text-color); border-radius: 12px;
+        box-shadow: 0 5px 0 var(--accent-shadow); color: var(--text-color); padding: 15px 20px;
+        font-weight: 600; font-size: 22px; font-family: inherit; text-transform: capitalize;
+        cursor: pointer; transition: all 0.1s ease; user-select: none; margin: 5px;
     }
-
     @media (hover: hover) { .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 0 var(--accent-shadow); } }
     .btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 3px 0 var(--accent-shadow); }
     .btn:disabled { cursor: not-allowed; background-color: #d0d0d0; box-shadow: 0 5px 0 #a0a0a0; color: #888; }
-    
-    .btn.correct-flash {
-        background-color: var(--correct-color);
-        color: white;
-        transform: translateY(-3px);
-        box-shadow: 0 8px 0 #1e7e72;
-    }
-    
+    .btn.correct-flash { background-color: var(--correct-color); color: white; transform: translateY(-3px); box-shadow: 0 8px 0 #1e7e72; }
     .main-action-button { width: 90%; max-width: 300px; margin: 20px auto 0 auto; }
-
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-    }
-    
-    #info-page-1 .main-action-button {
-        animation: pulse 2s infinite ease-in-out;
-    }
-
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    #info-page-1 .main-action-button { animation: pulse 2s infinite ease-in-out; }
     #recall-word { width: 90%; max-width: 500px; margin: 0 auto 30px auto; font-size: 23px; }
     .recall-question-layout { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; line-height: 1.5; }
     .recall-question-layout .word-card { padding: 10px 15px; display: inline-block; margin: 0; font-weight: 600; }
-
     .info-page-container {
-        background-color: var(--white);
-        padding: 25px;
-        border-radius: 20px;
-        border: 3px solid var(--text-color);
-        box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1);
-        width: 95%;
-        max-width: 600px;
-        text-align: center;
-        font-size: 1.1em;
-        line-height: 1.6;
+        background-color: var(--white); padding: 25px; border-radius: 20px;
+        border: 3px solid var(--text-color); box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1);
+        width: 95%; max-width: 600px; text-align: center;
+        font-size: 1.1em; line-height: 1.6;
     }
-
     .info-page-container h2 { text-align: center; font-size: 1.8em; }
-    .info-page-container ul {
-        padding: 0;
-        margin: 20px auto;
-        list-style-type: none;
-        display: inline-block;
-        text-align: left;
-    }
-    .info-page-container ul li {
-        font-size: 1.2em;
-        margin-bottom: 15px;
-    }
-
-    .pop-title {
-        font-size: 3rem;
-        font-weight: 600;
-        line-height: 1.2;
-        color: var(--text-color);
-        text-shadow: 3px 3px 0px var(--accent-color);
-    }
-
+    .info-page-container ul { padding: 0; margin: 20px auto; list-style-type: none; display: inline-block; text-align: left; }
+    .info-page-container ul li { font-size: 1.2em; margin-bottom: 15px; }
+    .pop-title { font-size: 3rem; font-weight: 600; line-height: 1.2; color: var(--text-color); text-shadow: 3px 3px 0px var(--accent-color); }
     .welcome-subtitle { display: inline-block; margin-top: 15px; font-size: 1.2rem; color: #555; }
     .challenge-subtitle { display: block; margin-top: 10px; font-size: 1.1rem; color: var(--text-color); font-weight: 400; }
-
-    .info-button-group { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 20px; flex-wrap: wrap;}
-
     #session-timer {
         position: fixed; top: 15px; right: 15px; background-color: var(--white);
         padding: 10px 20px; border-radius: 12px; border: 3px solid var(--text-color);
         box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1); font-size: 1.2rem; font-weight: 600; z-index: 100;
     }
-
     #score-list { list-style-type: none; padding: 0; text-align: left; max-height: 250px; overflow-y: auto; }
     #score-list li.best-score { font-weight: bold; color: var(--correct-color); }
-
     #feedback-popup {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0.8);
-        background-color: rgba(255, 255, 255, 0.98);
-        padding: 30px 50px;
-        border-radius: 15px;
-        border: 3px solid var(--text-color);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        font-size: 2.5rem;
-        font-weight: 600;
-        z-index: 3000;
-        opacity: 0;
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        pointer-events: none;
-        color: var(--correct-color);
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+        background-color: rgba(255, 255, 255, 0.98); padding: 30px 50px; border-radius: 15px;
+        border: 3px solid var(--text-color); box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        font-size: 2.5rem; font-weight: 600; z-index: 3000; opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; color: var(--correct-color);
     }
-    #feedback-popup.show {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-    #feedback-popup.incorrect {
-        color: var(--incorrect-color);
-    }
-
+    #feedback-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    #feedback-popup.incorrect { color: var(--incorrect-color); }
     .help-button {
         position: fixed; bottom: 15px; left: 15px; width: 55px; height: 55px;
-        border-radius: 50%; font-size: 2rem; font-weight: 600;
-        z-index: 1000; padding: 0; line-height: 55px;
+        border-radius: 50%; font-size: 2rem; font-weight: 600; z-index: 1000; padding: 0; line-height: 55px;
     }
-    
     .overlay-container {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: rgba(0, 0, 0, 0.6); z-index: 2000;
-        display: flex; align-items: center; justify-content: center;
-        padding: 15px;
+        background-color: rgba(0, 0, 0, 0.6); z-index: 2000; display: flex;
+        align-items: center; justify-content: center; padding: 15px;
     }
     .overlay-container .info-page-container { margin: auto; }
 
+    /* NEW: Specific styles to make the final summary fit on screen */
+    #result.final-summary { padding: 15px 25px; }
+    #result.final-summary p { font-size: 1.2em; margin: 10px 0; }
+    #result.final-summary hr { margin: 10px 0; }
+    #result.final-summary #score-list h3 { font-size: 1.1em; margin: 8px 0 4px 0; }
+    #result.final-summary #score-list li { font-size: 1em; }
+    #result.final-summary .final-instruction { font-size: 1em; line-height: 1.4; margin-top: 15px; }
+
     @media (max-width: 650px) {
         .pop-title { font-size: 2.2rem; }
-        .info-button-group { flex-direction: column; gap: 15px; width: 100%; }
         #words-list { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 15px;}
-        
         .info-page-container { padding: 20px 15px; }
         .info-page-container h2 { font-size: 1.5em; }
         .info-page-container ul li { font-size: 1em; margin-bottom: 12px; }
         #feedback-popup { font-size: 2rem; padding: 20px 30px; width: 80%; text-align: center; }
     }
-
 </style>
 </head>
 <body class="no-scroll">
@@ -262,16 +134,13 @@
 <div id="info-page-1" class="view">
     <div class="info-page-container">
         <p>
-            <span class="welcome-subtitle">Welcome to the SMART Challenge</span>
-            <br>
-            <span class="pop-title">Word Wizard</span>
-            <br>
+            <span class="welcome-subtitle">Welcome to the SMART Challenge</span><br>
+            <span class="pop-title">Word Wizard</span><br>
             <span class="challenge-subtitle">How many words can you remember?</span>
         </p>
         <button class="btn main-action-button" onclick="showInstructionsPage()">How to Play</button>
     </div>
 </div>
-
 <div id="info-page-2" class="view hidden">
     <div class="info-page-container">
         <h2>How to Play</h2>
@@ -287,7 +156,6 @@
         </div>
     </div>
 </div>
-
 <div id="help-overlay" class="overlay-container hidden">
     <div class="info-page-container">
         <h2>How to Play</h2>
@@ -299,163 +167,92 @@
         <button class="btn main-action-button" onclick="toggleHelp(false)">Got it!</button>
     </div>
 </div>
-
 <div id="game-container" class="view hidden">
     <h2 id="game-heading">Memorise these words!</h2>
     <div id="words-list"></div>
     <p id="timer">Time left: <span id="time-left">20</span> seconds</p>
 </div>
-
 <div id="recall-container" class="view hidden">
     <h2>Recall the words!</h2>
     <div id="recall-word"></div>
     <button id="yes-btn" class="btn" onclick="answer('yes')">Yes</button>
     <button id="no-btn" class="btn" onclick="answer('no')">No</button>
 </div>
-
 <div id="result-container" class="view hidden">
     <div id="result">
         <p id="score-text"></p>
     </div>
 </div>
 
-<!-- REMOVED: The #end-page-container is no longer needed -->
-
 <script>
     document.body.classList.add('no-scroll');
-    
     const helpBtn = document.getElementById('help-btn');
     const helpOverlay = document.getElementById('help-overlay');
-
     const wordsPool = [ "table", "chair", "couch", "desk", "bed", "door", "window", "lamp", "shelf", "clock", "kitchen", "office", "school", "store", "market", "airport", "station", "museum", "hospital", "library", "park", "beach", "city", "island", "mountain", "garden", "street", "bridge", "tunnel", "road", "key", "phone", "book", "pen", "pencil", "paper", "bottle", "box", "cup", "plate", "fork", "knife", "spoon", "brush", "mirror", "hammer", "rope", "ladder", "button", "zipper", "car", "boat", "train", "plane", "bike", "truck", "wheel", "star", "moon", "cloud", "blanket", "pillow", "towel", "soap", "sponge", "broom", "basket", "vase", "rug", "curtain", "shirt", "pants", "dress", "skirt", "sock", "shoe", "hat", "glove", "belt", "jacket", "castle", "cabin", "cottage", "factory", "studio", "garage", "stadium", "arena", "chapel", "temple", "balloon", "candle", "trophy", "statue", "fountain", "flag", "coin", "dice", "gem", "marble", "screw", "wrench", "nail", "pliers", "battery", "cable", "drone", "laptop", "screen", "keyboard" ];
     const incorrectFeedback = ['Almost!', 'Nearly there!', 'Not Quite'];
     const encouragingPhrases = ['Great job!', 'Nice work!', 'Awesome!', 'Keep it up!'];
     const SESSION_DURATION = 300000;
-
     const difficultyLevels = [
         { name: 'Easy', memorizeCount: 6, distractorCount: 6 },
         { name: 'Medium', memorizeCount: 9, distractorCount: 7 },
         { name: 'Hard', memorizeCount: 15, distractorCount: 5 }
     ];
-
-    let sessionStartTime, sessionTimerInterval;
-    let totalGamesPlayed = 0;
-    let sessionActive = false;
+    let sessionStartTime, sessionTimerInterval, totalGamesPlayed = 0, sessionActive = false;
     let initialWords = [], recallWords = [], allWordsToRecall = [];
-    let score = 0, currentWordIndex = 0;
-    let timer;
+    let score = 0, currentWordIndex = 0, timer;
     let bestScores = { Easy: 0, Medium: 0, Hard: 0 };
-    let allSessionScores = [];
-    let wordsUsedLastRound = [], wordsUsedTwoRoundsAgo = [];
-    
+    let allSessionScores = [], wordsUsedLastRound = [], wordsUsedTwoRoundsAgo = [];
     let isPaused = false; 
 
     function switchView(viewId) {
-        document.querySelectorAll('.view').forEach(el => {
-            el.classList.toggle('hidden', el.id !== viewId);
-        });
-
-        if (viewId === 'info-page-1' || viewId === 'info-page-2') {
-             document.body.classList.add('no-scroll');
-        } else {
-             document.body.classList.remove('no-scroll');
-        }
+        document.querySelectorAll('.view').forEach(el => { el.classList.toggle('hidden', el.id !== viewId); });
+        if (viewId === 'info-page-1' || viewId === 'info-page-2') { document.body.classList.add('no-scroll'); } 
+        else { document.body.classList.remove('no-scroll'); }
     }
-
-    function showInstructionsPage() {
-        switchView('info-page-2');
-    }
-
+    function showInstructionsPage() { switchView('info-page-2'); }
     function startGame() {
-        if (!sessionActive) { 
-	        sessionActive = true;
-	        sessionStartTime = Date.now(); 
-            startSessionTimer(); 
-        } 
-        
+        if (!sessionActive) { sessionActive = true; sessionStartTime = Date.now(); startSessionTimer(); } 
         helpBtn.classList.remove('hidden'); 
         switchView('game-container');
-        
         let currentDifficulty;
-        if (totalGamesPlayed < 2) {
-            currentDifficulty = difficultyLevels[0];
-        } else if (totalGamesPlayed < 4) {
-            currentDifficulty = difficultyLevels[1];
-        } else {
-            currentDifficulty = difficultyLevels[2];
-        }
-
+        if (totalGamesPlayed < 2) { currentDifficulty = difficultyLevels[0]; } 
+        else if (totalGamesPlayed < 4) { currentDifficulty = difficultyLevels[1]; } 
+        else { currentDifficulty = difficultyLevels[2]; }
         document.getElementById('game-heading').textContent = `Memorise these words! (${currentDifficulty.name})`;
-        
         updateWordHistory();
-        
         const forbiddenWords = [...wordsUsedLastRound, ...wordsUsedTwoRoundsAgo];
         let availablePool = wordsPool.filter(word => !forbiddenWords.includes(word));
-        
-        if (availablePool.length < 20) {
-            availablePool = wordsPool.filter(word => !wordsUsedLastRound.includes(word));
-        }
-
+        if (availablePool.length < 20) { availablePool = wordsPool.filter(word => !wordsUsedLastRound.includes(word)); }
         initialWords = getRandomWordsFromPool(currentDifficulty.memorizeCount, availablePool);
         let distractorPool = availablePool.filter(word => !initialWords.includes(word));
         recallWords = getRandomWordsFromPool(currentDifficulty.distractorCount, distractorPool);
-        
         allWordsToRecall = [...initialWords, ...recallWords];
         shuffleArray(allWordsToRecall);
-        
         displayWords(initialWords);
         startTimer();
     }
-    
-    function toggleHelp(show) {
-        isPaused = show;
-        helpOverlay.classList.toggle('hidden', !show);
-    }
-
-    function updateWordHistory() {
-        wordsUsedTwoRoundsAgo = [...wordsUsedLastRound];
-        wordsUsedLastRound = [...allWordsToRecall];
-    }
-
-    function getRandomWordsFromPool(count, pool) {
-        const shuffled = [...pool].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, count);
-    }
-    
+    function toggleHelp(show) { isPaused = show; helpOverlay.classList.toggle('hidden', !show); }
+    function updateWordHistory() { wordsUsedTwoRoundsAgo = [...wordsUsedLastRound]; wordsUsedLastRound = [...allWordsToRecall]; }
+    function getRandomWordsFromPool(count, pool) { const shuffled = [...pool].sort(() => 0.5 - Math.random()); return shuffled.slice(0, count); }
     function startSessionTimer() {
         const timerDisplay = document.getElementById('session-timer');
         timerDisplay.classList.remove('hidden');
-
         sessionTimerInterval = setInterval(() => {
             if (isPaused) return; 
             const elapsedTime = Date.now() - sessionStartTime;
             let remainingTime = SESSION_DURATION - elapsedTime;
-
             if (remainingTime < 0) remainingTime = 0;
-
             const minutes = Math.floor((remainingTime / 1000) / 60);
             const seconds = Math.floor((remainingTime / 1000) % 60);
             timerDisplay.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
-            
-            if (remainingTime <= 0) {
-                clearInterval(sessionTimerInterval);
-                timerDisplay.textContent = "Time's up!";
-                if (sessionActive) endGame(true); 
-            }
+            if (remainingTime <= 0) { clearInterval(sessionTimerInterval); timerDisplay.textContent = "Time's up!"; if (sessionActive) endGame(true); }
         }, 1000);
     }
-
     function displayWords(words) {
         const wordList = document.getElementById('words-list');
         wordList.innerHTML = ''; 
-        words.forEach(word => {
-            const card = document.createElement('div');
-            card.classList.add('word-card');
-            card.textContent = word;
-            wordList.appendChild(card);
-        });
+        words.forEach(word => { const card = document.createElement('div'); card.classList.add('word-card'); card.textContent = word; wordList.appendChild(card); });
     }
-
     function startTimer() {
         let timeLeft = 20;
         document.getElementById('time-left').textContent = timeLeft;
@@ -463,109 +260,59 @@
             if (isPaused) return; 
             timeLeft--;
             document.getElementById('time-left').textContent = timeLeft;
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                startRecallPhase();
-            }
+            if (timeLeft <= 0) { clearInterval(timer); startRecallPhase(); }
         }, 1000);
     }
-
-    function startRecallPhase() {
-        switchView('recall-container');
-        displayRecallWord();
-    }
-
+    function startRecallPhase() { switchView('recall-container'); displayRecallWord(); }
     function displayRecallWord() {
         if (isPaused) return; 
         const elapsedTime = Date.now() - sessionStartTime;
-        if (elapsedTime >= SESSION_DURATION && sessionActive) {
-            endGame(true);
-            return;
-        }
-
+        if (elapsedTime >= SESSION_DURATION && sessionActive) { endGame(true); return; }
         if (currentWordIndex < allWordsToRecall.length) {
             const word = allWordsToRecall[currentWordIndex];
-            document.getElementById('recall-word').innerHTML = `
-                <div class="recall-question-layout">
-                    <span>Have you seen the word</span>
-                    <div class="word-card">${word}</div>
-                    <span>before?</span>
-                </div>
-            `;
+            document.getElementById('recall-word').innerHTML = `<div class="recall-question-layout"><span>Have you seen the word</span><div class="word-card">${word}</div><span>before?</span></div>`;
             toggleRecallButtons(true);
-        } else {
-            endGame();
-        }
+        } else { endGame(); }
     }
-
-    function toggleRecallButtons(enabled) {
-        document.querySelectorAll('#recall-container .btn').forEach(button => {
-            button.disabled = !enabled;
-        });
-    }
-
+    function toggleRecallButtons(enabled) { document.querySelectorAll('#recall-container .btn').forEach(button => { button.disabled = !enabled; }); }
     function answer(userAnswer) {
         toggleRecallButtons(false);
-        
         const feedbackPopup = document.getElementById('feedback-popup');
         const currentWord = allWordsToRecall[currentWordIndex];
         const isCorrect = (initialWords.includes(currentWord) && userAnswer === 'yes') || (!initialWords.includes(currentWord) && userAnswer === 'no');
-
         if (isCorrect) {
              score++;
              const correctButton = document.querySelector(`#recall-container .btn[onclick="answer('${userAnswer}')"]`);
-             if (correctButton) {
-                correctButton.classList.add('correct-flash');
-                setTimeout(() => correctButton.classList.remove('correct-flash'), 500);
-             }
+             if (correctButton) { correctButton.classList.add('correct-flash'); setTimeout(() => correctButton.classList.remove('correct-flash'), 500); }
         } else {
             const cardToShake = document.querySelector('#recall-word .word-card');
-            if (cardToShake) {
-                cardToShake.classList.add('shake');
-                setTimeout(() => cardToShake.classList.remove('shake'), 400);
-            }
+            if (cardToShake) { cardToShake.classList.add('shake'); setTimeout(() => cardToShake.classList.remove('shake'), 400); }
         }
-
         feedbackPopup.classList.toggle('incorrect', !isCorrect);
         feedbackPopup.textContent = isCorrect ? 'Good Job!' : incorrectFeedback[Math.floor(Math.random() * incorrectFeedback.length)];
         feedbackPopup.classList.add('show');
-        
         currentWordIndex++;
-        setTimeout(() => {
-            feedbackPopup.classList.remove('show');
-            setTimeout(() => displayRecallWord(), 150); 
-        }, 800);
+        setTimeout(() => { feedbackPopup.classList.remove('show'); setTimeout(() => displayRecallWord(), 150); }, 800);
     }
-
-    // MODIFIED: This function is now heavily updated
     function endGame(isTimeUp = false) {
         if (!sessionActive && !isTimeUp) return;
-
         let currentDifficulty;
         if (totalGamesPlayed < 2) currentDifficulty = difficultyLevels[0];
         else if (totalGamesPlayed < 4) currentDifficulty = difficultyLevels[1];
         else currentDifficulty = difficultyLevels[2];
         const difficultyName = currentDifficulty.name;
-        
         if(currentWordIndex > 0 || score > 0) {
-            if (score > bestScores[difficultyName]) {
-                bestScores[difficultyName] = score;
-            }
+            if (score > bestScores[difficultyName]) { bestScores[difficultyName] = score; }
             allSessionScores.push({ score: score, total: allWordsToRecall.length, difficulty: difficultyName });
         }
-        
         totalGamesPlayed++;
-        
         const elapsedTime = Date.now() - sessionStartTime;
-
         if (isTimeUp || elapsedTime >= SESSION_DURATION) {
             if (!sessionActive) return; 
             sessionActive = false;
-            clearInterval(timer);
-            clearInterval(sessionTimerInterval);
+            clearInterval(timer); clearInterval(sessionTimerInterval);
             document.getElementById('session-timer').classList.add('hidden');
             helpBtn.classList.add('hidden');
-
             let finalScoreHTML = '';
             difficultyLevels.forEach(level => {
                 const scoresForLevel = allSessionScores.filter(s => s.difficulty === level.name);
@@ -573,54 +320,28 @@
                     finalScoreHTML += `<h3>${level.name}</h3>`;
                     scoresForLevel.forEach((s, i) => {
                         const isBest = s.score === bestScores[level.name];
-                        finalScoreHTML += `<li class="${isBest ? 'best-score' : ''}">
-                            Round ${i + 1}: ${s.score} / ${s.total} ${isBest ? '(Best!)' : ''}
-                        </li>`;
+                        finalScoreHTML += `<li class="${isBest ? 'best-score' : ''}">Round ${i + 1}: ${s.score} / ${s.total} ${isBest ? '(Best!)' : ''}</li>`;
                     });
                 }
             });
-            
-            // Show the combined final screen
             switchView('result-container');
             document.body.classList.add('no-scroll');
-            // Inject the combined HTML content
-            document.getElementById('result').innerHTML = `
-                <p style="font-size: 1.5em; font-weight: bold;">Time's Up!</p>
-                <hr>
-                <ul id="score-list">${finalScoreHTML}</ul>
-                <hr>
-                <p style="font-weight: 600; margin-top: 25px; font-size: 1.1em; line-height: 1.5;">
-                    Good job! Now, press the red arrow on the survey and you will have earned an extra $2.50 for your SMART bank.
-                </p>
-            `;
-
-            // Tell the survey to enable the 'next' button
+            const resultEl = document.getElementById('result');
+            resultEl.classList.add('final-summary'); // Add class for specific styling
+            resultEl.innerHTML = `
+                <p>Time's Up!</p><hr>
+                <ul id="score-list">${finalScoreHTML}</ul><hr>
+                <p class="final-instruction">Good job! Now, press the red arrow on the bottom right of the screen and you will have earned an extra $2.50 for your SMART bank.</p>`;
             window.parent.postMessage("showNext", "*");
-            // No more setTimeouts to switch screens. The game ends here.
-
         } else {
             switchView('result-container');
             const randomPhrase = encouragingPhrases[Math.floor(Math.random() * encouragingPhrases.length)];
             document.getElementById('score-text').innerHTML = `${randomPhrase}<br>Your score: ${score} / ${allWordsToRecall.length}`;
-            setTimeout(() => {
-                resetGame();
-                startGame();
-            }, 4000);
+            setTimeout(() => { resetGame(); startGame(); }, 4000);
         }
     }
-
-    function resetGame() {
-        score = 0;
-        currentWordIndex = 0;
-        initialWords = []; 
-    }
-
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-    }
+    function resetGame() { score = 0; currentWordIndex = 0; initialWords = []; }
+    function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
 </script>
 </body>
 </html>
