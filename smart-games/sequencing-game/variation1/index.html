@@ -74,7 +74,6 @@
     h1 {
       font-size: clamp(3em, 12vw, 5em);
       color: #fff;
-      /* Change: Reduced glow and added letter-spacing for better readability */
       text-shadow: 0 0 2px #fff, 0 0 8px var(--primary-glow), 0 0 15px var(--primary-glow);
       letter-spacing: 2px;
       margin: 0;
@@ -207,7 +206,8 @@
   <div id="help-overlay" class="overlay fadeable is-faded-out">
     <div class="overlay-content">
       <h2>How To Play</h2>
-      <p>Watch the neon sequence.<br>Repeat the pattern by pressing the glowing pads in the same order.<br>Get the highest score you can!</p>
+      <!-- Change 1: "pads" changed to "squares" -->
+      <p>Watch the neon sequence.<br>Repeat the pattern by pressing the glowing squares in the same order.<br>Get the highest score you can!</p>
       <button class="play-button" id="resumeBtn">Resume</button>
     </div>
   </div>
@@ -215,11 +215,12 @@
   <div id="final-summary-overlay" class="overlay fadeable is-faded-out">
     <div class="overlay-content">
       <h2>Time's Up!</h2>
+      <!-- Change 2: "Great Job!" message added -->
+      <p style="font-size: 1.5em; color: var(--primary-glow);">Great Job!</p>
       <p>Your personal best score:</p>
-      <!-- Change: Reduced glow on final score for readability -->
       <p id="final-best-score" style="font-size: 3em; color: #fff; margin: 10px 0; text-shadow: 0 0 8px var(--primary-glow);">0</p>
-      <p>Make sure you press the red arrow on the bottom right of the screen to finish.</p>
-      <button class="play-button" onclick="location.reload()">Play Again</button>
+      <!-- Change 3: Final prompt updated and "Play Again" button removed -->
+      <p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>
     </div>
   </div>
 
@@ -241,7 +242,6 @@
     }
   
     const GAME_TIME = 300;
-    // Change: Array of encouraging messages for incorrect attempts
     const RETRY_MESSAGES = ["Let's try again!", "You got this!", "Nice try!", "Give it another shot!"];
 
     const elements = {
@@ -339,7 +339,6 @@
     function handleIncorrect() {
         isPlayerTurn = false;
         elements.wrongSound.play();
-        // Change: Select a random encouraging message
         elements.message.textContent = RETRY_MESSAGES[Math.floor(Math.random() * RETRY_MESSAGES.length)];
         elements.buttonContainer.classList.add('shake-container');
         score = 0;
