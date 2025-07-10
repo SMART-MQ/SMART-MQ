@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SMART Sequence Challenge</title>
+  <!-- Change: Updated page title -->
+  <title>SMART Sequence Master</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-color: #f3e8ff;
-      --primary-color: #4b0082;
-      --accent-color: #ff7f50;
-      --accent-shadow: #e06c3a;
-      --light-lavender: #e6e6fa;
-      --text-color: #3d3d3d;
+      --bg-color: #191932;
+      --primary-glow: #23d9d9;
+      --text-color: #f0f0f0;
+      
+      --btn1-color: #ff3c82; /* Neon Pink/Magenta */
+      --btn2-color: #ff9a3c; /* Neon Orange */
+      --btn3-color: #3cff9a; /* Neon Green */
+      --btn4-color: #3c9aff; /* Neon Blue */
     }
 
     * { box-sizing: border-box; }
@@ -22,16 +25,27 @@
     html, body {
       margin: 0;
       padding: 0;
-      font-family: 'Fredoka One', cursive;
+      font-family: 'Bungee', cursive;
       background-color: var(--bg-color);
       color: var(--text-color);
       text-align: center;
-      overflow-x: hidden;
+      overflow: hidden; /* Hide scrollbars, stars will be contained */
+      position: relative;
     }
     
     .hidden { display: none !important; }
     .fadeable { transition: opacity 0.4s ease-in-out, visibility 0.4s; }
     .is-faded-out { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    /* --- Animated Star Background --- */
+    .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+    .star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      animation: twinkle 10s infinite linear;
+    }
+    @keyframes twinkle { 0% { opacity: 0; transform: translateY(0); } 50% { opacity: 0.8; } 100% { opacity: 0; transform: translateY(-100px); } }
 
     /* --- Screens & Overlays --- */
     .screen {
@@ -41,56 +55,63 @@
       justify-content: center;
       align-items: center;
       padding: 20px;
+      position: relative;
+      z-index: 1;
     }
 
     .overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.6); z-index: 1000; display: flex;
+      background-color: rgba(0,0,0,0.7); z-index: 1000; display: flex;
       justify-content: center; align-items: center; padding: 15px;
     }
     
     .overlay-content {
-      background-color: var(--light-lavender); padding: 20px; border-radius: 20px; 
-      border: 4px solid var(--primary-color); width: 100%; max-width: 500px;
+      background: rgba(25, 25, 50, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 30px; border-radius: 20px; 
+      border: 2px solid var(--primary-glow); width: 100%; max-width: 500px;
       max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 0 20px rgba(35, 217, 217, 0.3);
     }
 
     /* --- Typography & Titles --- */
     h1 {
-      font-size: clamp(2.5em, 10vw, 4em);
-      color: var(--primary-color);
-      text-shadow: 4px 4px 0px var(--accent-color);
-      margin: 0 0 20px 0;
+      font-size: clamp(3em, 12vw, 5em);
+      color: #fff;
+      text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--primary-glow), 0 0 30px var(--primary-glow);
+      margin: 0;
+      line-height: 1;
     }
     
-    h2 {
-      font-size: clamp(1.5em, 6vw, 2em);
-      color: var(--primary-color);
+    h2 { font-size: clamp(2em, 7vw, 2.5em); color: var(--primary-glow); }
+    p, li { font-size: clamp(1em, 4vw, 1.2em); line-height: 1.5; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+    
+    /* Change: Style for the subtitle */
+    .subtitle {
+        font-size: clamp(1.2em, 5vw, 1.5em);
+        color: var(--text-color);
+        margin: 20px 0;
     }
 
-    ul { list-style-type: none; padding: 0; text-align: left; max-width: 350px; margin: 20px auto; }
-    ul li { font-size: clamp(1em, 4vw, 1.2em); margin-bottom: 12px; line-height: 1.4; }
-    ul li::before { content: '⭐'; margin-right: 10px; }
-    
     /* --- Game Area --- */
     #game-area { width: 100%; max-width: 600px; }
     .scoreboard { display: flex; justify-content: space-around; font-size: 1.2em; margin-bottom: 15px; }
-    #message { font-size: 1.3em; color: var(--primary-color); min-height: 1.5em; margin: 15px 0; font-weight: bold; }
+    #message { font-size: 1.5em; color: #fff; min-height: 1.5em; margin: 20px 0; text-shadow: 0 0 5px var(--primary-glow); }
 
     .timer-bar-container {
-      width: 90%; max-width: 500px; height: 25px; background-color: #e9ecef;
-      border-radius: 10px; border: 3px solid var(--primary-color);
-      margin: 15px auto; overflow: hidden;
+      width: 90%; max-width: 500px; height: 15px; background-color: rgba(0,0,0,0.3);
+      border-radius: 10px; border: 2px solid var(--primary-glow);
+      margin: 15px auto; overflow: hidden; box-shadow: 0 0 10px rgba(35, 217, 217, 0.3);
     }
     .timer-bar {
-      height: 100%; width: 100%; background-color: #32cd32;
+      height: 100%; width: 100%; background-color: var(--primary-glow);
       border-radius: 6px; transition: width 1s linear;
     }
 
     .button-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 25px;
       margin-top: 20px;
       max-width: 400px;
       margin: 0 auto;
@@ -98,67 +119,75 @@
 
     .color-button {
       aspect-ratio: 1 / 1;
-      border: none;
+      border: 3px solid;
       border-radius: 20px;
       cursor: pointer;
       transition: all 0.1s ease-out;
+      background-color: transparent; /* Explicitly set */
     }
-    #btn1 { background-color: #ffb3ba; box-shadow: 0 8px 0 #e08a91; }
-    #btn2 { background-color: #ffdfba; box-shadow: 0 8px 0 #e0b98a; }
-    #btn3 { background-color: #baffc9; box-shadow: 0 8px 0 #8ad89b; }
-    #btn4 { background-color: #bae1ff; box-shadow: 0 8px 0 #8ab8de; }
+    #btn1 { border-color: var(--btn1-color); box-shadow: 0 0 15px var(--btn1-color); }
+    #btn2 { border-color: var(--btn2-color); box-shadow: 0 0 15px var(--btn2-color); }
+    #btn3 { border-color: var(--btn3-color); box-shadow: 0 0 15px var(--btn3-color); }
+    #btn4 { border-color: var(--btn4-color); box-shadow: 0 0 15px var(--btn4-color); }
 
-    .color-button:active:not(:disabled) { transform: translateY(4px); }
-    #btn1:active:not(:disabled) { box-shadow: 0 4px 0 #e08a91; }
-    #btn2:active:not(:disabled) { box-shadow: 0 4px 0 #e0b98a; }
-    #btn3:active:not(:disabled) { box-shadow: 0 4px 0 #8ad89b; }
-    #btn4:active:not(:disabled) { box-shadow: 0 4px 0 #8ab8de; }
-    
-    .color-button:disabled { opacity: 0.7; cursor: not-allowed; }
-
-    .color-button.flash {
-      transform: translateY(4px) scale(0.95);
-      filter: brightness(1.2);
+    .color-button:active:not(:disabled), .color-button.flash {
+      transform: scale(0.95);
+      filter: brightness(2.5);
     }
+    #btn1.flash { background-color: var(--btn1-color); } /* Add fill on flash */
+    #btn2.flash { background-color: var(--btn2-color); }
+    #btn3.flash { background-color: var(--btn3-color); }
+    #btn4.flash { background-color: var(--btn4-color); }
+
+    .color-button:disabled { filter: brightness(0.4); cursor: not-allowed; }
     
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
     .shake-container { animation: shake 0.4s; }
 
-    /* --- Buttons & Misc --- */
+    /* --- General Buttons & Misc --- */
     .play-button {
-      background-color: var(--accent-color); border: none; color: white;
-      padding: 15px 30px; margin-top: 10px; font-size: 1.3em;
-      font-family: 'Fredoka One', cursive; border-radius: 12px;
+      background: transparent;
+      border: 2px solid var(--primary-glow);
+      color: var(--primary-glow);
+      padding: 15px 30px; margin-top: 20px; font-size: 1.3em;
+      font-family: 'Bungee', cursive; border-radius: 12px;
       cursor: pointer; transition: all 0.2s ease;
-      box-shadow: 0 6px 0 var(--accent-shadow); text-transform: uppercase;
+      text-shadow: 0 0 5px var(--primary-glow);
+      box-shadow: 0 0 10px rgba(35, 217, 217, 0.5) inset;
     }
-    .play-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 0 var(--accent-shadow); }
+    .play-button:hover:not(:disabled) { background: var(--primary-glow); color: var(--bg-color); text-shadow: none; }
 
     .help-button {
       position: fixed; bottom: 15px; right: 15px; width: 55px; height: 55px;
       border-radius: 50%; font-size: 2em; z-index: 500;
-      background-color: var(--primary-color); color: white;
-      border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      cursor: pointer; line-height: 1;
+      background-color: var(--primary-glow); color: var(--bg-color);
+      border: none; box-shadow: 0 0 15px var(--primary-glow);
+      cursor: pointer; line-height: 1; transition: transform 0.2s;
     }
+    .help-button:hover { transform: scale(1.1); }
     
     #fanfare {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background-color: rgba(75, 0, 130, 0.9); color: white; padding: 20px 40px;
-      border-radius: 20px; font-size: 3em; z-index: 9999;
+      font-size: 3em; color: #fff; z-index: 9999;
+      text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--primary-glow), 0 0 30px var(--primary-glow);
     }
-    @keyframes fanfare-anim { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+    @keyframes fanfare-anim { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
 
   </style>
 </head>
 <body>
+  
+  <div class="stars"></div>
 
   <!-- Start Screen -->
   <div id="start-screen" class="screen">
-    <h1>Sequence Challenge</h1>
+    <!-- Change: New subtitle added -->
+    <p class="subtitle">Welcome to the SMART Challenge</p>
+    <!-- Change: Game title updated -->
+    <h1>Sequence Master</h1>
     <p>This is a challenge just for you. Try to beat your best score each round!</p>
-    <button class="play-button" id="startBtn">Play</button>
+    <button class="play-button" id="startBtn">Start Game</button>
   </div>
 
   <!-- Game Screen -->
@@ -181,44 +210,48 @@
     </div>
   </div>
 
-  <!-- Help Button -->
   <button id="helpBtn" class="help-button hidden">?</button>
-  
-  <!-- Fanfare Message -->
   <div id="fanfare" class="hidden"></div>
 
-  <!-- Help Overlay -->
+  <!-- Help & Final Summary Overlays -->
   <div id="help-overlay" class="overlay fadeable is-faded-out">
     <div class="overlay-content">
-      <h2>Instructions</h2>
-      <ul>
-        <li>Watch the sequence of colours.</li>
-        <li>Repeat the pattern by pressing the buttons in the same order.</li>
-        <li>Each correct round adds a new colour to the sequence.</li>
-        <li>Get the highest score you can before time runs out!</li>
-      </ul>
+      <h2>How To Play</h2>
+      <p>Watch the neon sequence.<br>Repeat the pattern by pressing the glowing pads in the same order.<br>Get the highest score you can!</p>
       <button class="play-button" id="resumeBtn">Resume</button>
     </div>
   </div>
 
-  <!-- Final Summary Overlay -->
   <div id="final-summary-overlay" class="overlay fadeable is-faded-out">
     <div class="overlay-content">
       <h2>Time's Up!</h2>
-      <p style="font-size: 1.2em;">Your personal best was:</p>
-      <p id="final-best-score" style="font-size: 2.5em; color: var(--primary-color); margin: 10px 0;">0</p>
+      <p>Your personal best score:</p>
+      <p id="final-best-score" style="font-size: 3em; color: #fff; margin: 10px 0; text-shadow: 0 0 10px var(--primary-glow);">0</p>
       <p>Make sure you press the red arrow on the bottom right of the screen to finish.</p>
       <button class="play-button" onclick="location.reload()">Play Again</button>
     </div>
   </div>
 
-  <audio id="flashSound" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
-  <audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.mp3" preload="auto"></audio>
+  <audio id="flashSound" src="https://assets.codepen.io/217233/synth_C4.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="https://assets.codepen.io/217233/synth_misc_1.mp3" preload="auto"></audio>
 
   <script>
-    const GAME_TIME = 300; // 5 minutes in seconds
+    // --- Star Background Generator ---
+    const starsContainer = document.querySelector('.stars');
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.width = `${Math.random() * 2}px`;
+        star.style.height = star.style.width;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.animationDelay = `${Math.random() * 10}s`;
+        star.style.animationDuration = `${5 + Math.random() * 5}s`;
+        starsContainer.appendChild(star);
+    }
+  
+    const GAME_TIME = 300;
 
-    // --- Element Cache ---
     const elements = {
         startScreen: document.getElementById('start-screen'),
         gameScreen: document.getElementById('game-screen'),
@@ -239,12 +272,10 @@
         wrongSound: document.getElementById('wrongSound'),
     };
 
-    // --- Game State ---
     let sequence = [], userSequence = [], score = 0, best = 0;
     let timer, timeLeft = GAME_TIME;
     let isPlayerTurn = false, isGameRunning = false, isPaused = false;
 
-    // --- Event Listeners ---
     elements.startBtn.addEventListener('click', startGame);
     elements.helpBtn.addEventListener('click', pauseGame);
     elements.resumeBtn.addEventListener('click', resumeGame);
@@ -252,13 +283,12 @@
       btn.addEventListener('click', () => handlePlayerInput(i));
     });
 
-    // --- Game Flow ---
     function startGame() {
       elements.startScreen.classList.add('hidden');
       elements.gameScreen.classList.remove('hidden');
       elements.helpBtn.classList.remove('hidden');
 
-      triggerFanfare("Let's Go!", 1500);
+      triggerFanfare("Get Ready", 1500);
 
       setTimeout(() => {
         isGameRunning = true;
@@ -272,18 +302,17 @@
       
       isPlayerTurn = false;
       userSequence = [];
-      updateButtonsState(true); // Disable buttons
-      elements.message.textContent = 'Watch carefully...';
+      updateButtonsState(true);
+      elements.message.textContent = '...WATCH...';
       
       sequence.push(Math.floor(Math.random() * 4));
       playSequence();
       
-      // Schedule player's turn after sequence playback
       setTimeout(() => {
         isPlayerTurn = true;
-        updateButtonsState(false); // Enable buttons
-        elements.message.textContent = 'Your turn!';
-      }, sequence.length * 700 + 400); // Sequence speed + buffer
+        updateButtonsState(false);
+        elements.message.textContent = 'YOUR TURN!';
+      }, sequence.length * 600 + 400);
     }
     
     function endGame() {
@@ -296,45 +325,39 @@
         window.parent.postMessage("showNext", "*");
     }
 
-    // --- Player Interaction ---
     function handlePlayerInput(index) {
         if (!isPlayerTurn) return;
         
         flashButton(elements.buttons[index]);
         userSequence.push(index);
         
-        // Check if the current press is correct
         if (userSequence[userSequence.length - 1] !== sequence[userSequence.length - 1]) {
             handleIncorrect();
             return;
         }
         
-        // Check if the full sequence has been entered
         if (userSequence.length === sequence.length) {
             handleCorrect();
         }
     }
     
     function handleCorrect() {
-        isPlayerTurn = false; // Prevent further clicks
+        isPlayerTurn = false;
         score++;
         if (score > best) {
             best = score;
-            elements.message.textContent = 'New Best!';
-        } else {
-            elements.message.textContent = 'Correct!';
+            triggerFanfare("NEW BEST!", 1000);
         }
         updateScoreboard();
         setTimeout(nextRound, 1000);
     }
     
     function handleIncorrect() {
-        isPlayerTurn = false; // Prevent further clicks
+        isPlayerTurn = false;
         elements.wrongSound.play();
-        elements.message.textContent = 'Oops! Try again.';
+        elements.message.textContent = 'RESET!';
         elements.buttonContainer.classList.add('shake-container');
         
-        // Reset game state
         score = 0;
         sequence = [];
         updateScoreboard();
@@ -345,15 +368,12 @@
         }, 1500);
     }
     
-    // --- Timers & Pausing ---
     function startTimer() {
         timer = setInterval(() => {
             if (isPaused || !isGameRunning) return;
             timeLeft--;
             elements.timerBar.style.width = (timeLeft / GAME_TIME) * 100 + '%';
-            if (timeLeft <= 0) {
-                endGame();
-            }
+            if (timeLeft <= 0) endGame();
         }, 1000);
     }
 
@@ -368,35 +388,30 @@
         elements.helpOverlay.classList.add('is-faded-out');
     }
     
-    // --- Visual & Audio Feedback ---
     function playSequence() {
       let i = 0;
       const interval = setInterval(() => {
-        if(i >= sequence.length) {
-            clearInterval(interval);
-            return;
-        }
+        if(i >= sequence.length) { clearInterval(interval); return; }
         flashButton(elements.buttons[sequence[i]]);
         i++;
-      }, 700); // Slightly faster sequence
+      }, 600);
     }
     
     function flashButton(btn) {
         elements.flashSound.currentTime = 0;
         elements.flashSound.play();
         btn.classList.add("flash");
-        setTimeout(() => btn.classList.remove("flash"), 350);
+        setTimeout(() => btn.classList.remove("flash"), 300);
     }
     
     function triggerFanfare(text, duration) {
         elements.fanfare.textContent = text;
         elements.fanfare.classList.remove('hidden', 'fanfare-animate');
-        void elements.fanfare.offsetWidth; // Trigger reflow to restart animation
+        void elements.fanfare.offsetWidth;
         elements.fanfare.classList.add('fanfare-animate');
         setTimeout(() => elements.fanfare.classList.add('hidden'), duration);
     }
     
-    // --- UI Updates ---
     function updateScoreboard() {
         elements.currentScoreEl.textContent = `Score: ${score}`;
         elements.bestScoreEl.textContent = `Best: ${best}`;
