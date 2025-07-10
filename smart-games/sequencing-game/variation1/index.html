@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SMART Memory Game</title>
+  <title>SMART Sequence Challenge</title>
   <style>
     html, body {
       margin: 0;
@@ -54,6 +54,7 @@
       font-size: 4vw;
       color: #555;
       margin: 10px 0;
+      min-height: 1.2em; /* Change: Ensures space is reserved for messages */
     }
 
     .play-button {
@@ -84,6 +85,11 @@
       transition: transform 0.2s, opacity 0.2s, border 0.2s;
     }
 
+    .color-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
     .color-button.flash {
       opacity: 0.4 !important;
       transform: scale(1.1);
@@ -97,11 +103,18 @@
       flex-wrap: wrap;
       margin-bottom: 10px;
     }
+    
+    /* Change: Container for timer and help button */
+    .game-footer {
+        position: fixed;
+        bottom: 15px;
+        right: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
 
     #timerBox {
-      position: fixed;
-      bottom: 15px;
-      right: 15px;
       background: #ffffffcc;
       padding: 10px 20px;
       border-radius: 10px;
@@ -109,6 +122,25 @@
       font-weight: bold;
       color: #222;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    
+    /* Change: Style for new help button */
+    #helpButton {
+        width: 12vw;
+        height: 12vw;
+        max-width: 50px;
+        max-height: 50px;
+        border-radius: 50%;
+        border: none;
+        background-color: #bae1ff;
+        color: white;
+        font-size: 7vw;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     #instructionModal, #finalPopup {
@@ -157,16 +189,12 @@
       display: none;
     }
 
-    #gameInstructionText {
-      font-size: 4vw;
-      margin-top: 20px;
-      color: #333;
-    }
   </style>
 </head>
 <body>
   <div class="content" id="startScreen">
-    <h1>Welcome to the SMART Memory Game!</h1>
+    <!-- Change (2): Game given a unique name -->
+    <h1>Welcome to Sequence Challenge!</h1>
     <p><strong>This is a challenge just for you. Try to beat your best score each round!</strong></p>
     <button class="play-button" onclick="showInstructions()">Play</button>
   </div>
@@ -176,11 +204,14 @@
       <h2>Instructions</h2>
       <ul>
         <li>Watch the sequence of colours flash on the screen.</li>
-        <li>Repeat the pattern by clicking the buttons in the same order.</li>
+        <!-- Change (5): "clicking" changed to "pressing" -->
+        <li>Repeat the pattern by pressing the buttons in the same order.</li>
         <li>Each round adds a new colour to the sequence.</li>
-        <li>Try to get the highest score in 10 minutes!</li>
+        <!-- Change (1): "10 minutes" changed to "5 minutes" -->
+        <li>Try to get the highest score in 5 minutes!</li>
       </ul>
-      <button class="play-button" onclick="startCountdown()">Start</button>
+      <!-- Change (6): Added an ID to the button to control its text/function -->
+      <button class="play-button" id="modalStartButton" onclick="startCountdown()">Start</button>
     </div>
   </div>
 
@@ -197,32 +228,45 @@
       <button class="color-button" id="btn3" style="background-color: #baffc9;"></button>
       <button class="color-button" id="btn4" style="background-color: #bae1ff;"></button>
     </div>
+    <!-- Change (9): This message element will now show turn prompts -->
     <p id="message"></p>
-    <div id="timerBox">10:00</div>
+  </div>
+  
+  <!-- Change (6): Footer for timer and new help button -->
+  <div class="game-footer" id="gameFooter" style="display: none;">
+      <button id="helpButton" onclick="showHelp()">?</button>
+      <div id="timerBox">05:00</div>
   </div>
 
-  <!-- New instruction line under game -->
-  <p id="gameInstructionText" style="display: none;">Repeat the pattern shown.</p>
 
   <div id="finalPopup">
     <div>
       <h2>Congratulations!</h2>
-      <p id="finalMessage"></p>
-      <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
+      <!-- Change (3 & 4): Updated final message and added new prompt -->
+      <p id="finalMessage">Your personal best was: 0</p>
+      <p>Make sure you press the red arrow on the bottom right of the screen to finish.</p>
     </div>
   </div>
 
-  <audio id="flashSound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
-  <audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.mp3"></audio>
+  <audio id="flashSound" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.mp3" preload="auto"></audio>
 
   <script>
-    let sequence = [], userSequence = [], score = 0, best = 0, timer, timeLeft = 600;
+    // Change (1): timeLeft is now 300 seconds (5 minutes)
+    let sequence = [], userSequence = [], score = 0, best = 0, timer, timeLeft = 300;
+    // Change (9): isPlayerTurn flag to manage game state and disable buttons
+    let isPlayerTurn = false; 
+
     const buttons = ["btn1", "btn2", "btn3", "btn4"].map(id => document.getElementById(id));
     const flashSound = document.getElementById("flashSound");
     const wrongSound = document.getElementById("wrongSound");
+    const messageEl = document.getElementById("message");
+    const modalStartButton = document.getElementById("modalStartButton");
 
     buttons.forEach((btn, i) => {
       btn.addEventListener("click", () => {
+        // Change (9): Only allow clicks during the player's turn
+        if (!isPlayerTurn) return; 
         flashButton(btn);
         userSequence.push(i);
         checkUserInput();
@@ -237,7 +281,7 @@
     function startCountdown() {
       document.getElementById("instructionModal").style.display = "none";
       document.getElementById("gameArea").style.display = "block";
-      document.getElementById("gameInstructionText").style.display = "block";
+      document.getElementById("gameFooter").style.display = "flex"; // Change: Show footer
       let countdown = 3;
       const box = document.getElementById("countdownBox");
       box.style.display = "block";
@@ -256,6 +300,7 @@
     }
 
     function flashButton(btn) {
+      flashSound.currentTime = 0;
       flashSound.play();
       btn.classList.add("flash");
       setTimeout(() => btn.classList.remove("flash"), 500);
@@ -274,29 +319,48 @@
       const index = userSequence.length - 1;
       if (userSequence[index] !== sequence[index]) {
         wrongSound.play();
-        document.getElementById("message").textContent = "Try again!";
+        messageEl.textContent = "Try again!";
         sequence = [], userSequence = [], score = 0;
         document.getElementById("currentScore").textContent = `Current Score: ${score}`;
-        setTimeout(nextRound, 1000);
+        // Delay next round to allow "Try again" message to be seen
+        setTimeout(nextRound, 1500);
         return;
       }
       if (userSequence.length === sequence.length) {
         score++;
         best = Math.max(best, score);
-        document.getElementById("message").textContent = score === best ? "New personal best!" : "Well done!";
+        messageEl.textContent = score === best ? "New personal best!" : "Well done!";
         document.getElementById("currentScore").textContent = `Current Score: ${score}`;
         document.getElementById("bestScore").textContent = `Personal Best: ${best}`;
         userSequence = [];
+        // Delay next round to allow "Well done!" message to be seen
         setTimeout(nextRound, 1000);
       }
     }
 
     function nextRound() {
+      // Change (10): Clear previous message (e.g., "Try again" or "Well done")
+      messageEl.textContent = ""; 
+      isPlayerTurn = false;
+      buttons.forEach(btn => btn.disabled = true); // Disable buttons during sequence playback
+
+      // Change (9): Add prompt for computer's turn
+      messageEl.textContent = "Watch carefully...";
+
       sequence.push(Math.floor(Math.random() * 4));
       playSequence();
+
+      // Change (9): Set a timeout to switch to the player's turn after the sequence has finished playing
+      setTimeout(() => {
+        messageEl.textContent = "Your turn!";
+        isPlayerTurn = true;
+        buttons.forEach(btn => btn.disabled = false); // Re-enable buttons
+      }, sequence.length * 800 + 400); // Add a small buffer
     }
 
     function startTimer() {
+      // Change (6): Ensure the timer variable is cleared before setting a new one
+      if(timer) clearInterval(timer);
       timer = setInterval(() => {
         timeLeft--;
         const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
@@ -304,21 +368,40 @@
         document.getElementById("timerBox").textContent = `${m}:${s}`;
         if (timeLeft <= 0) {
           clearInterval(timer);
-          document.getElementById("message").textContent = "Time's up!";
+          messageEl.textContent = "Time's up!";
+          buttons.forEach(btn => btn.disabled = true); // Disable buttons when time is up
           showFinalPopup();
         }
       }, 1000);
+    }
+    
+    // Change (6): New function to show help/instructions mid-game
+    function showHelp() {
+        if (timeLeft <= 0) return; // Don't show if game is over
+        clearInterval(timer);
+        buttons.forEach(btn => btn.disabled = true);
+        
+        modalStartButton.textContent = "Resume";
+        modalStartButton.onclick = resumeGame; // Change button function
+        
+        document.getElementById("instructionModal").style.display = "flex";
+    }
+
+    // Change (6): New function to resume the game from the instruction modal
+    function resumeGame() {
+        document.getElementById("instructionModal").style.display = "none";
+        if(isPlayerTurn) { // Only enable buttons if it was the player's turn
+            buttons.forEach(btn => btn.disabled = false);
+        }
+        startTimer(); // Resume timer
     }
 
     function showFinalPopup() {
       document.getElementById("finalMessage").textContent = `Your personal best was: ${best}`;
       document.getElementById("finalPopup").style.display = "flex";
-      window.parent.postMessage("showNext", "*");
+      // This message helps integrate with the external platform if needed
+      // window.parent.postMessage("showNext", "*"); 
     }
   </script>
 </body>
 </html>
-
-
-
-
