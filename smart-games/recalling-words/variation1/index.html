@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Game - Progressive</title>
+    <title>SMART Game - Word Wizard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- MODIFIED: Changed font to the more modern and playful Fredoka One -->
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-    /* NEW: Define a color palette in CSS variables for easy changes */
     :root {
         --bg-color: #e0f7fa; /* Light Sky Blue */
         --text-color: #004d40; /* Deep Teal */
@@ -22,42 +20,43 @@
         --incorrect-color: #e76f51;
     }
 
-    * {
-        box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
-        /* MODIFIED: Using new font and color palette */
         font-family: 'Fredoka', sans-serif;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: 100vh;
+        min-height: 100vh; 
         margin: 0;
+        padding: 20px 10px;
         text-align: center;
-        font-size: 1.5rem;
         background-color: var(--bg-color);
         color: var(--text-color);
-        overflow: hidden;
+        overflow-y: auto;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
 
-    /* NEW: Smooth transitions for showing/hiding main containers */
+    body.no-scroll {
+        height: 100vh;
+        overflow: hidden;
+        padding: 0;
+    }
+
     .view {
         width: 100%;
+        max-width: 900px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        position: absolute;
-        transition: opacity 0.4s ease-in-out;
+        transition: opacity 0.4s ease-in-out, height 0.4s ease;
     }
 
     .view.hidden {
-        opacity: 0;
-        pointer-events: none;
+       display: none;
     }
 
     #result {
@@ -74,15 +73,15 @@
 
     #words-list {
         display: grid;
-        gap: 25px;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 20px;
         justify-items: center;
         margin-top: 20px;
         padding: 10px;
-        width: 90%;
+        width: 100%;
         max-width: 800px;
     }
 
-    /* MODIFIED: Redesigned word cards with 3D effect */
     .word-card {
         background-color: var(--white);
         border: 3px solid var(--text-color);
@@ -90,7 +89,10 @@
         box-shadow: 0 5px 0 var(--text-color);
         padding: 20px;
         width: 100%;
-        box-sizing: border-box;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
         font-weight: 400;
         font-size: 22px;
@@ -100,19 +102,13 @@
         user-select: none;
     }
 
-    /* NEW: Shake animation for incorrect answers */
     @keyframes shake {
         0%, 100% { transform: translateX(0); }
         25% { transform: translateX(-8px); }
         75% { transform: translateX(8px); }
     }
+    .word-card.shake { animation: shake 0.4s; border-color: var(--incorrect-color); }
 
-    .word-card.shake {
-        animation: shake 0.4s;
-        border-color: var(--incorrect-color);
-    }
-
-    /* MODIFIED: Standardized button styles with 3D effect */
     .btn {
         background-color: var(--accent-color);
         border: 3px solid var(--text-color);
@@ -130,57 +126,15 @@
         margin: 5px;
     }
 
-    @media (hover: hover) {
-        .btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 0 var(--accent-shadow);
-        }
-    }
+    @media (hover: hover) { .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 0 var(--accent-shadow); } }
+    .btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 3px 0 var(--accent-shadow); }
+    .btn:disabled { cursor: not-allowed; background-color: #d0d0d0; box-shadow: 0 5px 0 #a0a0a0; color: #888; }
+    
+    .main-action-button { width: 90%; max-width: 300px; margin: 20px auto 0 auto; }
 
-    .btn:active:not(:disabled) {
-        transform: translateY(2px);
-        box-shadow: 0 3px 0 var(--accent-shadow);
-    }
-
-    .btn:disabled {
-        cursor: not-allowed;
-        background-color: #d0d0d0;
-        box-shadow: 0 5px 0 #a0a0a0;
-        color: #888;
-    }
-
-    .main-action-button {
-        width: 90%;
-        max-width: 300px;
-        margin: 10px auto 0 auto;
-    }
-
-    #recall-word {
-        width: 90%;
-        max-width: 500px;
-        margin: 0 auto 30px auto;
-        font-size: 23px;
-    }
-
-    .recall-question-layout {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 12px;
-        line-height: 1.5;
-    }
-
-    .recall-question-layout .word-card {
-        padding: 10px 15px;
-        display: inline-block;
-        margin: 0;
-        font-weight: 600;
-    }
-
-    .hidden {
-        display: none !important; /* Overwrite fading class */
-    }
+    #recall-word { width: 90%; max-width: 500px; margin: 0 auto 30px auto; font-size: 23px; }
+    .recall-question-layout { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; line-height: 1.5; }
+    .recall-question-layout .word-card { padding: 10px 15px; display: inline-block; margin: 0; font-weight: 600; }
 
     .info-page-container {
         background-color: var(--white);
@@ -190,148 +144,80 @@
         box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1);
         width: 95%;
         max-width: 600px;
-        box-sizing: border-box;
         text-align: center;
-        font-size: 17px;
-        line-height: 1.5;
+        font-size: 1.1em;
+        line-height: 1.6;
     }
 
-    .info-page-container h2 {
-        text-align: center;
-    }
-
+    .info-page-container h2 { text-align: center; font-size: 1.8em; }
     .info-page-container ul {
-        padding-left: 20px;
-        margin-top: 20px;
+        padding: 0;
+        margin: 20px auto;
+        list-style-type: none;
+        display: inline-block;
         text-align: left;
     }
+    .info-page-container ul li {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+    }
 
-    /* MODIFIED: New title style - no more rainbow */
     .pop-title {
-        font-size: 2.5rem;
+        font-size: 3rem;
         font-weight: 600;
-        line-height: 1.3;
+        line-height: 1.2;
         color: var(--text-color);
         text-shadow: 3px 3px 0px var(--accent-color);
     }
 
-    .welcome-subtitle {
-        display: inline-block;
-        margin-top: 15px;
-        font-size: 1.1rem;
-        color: #555;
-    }
-
-    .info-button-group {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-        margin-top: 20px;
-    }
+    .welcome-subtitle { display: inline-block; margin-top: 15px; font-size: 1.2rem; color: #555; }
+    .info-button-group { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 20px; flex-wrap: wrap;}
 
     #session-timer {
-        position: fixed;
-        top: 15px;
-        right: 15px;
-        background-color: var(--white);
-        padding: 10px 20px;
-        border-radius: 12px;
-        border: 3px solid var(--text-color);
-        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
-        font-size: 1.2rem;
-        font-weight: 600;
-        z-index: 100;
+        position: fixed; top: 15px; right: 15px; background-color: var(--white);
+        padding: 10px 20px; border-radius: 12px; border: 3px solid var(--text-color);
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1); font-size: 1.2rem; font-weight: 600; z-index: 100;
     }
 
-    #score-list {
-        list-style-type: none;
-        padding: 0;
-        text-align: left;
-        max-height: 250px;
-        overflow-y: auto;
-    }
-    #score-list li.best-score {
-        font-weight: bold;
-        color: var(--correct-color);
-    }
+    #score-list { list-style-type: none; padding: 0; text-align: left; max-height: 250px; overflow-y: auto; }
+    #score-list li.best-score { font-weight: bold; color: var(--correct-color); }
+    #feedback-popup { /* Styles from previous version */ }
+    #feedback-popup.incorrect { /* Styles from previous version */ }
 
-    #feedback-popup {
-        /* Styles remain similar, just color updates */
-        color: var(--correct-color);
-    }
-    #feedback-popup.incorrect {
-        color: var(--incorrect-color);
-    }
-
-    /* NEW: Help Button styles */
     .help-button {
-        position: fixed;
-        bottom: 15px;
-        left: 15px;
-        width: 55px;
-        height: 55px;
-        border-radius: 50%;
-        font-size: 2rem;
-        font-weight: 600;
-        z-index: 1000;
-        padding: 0;
-        line-height: 55px;
+        position: fixed; bottom: 15px; left: 15px; width: 55px; height: 55px;
+        border-radius: 50%; font-size: 2rem; font-weight: 600;
+        z-index: 1000; padding: 0; line-height: 55px;
     }
     
-    /* NEW: Help Overlay styles */
     .overlay-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 2000;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.6); z-index: 2000;
+        display: flex; align-items: center; justify-content: center;
+        padding: 15px;
     }
-    .overlay-container .info-page-container {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
+    .overlay-container .info-page-container { margin: auto; }
 
-    /* MOBILE IMPROVEMENTS */
     @media (max-width: 650px) {
-        body {
-            font-size: 1.1rem;
-        }
-        #words-list {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-        .pop-title {
-            font-size: 2rem;
-        }
-        .info-button-group {
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-        }
+        .pop-title { font-size: 2.5rem; }
+        .info-button-group { flex-direction: column; gap: 15px; width: 100%; }
+        #words-list { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 15px;}
     }
-</style>
 
+</style>
 </head>
 <body class="no-scroll">
     <div id="feedback-popup"></div>
-    <div id="session-timer" class="hidden">Time: 10:00</div>
-    <!-- NEW: Help button, hidden by default -->
+    <div id="session-timer" class="hidden">Time: 05:00</div>
     <button id="help-btn" class="btn help-button hidden" onclick="toggleHelp(true)">?</button>
 
 <div id="info-page-1" class="view">
     <div class="info-page-container">
         <p>
-            <!-- MODIFIED: Changed class to pop-title -->
-            <span class="pop-title">SMART Memory Game!</span>
+            <span class="welcome-subtitle">Welcome to</span>
             <br>
-            <span class="welcome-subtitle"> This is a challenge just for you. Try to beat your best score!</span>
+            <span class="pop-title">Word Wizard</span>
         </p>
-        <!-- MODIFIED: Buttons now use the .btn class -->
         <button class="btn main-action-button" onclick="showInstructionsPage()">How to Play</button>
     </div>
 </div>
@@ -340,11 +226,10 @@
     <div class="info-page-container">
         <h2>How to Play</h2>
         <ul>
-            <li>This game has three difficulties: Easy, Medium, and Hard. You get to play 3 rounds of each before moving to the next.</li>
-            <li>In each round, memorise the words you see.</li>
-            <li>You will then begin to see a series of words, one by one.</li>
-            <li>For each word, click <strong>"Yes"</strong> if you saw it in the original set, or <strong>"No"</strong> if you did not.</li>
-            <li>You get 10 minutes to play. Try to get the best score in each difficulty!</li>
+            <li>🧠 First, memorise the list of words.</li>
+            <li>👍 Press <strong>"Yes"</strong> if you saw the word, or 👎 <strong>"No"</strong> if it's new.</li>
+            <li>💪 The game has 3 levels: <strong>Easy, Medium, and Hard.</strong> It gets trickier!</li>
+            <li>🏆 Try to get your best score in <strong>5 minutes!</strong></li>
         </ul>
         <div class="info-button-group">
             <button class="btn" onclick="showWelcomePage()">Back</button>
@@ -353,20 +238,17 @@
     </div>
 </div>
 
-<!-- NEW: Help Overlay, contains a copy of instructions -->
-<div id="help-overlay" class="overlay-container view hidden">
+<div id="help-overlay" class="overlay-container hidden">
     <div class="info-page-container">
         <h2>How to Play</h2>
-        <ul>
-            <li>Memorise the words you see on the screen.</li>
-            <li>You will then see a series of words, one by one.</li>
-            <li>For each word, click <strong>"Yes"</strong> if you saw it, or <strong>"No"</strong> if you did not.</li>
-            <li>Try to get as many correct as possible!</li>
+         <ul>
+            <li>🧠 First, memorise the list of words.</li>
+            <li>👍 Press <strong>"Yes"</strong> if you saw the word.</li>
+            <li>👎 Press <strong>"No"</strong> if it's a new word.</li>
         </ul>
         <button class="btn main-action-button" onclick="toggleHelp(false)">Got it!</button>
     </div>
 </div>
-
 
 <div id="game-container" class="view hidden">
     <h2 id="game-heading">Memorise these words!</h2>
@@ -377,7 +259,6 @@
 <div id="recall-container" class="view hidden">
     <h2>Recall the words!</h2>
     <div id="recall-word"></div>
-    <!-- MODIFIED: Buttons now use the .btn class -->
     <button class="btn" onclick="answer('yes')">Yes</button>
     <button class="btn" onclick="answer('no')">No</button>
 </div>
@@ -397,14 +278,13 @@
 <script>
     document.body.classList.add('no-scroll');
     
-    // NEW: Get references to new UI elements
     const helpBtn = document.getElementById('help-btn');
     const helpOverlay = document.getElementById('help-overlay');
     const allViews = document.querySelectorAll('.view');
 
     const wordsPool = [ "table", "chair", "couch", "desk", "bed", "door", "window", "lamp", "shelf", "clock", "kitchen", "office", "school", "store", "market", "airport", "station", "museum", "hospital", "library", "park", "beach", "city", "island", "mountain", "garden", "street", "bridge", "tunnel", "road", "key", "phone", "book", "pen", "pencil", "paper", "bottle", "box", "cup", "plate", "fork", "knife", "spoon", "brush", "mirror", "hammer", "rope", "ladder", "button", "zipper", "car", "boat", "train", "plane", "bike", "truck", "wheel", "star", "moon", "cloud", "blanket", "pillow", "towel", "soap", "sponge", "broom", "basket", "vase", "rug", "curtain", "shirt", "pants", "dress", "skirt", "sock", "shoe", "hat", "glove", "belt", "jacket", "castle", "cabin", "cottage", "factory", "studio", "garage", "stadium", "arena", "chapel", "temple", "balloon", "candle", "trophy", "statue", "fountain", "flag", "coin", "dice", "gem", "marble", "screw", "wrench", "nail", "pliers", "battery", "cable", "drone", "laptop", "screen", "keyboard" ];
     const incorrectFeedback = ['Almost!', 'Nearly there!', 'Not Quite'];
-    const SESSION_DURATION = 600000;
+    const SESSION_DURATION = 300000;
 
     const difficultyLevels = [
         { name: 'Easy', memorizeCount: 6, distractorCount: 6 },
@@ -422,17 +302,17 @@
     let allSessionScores = [];
     let wordsUsedLastRound = [], wordsUsedTwoRoundsAgo = [];
     
-    let isPaused = false; // NEW: Flag to control pausing
+    let isPaused = false; 
 
-    // NEW: Helper function to switch between views smoothly
     function switchView(viewId) {
         allViews.forEach(view => {
-            if (view.id === viewId) {
-                view.classList.remove('hidden');
-            } else {
-                view.classList.add('hidden');
-            }
+            view.classList.toggle('hidden', view.id !== viewId);
         });
+        if (viewId === 'info-page-1' || viewId === 'info-page-2') {
+             document.body.classList.add('no-scroll');
+        } else {
+             document.body.classList.remove('no-scroll');
+        }
     }
 
     function showInstructionsPage() {
@@ -450,19 +330,26 @@
             startSessionTimer(); 
         } 
         
-        document.body.classList.remove('no-scroll');
-        helpBtn.classList.remove('hidden'); // Show help button
-
+        helpBtn.classList.remove('hidden'); 
         switchView('game-container');
         
+        // ================================= //
+        // THIS IS THE PART THAT WAS UPDATED //
+        // ================================= //
         let currentDifficulty;
-        if (totalGamesPlayed < 3) currentDifficulty = difficultyLevels[0];
-        else if (totalGamesPlayed < 6) currentDifficulty = difficultyLevels[1];
-        else currentDifficulty = difficultyLevels[2];
+        if (totalGamesPlayed < 2) { // Play 2 rounds of Easy
+            currentDifficulty = difficultyLevels[0]; // Easy
+        } else if (totalGamesPlayed < 4) { // Play 2 rounds of Medium
+            currentDifficulty = difficultyLevels[1]; // Medium
+        } else { // All subsequent rounds are Hard
+            currentDifficulty = difficultyLevels[2]; // Hard
+        }
+        // ================================= //
+        //       END OF UPDATED PART         //
+        // ================================= //
 
         document.getElementById('game-heading').textContent = `Memorise these words! (${currentDifficulty.name})`;
-        document.getElementById('words-list').style.gridTemplateColumns = `repeat(3, 1fr)`;
-
+        
         updateWordHistory();
         
         const forbiddenWords = [...wordsUsedLastRound, ...wordsUsedTwoRoundsAgo];
@@ -483,14 +370,9 @@
         startTimer();
     }
     
-    // NEW: Function to show/hide help and pause the game
     function toggleHelp(show) {
         isPaused = show;
-        if (show) {
-            helpOverlay.classList.remove('hidden');
-        } else {
-            helpOverlay.classList.add('hidden');
-        }
+        helpOverlay.classList.toggle('hidden', !show);
     }
 
     function updateWordHistory() {
@@ -508,16 +390,20 @@
         timerDisplay.classList.remove('hidden');
 
         sessionTimerInterval = setInterval(() => {
+            if (isPaused) return; 
             const elapsedTime = Date.now() - sessionStartTime;
-            const remainingTime = SESSION_DURATION - elapsedTime;
+            let remainingTime = SESSION_DURATION - elapsedTime;
 
+            if (remainingTime < 0) remainingTime = 0;
+
+            const minutes = Math.floor((remainingTime / 1000) / 60);
+            const seconds = Math.floor((remainingTime / 1000) % 60);
+            timerDisplay.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
             if (remainingTime <= 0) {
                 clearInterval(sessionTimerInterval);
                 timerDisplay.textContent = "Time's up!";
-            } else {
-                const minutes = Math.floor((remainingTime / 1000) / 60);
-                const seconds = Math.floor((remainingTime / 1000) % 60);
-                timerDisplay.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                if (sessionActive) endGame(true); 
             }
         }, 1000);
     }
@@ -537,7 +423,7 @@
         let timeLeft = 20;
         document.getElementById('time-left').textContent = timeLeft;
         timer = setInterval(function() {
-            if (isPaused) return; // NEW: Don't count down if paused
+            if (isPaused) return; 
             timeLeft--;
             document.getElementById('time-left').textContent = timeLeft;
             if (timeLeft <= 0) {
@@ -553,6 +439,13 @@
     }
 
     function displayRecallWord() {
+        if (isPaused) return; 
+        const elapsedTime = Date.now() - sessionStartTime;
+        if (elapsedTime >= SESSION_DURATION && sessionActive) {
+            endGame(true);
+            return;
+        }
+
         if (currentWordIndex < allWordsToRecall.length) {
             const word = allWordsToRecall[currentWordIndex];
             document.getElementById('recall-word').innerHTML = `
@@ -584,7 +477,6 @@
         if (isCorrect) {
              score++;
         } else {
-            // NEW: Shake the word card on incorrect answer
             const cardToShake = document.querySelector('#recall-word .word-card');
             if (cardToShake) {
                 cardToShake.classList.add('shake');
@@ -603,29 +495,33 @@
         }, 800);
     }
 
-    function endGame() {
-        switchView('result-container');
+    function endGame(isTimeUp = false) {
+        if (!sessionActive && !isTimeUp) return;
 
         let currentDifficulty;
-        if (totalGamesPlayed < 3) currentDifficulty = difficultyLevels[0];
-        else if (totalGamesPlayed < 6) currentDifficulty = difficultyLevels[1];
+        if (totalGamesPlayed < 2) currentDifficulty = difficultyLevels[0];
+        else if (totalGamesPlayed < 4) currentDifficulty = difficultyLevels[1];
         else currentDifficulty = difficultyLevels[2];
         const difficultyName = currentDifficulty.name;
-
-        if (score > bestScores[difficultyName]) {
-            bestScores[difficultyName] = score;
+        
+        if(currentWordIndex > 0 || score > 0) {
+            if (score > bestScores[difficultyName]) {
+                bestScores[difficultyName] = score;
+            }
+            allSessionScores.push({ score: score, total: allWordsToRecall.length, difficulty: difficultyName });
         }
-        allSessionScores.push({ score: score, total: allWordsToRecall.length, difficulty: difficultyName });
         
         totalGamesPlayed++;
         
         const elapsedTime = Date.now() - sessionStartTime;
 
-        if (elapsedTime >= SESSION_DURATION) {
+        if (isTimeUp || elapsedTime >= SESSION_DURATION) {
+            if (!sessionActive) return; 
+            sessionActive = false;
             clearInterval(timer);
             clearInterval(sessionTimerInterval);
             document.getElementById('session-timer').classList.add('hidden');
-            helpBtn.classList.add('hidden'); // Hide help button at the end
+            helpBtn.classList.add('hidden');
 
             let finalScoreHTML = '';
             difficultyLevels.forEach(level => {
@@ -640,10 +536,11 @@
                     });
                 }
             });
-
+            
+            switchView('result-container');
             document.body.classList.add('no-scroll');
             document.getElementById('result').innerHTML = `
-                <p style="font-size: 1.5em; font-weight: bold;">Session Ended!</p>
+                <p style="font-size: 1.5em; font-weight: bold;">Time's Up!</p>
                 <hr>
                 <ul id="score-list">${finalScoreHTML}</ul>
             `;
@@ -654,11 +551,12 @@
             }, 8000); 
 
         } else {
+            switchView('result-container');
             document.getElementById('score-text').innerHTML = `Your score: ${score} / ${allWordsToRecall.length}`;
             setTimeout(() => {
                 resetGame();
                 startGame();
-            }, 5000);
+            }, 4000);
         }
     }
 
@@ -666,7 +564,6 @@
         score = 0;
         currentWordIndex = 0;
         initialWords = []; 
-        switchView('hidden'); // Hide all views before starting new game
     }
 
     function shuffleArray(array) {
