@@ -55,12 +55,11 @@
   .active { display: flex; animation: zoomIn 0.4s ease-out; }
   .hidden { display: none !important; }
 
-  /* --- MODIFICATION: Start Screen Redesign for Alignment & Clarity --- */
   .start-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px; /* Adds space between elements */
+    gap: 15px;
   }
   
   h1 {
@@ -90,15 +89,14 @@
     line-height: 1.4;
   }
   .instruction-item + .instruction-item {
-      margin-top: 12px; /* Space between instruction lines */
+      margin-top: 12px;
   }
 
   .instruction-icon {
       font-size: 1.5em;
       margin-right: 15px;
-      width: 30px; /* Ensures text aligns even with different icon widths */
+      width: 30px;
   }
-  /* --- End Start Screen Redesign --- */
 
   p { font-size: 1.2em; max-width: 550px; line-height: 1.5; }
 
@@ -378,7 +376,8 @@
 
     function endGame() {
       helpButton.classList.add('hidden');
-      finalResults.innerHTML = `Check out your scores below!<br><span class="final-score">${roundsCompleted} Rounds Completed!</span>`;
+      // MODIFICATION: Simplified final score message
+      finalResults.innerHTML = `<span class="final-score">${roundsCompleted} Rounds Completed!</span>`;
       switchScreen(gameScreen, finalScreen);
       window.parent.postMessage("showNext", "*");
     }
