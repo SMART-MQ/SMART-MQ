@@ -8,24 +8,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
     <style>
-        /* --- WARM FOOD / BAKERY THEME --- */
+        /* CSS is unchanged */
         * { box-sizing: border-box; }
         body {
-            background-color: #FFF9C4; /* Buttery Yellow */
+            background-color: #FFF9C4;
             font-family: 'Fredoka One', cursive;
-            color: #4E342E; /* Dark Chocolate Brown */
+            color: #4E342E;
             text-align: center;
             margin: 0;
             padding: 10px;
             -webkit-tap-highlight-color: transparent;
         }
         .hidden { display: none !important; }
-
         .container {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 10px; min-height: 95vh; max-width: 600px; margin: 0 auto;
         }
-
         h1 { font-size: 3rem; color: #D84315; text-shadow: 3px 3px 0px #FFCC80; margin: 15px 0; }
         .welcome-title {
             font-size: 1.3em; color: #4E342E; background-color: #FFE0B2;
@@ -33,11 +31,9 @@
         }
         .instructions-list { list-style-type: '⭐'; padding-left: 25px; margin: 20px auto; text-align: left; max-width: 400px; }
         .instructions-list li { font-size: 1.2em; margin-bottom: 15px; padding-left: 10px; line-height: 1.4; transition: all 0.2s ease-in-out; }
-
         #game-area { width: 100%; }
         #game-info { font-size: 1.5rem; font-weight: 700; color: #6D4C41; margin-bottom: 10px; }
         #message { font-size: 1.2rem; font-weight: 700; color: #BF360C; min-height: 40px; margin-bottom: 15px; }
-        
         .timer-bar-container {
             width: 100%; height: 25px; background-color: #BCAAA4; border-radius: 12px;
             border: 2px solid #5D4037; margin: 15px auto; overflow: hidden;
@@ -47,7 +43,6 @@
             height: 100%; width: 100%; background: linear-gradient(90deg, #FFA726, #FFCC80);
             border-radius: 8px; transition: width 0.5s linear;
         }
-
         .grid {
             display: grid; gap: 15px; justify-content: center;
             margin: 20px auto; user-select: none; max-width: max-content;
@@ -59,38 +54,27 @@
             display: flex; align-items: center; justify-content: center;
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
         }
-        .grid.guessing .cell:hover:not(.correct):not(.incorrect) {
-            transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 0 #A1887F;
-            border-color: #FF7043;
-        }
-        .cell:active:not(.correct):not(.incorrect) {
-            transform: translateY(1px); box-shadow: 0 2px 0 #A1887F;
-        }
+        .grid.guessing .cell:hover:not(.correct):not(.incorrect) { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 0 #A1887F; border-color: #FF7043; }
+        .cell:active:not(.correct):not(.incorrect) { transform: translateY(1px); box-shadow: 0 2px 0 #A1887F; }
         .cell.correct {
             border-color: #66BB6A; background-color: #E8F5E9;
             transform: translateY(2px); box-shadow: 0 2px 0 #43A047; cursor: not-allowed;
         }
         .cell.incorrect { animation: shake 0.5s; border-color: #EF5350; }
-        .marker {
-            position: absolute; bottom: 5px; right: 5px; font-size: 2.4rem; animation: popIn 0.3s ease;
-        }
+        .marker { position: absolute; bottom: 5px; right: 5px; font-size: 2.4rem; animation: popIn 0.3s ease; }
         @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
-
         button {
             background-color: #FF7043; border: none; color: #fff; padding: 15px 30px;
             margin: 10px; font-size: 1.5em; font-family: 'Fredoka One', cursive; font-weight: 700;
             border-radius: 12px; cursor: pointer; transition: all 0.2s ease;
             box-shadow: 0 5px 0 #E64A19; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
-        button:hover:not(:disabled) {
-            background-color: #FF8A65; transform: translateY(-2px); box-shadow: 0 7px 0 #E64A19;
-        }
+        button:hover:not(:disabled) { background-color: #FF8A65; transform: translateY(-2px); box-shadow: 0 7px 0 #E64A19; }
         .help-button {
             position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px;
             border-radius: 50%; font-size: 1.8em; z-index: 2000; padding: 0; line-height: 1;
         }
-
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(78, 52, 46, 0.7); z-index: 1000; display: flex;
@@ -112,18 +96,11 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3); pointer-events: none; opacity: 0;
         }
         .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
-        @keyframes fanfare-anim {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
-        }
-
+        @keyframes fanfare-anim { 0%, 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
         #finalSummary { text-align: center; }
         #finalSummary p { margin: 15px 0; font-size: 1.2em; line-height: 1.5; }
         #star-summary { font-size: 1.8em; color: #BF360C; margin: 20px 0; font-weight: bold; }
         #final-prompt { color: #D84315; font-weight: bold; }
-
-        /* FIX: Media query for small screens to prevent scrolling on instruction page */
         @media (max-height: 700px) and (max-width: 400px) {
             h1 { font-size: 2.2rem; margin-top: 5px; margin-bottom: 5px; }
             .welcome-title { font-size: 1.1em; margin-bottom: 10px; }
@@ -213,10 +190,11 @@
     let foundDifferences = new Set();
     let incorrectPressesThisRound = 0;
     let totalStars = 0;
-    let memorizationTimeout;
     let isPaused = false;
-    // FIX: New variable to track game phase for pause logic
     let isMemorizing = false;
+
+    // FIX: Variables to hold timers so they can be cleared
+    let fanfareTimeout, introTimeout, memorizationTimeout;
 
     const cover = document.getElementById('cover');
     const game = document.getElementById('game');
@@ -259,7 +237,7 @@
         roundFanfare.classList.remove('fanfare-animate');
         void roundFanfare.offsetWidth;
         roundFanfare.classList.add('fanfare-animate');
-        setTimeout(callback, 1500);
+        fanfareTimeout = setTimeout(callback, 1500);
     }
 
     function startRound() {
@@ -278,7 +256,7 @@
             const diffText = round.differences === 1 ? 'There is 1 difference.' : `There are ${round.differences} differences.`;
             messageElement.innerHTML = `Get ready to memorise...<br>${diffText}`;
             
-            setTimeout(() => {
+            introTimeout = setTimeout(() => {
                 if (isPaused) return;
                 if (emojiIndex + round.gridSize > foodEmojis.length) { emojiIndex = 0; }
                 originalGrid = foodEmojis.slice(emojiIndex, emojiIndex + round.gridSize);
@@ -290,7 +268,7 @@
     }
 
     function startMemorizationPhase(round) {
-        isMemorizing = true; // FIX: Set game phase
+        isMemorizing = true;
         messageElement.textContent = 'Memorise the menu!';
         gridElement.classList.remove('hidden');
         timerBarContainer.classList.remove('hidden');
@@ -301,7 +279,6 @@
         timerBar.style.transition = `width ${round.time}s linear`;
         timerBar.style.width = '0%';
 
-        clearTimeout(memorizationTimeout);
         memorizationTimeout = setTimeout(() => {
             if (isPaused) return;
             startGuessingPhase();
@@ -309,7 +286,7 @@
     }
 
     function startGuessingPhase() {
-        isMemorizing = false; // FIX: Set game phase
+        isMemorizing = false;
         timerBarContainer.classList.add('hidden');
         const result = modifyGrid(originalGrid, rounds[currentRound].differences);
         modifiedGrid = result.newGrid;
@@ -419,21 +396,25 @@
     function toggleHelp(show) {
         isPaused = show;
         helpOverlay.classList.toggle('hidden', !show);
+
         if (isPaused) {
-            // If we are in the middle of memorizing, stop the timer
+            // Stop all timers that advance the game
+            clearTimeout(fanfareTimeout);
+            clearTimeout(introTimeout);
+            clearTimeout(memorizationTimeout);
+            // If the timer bar is running, freeze it
             if(isMemorizing) {
-                clearTimeout(memorizationTimeout);
                 const computedStyle = window.getComputedStyle(timerBar);
                 const width = computedStyle.getPropertyValue('width');
                 timerBar.style.transition = 'none';
                 timerBar.style.width = width;
             }
         } else {
-            // If we were memorizing when we paused, restart the round.
-            // Otherwise, do nothing and let the user continue the guessing phase.
-            if (isMemorizing) {
+            // If we were in the intro or memorization phase, it's safest to restart the round
+            if (gridElement.classList.contains('guessing') === false) {
                 startRound();
             }
+            // If we were in the guessing phase (grid has 'guessing' class), do nothing. The player can resume.
         }
     }
 </script>
