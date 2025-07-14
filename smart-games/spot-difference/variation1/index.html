@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>SMART Game - Spot the Swap</title>
+    <title>SMART Game - Spot the Difference</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
         body {
-            background-color: #f3e8ff;
+            background-color: #FFFDE7; /* Light sunny yellow */
             font-family: 'Fredoka One', cursive;
-            color: #3d3d3d;
+            color: #3D4451; /* Dark Slate Gray */
             text-align: center;
             margin: 0;
             padding: 10px;
@@ -22,37 +22,31 @@
 
         /* Page Containers */
         .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-            min-height: 95vh;
-            max-width: 600px;
-            margin: 0 auto;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 10px; min-height: 95vh; max-width: 600px; margin: 0 auto;
         }
 
         /* Typography & Titles */
-        h1 { font-size: 3rem; color: #4b0082; text-shadow: 3px 3px 0px #ff7f50; margin: 15px 0; }
+        h1 { font-size: 3rem; color: #0288D1; text-shadow: 3px 3px 0px #81D4FA; margin: 15px 0; }
         .welcome-title {
-            font-size: 1.3em; color: #4b0082; background-color: #e6e6fa;
-            padding: 8px 20px; border-radius: 30px; border: 2px solid #d8bfd8; margin-bottom: 20px;
+            font-size: 1.3em; color: #01579B; background-color: #E1F5FE;
+            padding: 8px 20px; border-radius: 30px; border: 2px solid #B3E5FC; margin-bottom: 20px;
         }
         .instructions-list { list-style-type: '⭐'; padding-left: 25px; margin: 20px auto; text-align: left; max-width: 400px; }
         .instructions-list li { font-size: 1.2em; margin-bottom: 15px; padding-left: 10px; line-height: 1.4; }
 
         /* Game Area */
         #game-area { width: 100%; }
-        #game-info { font-size: 1.5rem; font-weight: 700; color: #555; margin-bottom: 10px; }
-        #message { font-size: 1.2rem; font-weight: 700; color: #4b0082; min-height: 40px; margin-bottom: 15px; }
+        #game-info { font-size: 1.5rem; font-weight: 700; color: #546E7A; margin-bottom: 10px; }
+        #message { font-size: 1.2rem; font-weight: 700; color: #0277BD; min-height: 40px; margin-bottom: 15px; }
         
         .timer-bar-container {
-            width: 100%; height: 25px; background-color: #e9ecef; border-radius: 12px;
-            border: 2px solid #4b0082; margin: 15px auto; overflow: hidden;
+            width: 100%; height: 25px; background-color: #CFD8DC; border-radius: 12px;
+            border: 2px solid #0288D1; margin: 15px auto; overflow: hidden;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
         .timer-bar {
-            height: 100%; width: 100%; background: linear-gradient(90deg, #32cd32, #98fb98);
+            height: 100%; width: 100%; background: linear-gradient(90deg, #4FC3F7, #B3E5FC);
             border-radius: 8px; transition: width 0.5s linear;
         }
 
@@ -63,27 +57,25 @@
         }
         .cell {
             cursor: pointer; position: relative; background-color: #fff;
-            border: 3px solid #d8bfd8; border-radius: 12px; box-shadow: 0 5px 0 #b39db3;
+            border: 3px solid #CFD8DC; border-radius: 12px; box-shadow: 0 5px 0 #90A4AE;
             display: flex; align-items: center; justify-content: center;
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
         }
         .grid.guessing .cell:hover:not(.correct):not(.incorrect) {
-            transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 0 #b39db3;
-            border-color: #ff7f50;
+            transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 0 #90A4AE;
+            border-color: #8BC34A; /* Green accent on hover */
         }
         .cell:active:not(.correct):not(.incorrect) {
-            transform: translateY(1px); box-shadow: 0 2px 0 #b39db3;
+            transform: translateY(1px); box-shadow: 0 2px 0 #90A4AE;
         }
 
         /* Cell Feedback States */
         .cell.correct {
-            border-color: #32cd32; background-color: #d4edda;
-            transform: translateY(2px); box-shadow: 0 2px 0 #28a745;
+            border-color: #66BB6A; background-color: #E8F5E9;
+            transform: translateY(2px); box-shadow: 0 2px 0 #43A047;
             cursor: not-allowed;
         }
-        .cell.incorrect {
-            animation: shake 0.5s; border-color: #dc3545;
-        }
+        .cell.incorrect { animation: shake 0.5s; border-color: #EF5350; }
         .marker {
             position: absolute; bottom: 5px; right: 5px; font-size: 2.4rem;
             animation: popIn 0.3s ease;
@@ -93,13 +85,13 @@
 
         /* Buttons */
         button {
-            background-color: #ff7f50; border: none; color: white; padding: 15px 30px;
+            background-color: #8BC34A; border: none; color: white; padding: 15px 30px;
             margin: 10px; font-size: 1.5em; font-family: 'Fredoka One', cursive; font-weight: 700;
             border-radius: 12px; cursor: pointer; transition: all 0.2s ease;
-            box-shadow: 0 5px 0 #e06c3a; text-transform: uppercase;
+            box-shadow: 0 5px 0 #689F38; text-transform: uppercase;
         }
         button:hover:not(:disabled) {
-            background-color: #ff9066; transform: translateY(-2px); box-shadow: 0 7px 0 #e06c3a;
+            background-color: #9CCC65; transform: translateY(-2px); box-shadow: 0 7px 0 #689F38;
         }
         .help-button {
             position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px;
@@ -114,20 +106,18 @@
             transition: opacity 0.3s ease;
         }
         .overlay-content {
-            background-color: #e6e6fa; padding: 30px; border-radius: 15px;
-            border: 3px solid #4b0082; width: 100%; max-width: 500px;
+            background-color: #E1F5FE; padding: 30px; border-radius: 15px;
+            border: 3px solid #0288D1; width: 100%; max-width: 500px;
         }
         #countdownOverlay {
-            font-size: 8rem; font-weight: bold; color: #4b0082;
-            background-color: rgba(243, 232, 255, 0.95);
+            font-size: 8rem; font-weight: bold; color: #0288D1;
+            background-color: rgba(255, 253, 231, 0.95);
         }
         #round-fanfare {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background-color: rgba(75, 0, 130, 0.9); color: white; padding: 20px 40px;
+            background-color: rgba(2, 136, 209, 0.9); color: white; padding: 20px 40px;
             border-radius: 20px; font-size: 3em; z-index: 9999;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            pointer-events: none;
-            opacity: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3); pointer-events: none; opacity: 0;
         }
         .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
         @keyframes fanfare-anim {
@@ -139,8 +129,8 @@
         /* Final Summary */
         #finalSummary { text-align: center; }
         #finalSummary p { margin: 15px 0; font-size: 1.2em; line-height: 1.5; }
-        #personal-best { font-size: 1.8em; color: #4b0082; margin: 20px 0; font-weight: bold; }
-        #final-prompt { color: #c71585; font-weight: bold; }
+        #personal-best { font-size: 1.8em; color: #01579B; margin: 20px 0; font-weight: bold; }
+        #final-prompt { color: #0277BD; font-weight: bold; }
 
         @media (max-width: 480px) {
             .cell { width: 60px !important; height: 60px !important; font-size: 2.2rem !important; }
@@ -153,11 +143,11 @@
 
     <div id="cover" class="container">
         <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
-        <h1>Spot the Swap</h1>
+        <h1>Spot the Difference</h1>
         <ul class="instructions-list">
             <li>You will be shown a grid of food emojis. Memorise it!</li>
-            <li>The grid will re-appear, but some emojis will have swapped.</li>
-            <li>Your mission is to press on all the swapped emojis!</li>
+            <li>The grid will re-appear, but some emojis will have changed.</li>
+            <li>Your mission is to press on all the changed emojis!</li>
         </ul>
         <button onclick="startGame()">Let's Play!</button>
     </div>
@@ -190,7 +180,7 @@
             <ul class="instructions-list">
                 <li>Memorise the grid of food emojis.</li>
                 <li>When the grid comes back, find the emojis that have changed.</li>
-                <li>Press on all the swapped emojis to win the round!</li>
+                <li>Press on all the changed emojis to win the round!</li>
             </ul>
             <button onclick="toggleHelp(false)">Got it!</button>
         </div>
@@ -219,7 +209,7 @@
     let foundDifferences = new Set();
     let incorrectGuesses = new Set();
     let personalBestDifferences = 0;
-    let memorizationInterval;
+    let memorizationTimeout;
     let isPaused = false;
 
     let gameStartTime;
@@ -252,9 +242,9 @@
     }
 
     function showStartCountdown(callback) {
+        countdownOverlay.classList.remove('hidden');
         const steps = ["3", "2", "1", "GO!"];
         let i = 0;
-        countdownOverlay.classList.remove('hidden');
         countdownText.textContent = steps[i];
         const interval = setInterval(() => {
             i++;
@@ -271,7 +261,7 @@
     function triggerFanfare(text, callback) {
         roundFanfare.textContent = text;
         roundFanfare.classList.remove('fanfare-animate');
-        void roundFanfare.offsetWidth; // Trigger reflow
+        void roundFanfare.offsetWidth; // Trigger reflow to restart animation
         roundFanfare.classList.add('fanfare-animate');
         setTimeout(callback, 1500);
     }
@@ -286,8 +276,9 @@
         timerBarContainer.classList.add('hidden');
 
         triggerFanfare(`Round ${currentRound + 1}`, () => {
-            gameInfoElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`;
-            messageElement.innerHTML = `Get ready to memorise...<br>There will be ${round.differences} swap${round.differences > 1 ? 's' : ''}.`;
+            if (isPaused) return; // Check again after fanfare
+            gameInfoElement.textContent = `Round ${currentRound + 1}`; // MODIFIED: Removed "of X"
+            messageElement.innerHTML = `Get ready to memorise...<br>There will be ${round.differences} difference${round.differences > 1 ? 's' : ''}.`;
             
             setTimeout(() => {
                 if (isPaused) return;
@@ -303,18 +294,23 @@
     function startMemorizationPhase(round) {
         messageElement.textContent = 'Memorise this grid!';
         timerBarContainer.classList.remove('hidden');
-        timerBar.style.transition = `width ${round.time}s linear`;
         timerBar.style.width = '100%';
-        setTimeout(() => timerBar.style.width = '0%', 100);
+        timerBar.style.transition = 'none'; // Reset transition for instant fill
+        
+        // Use requestAnimationFrame to ensure the 100% width is rendered before starting the transition
+        requestAnimationFrame(() => {
+            timerBar.style.transition = `width ${round.time}s linear`;
+            timerBar.style.width = '0%';
+        });
 
-        memorizationInterval = setTimeout(() => {
+        clearTimeout(memorizationTimeout);
+        memorizationTimeout = setTimeout(() => {
             if (isPaused) return;
             startGuessingPhase();
         }, round.time * 1000);
     }
 
     function startGuessingPhase() {
-        timerBar.style.transition = 'width 0.5s linear';
         timerBarContainer.classList.add('hidden');
         
         const result = modifyGrid(originalGrid, rounds[currentRound].differences);
@@ -322,11 +318,12 @@
         changedIndices = result.changedIndices;
 
         gridElement.style.opacity = '0';
-        messageElement.textContent = 'Now, find the swaps!';
+        messageElement.textContent = 'Now, find the differences!';
 
         setTimeout(() => {
             if (isPaused) return;
             renderGrid(modifiedGrid, rounds[currentRound].columns, rounds[currentRound].cellSize, true);
+            gridElement.style.transition = 'opacity 0.5s ease-in-out';
             gridElement.style.opacity = '1';
         }, 500);
     }
@@ -358,7 +355,7 @@
                 let newEmoji;
                 do {
                     newEmoji = foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
-                } while (newEmoji === newGrid[i] || grid.includes(newEmoji)); // Ensure new emoji is not elsewhere in original
+                } while (newEmoji === newGrid[i] || grid.includes(newEmoji));
                 newGrid[i] = newEmoji;
                 indices.push(i);
             }
@@ -414,7 +411,7 @@
     function endGame() {
         game.classList.add('hidden');
         helpBtn.classList.add('hidden');
-        personalBestElement.innerHTML = `Your Personal Best:<br><span>Found ${personalBestDifferences} swap${personalBestDifferences !== 1 ? 's' : ''} in one round!</span>`;
+        personalBestElement.innerHTML = `Your Personal Best:<br><span>Found ${personalBestDifferences} difference${personalBestDifferences !== 1 ? 's' : ''} in one round!</span>`;
         finalSummary.classList.remove('hidden');
         window.parent.postMessage("showNext", "*");
     }
@@ -423,10 +420,16 @@
         isPaused = show;
         helpOverlay.classList.toggle('hidden', !show);
         if (isPaused) {
-            clearTimeout(memorizationInterval);
-            timerBar.style.transition = 'none'; // Stop animation
+            clearTimeout(memorizationTimeout);
+            const computedStyle = window.getComputedStyle(timerBar);
+            const width = computedStyle.getPropertyValue('width');
+            timerBar.style.transition = 'none';
+            timerBar.style.width = width;
         } else {
-            // Resume logic could go here if needed, but for now it just unpauses
+            // Resume memorization if it was interrupted
+            if (timerBarContainer.classList.contains('hidden') === false) {
+                startRound(); // Easiest to just restart the current round's flow
+            }
         }
     }
 </script>
