@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SMART Sequence Master</title>
+  <!-- Change: New page title -->
+  <title>SMART Glow Grid</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
@@ -98,7 +99,6 @@
       border-radius: 6px; transition: width 1s linear;
     }
 
-    /* Change: Grid updated for 12 buttons */
     .button-container {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -111,7 +111,6 @@
     .color-button {
       aspect-ratio: 1 / 1;
       border: 3px solid;
-      /* Change: Buttons are now circles */
       border-radius: 50%;
       cursor: pointer;
       transition: all 0.1s ease-out;
@@ -124,7 +123,7 @@
     }
 
     .color-button.flash {
-       background-color: currentColor; /* Use the border color to fill */
+       background-color: currentColor;
     }
 
     .color-button:disabled { filter: brightness(0.4); cursor: not-allowed; }
@@ -169,7 +168,8 @@
 
   <div id="start-screen" class="screen">
     <p class="subtitle">Welcome to the SMART Challenge</p>
-    <h1>Sequence Master</h1>
+    <!-- Change: New game title -->
+    <h1>Glow Grid</h1>
     <p>This is a challenge just for you. Try to beat your best score each round!</p>
     <button class="play-button" id="startBtn">Start Game</button>
   </div>
@@ -184,7 +184,6 @@
         <span id="bestScore">Best: 0</span>
       </div>
       <p id="message">Get Ready...</p>
-      <!-- Change: Button container is now empty, will be filled by JS -->
       <div id="button-container" class="button-container"></div>
     </div>
   </div>
@@ -229,7 +228,6 @@
   
     const GAME_TIME = 300;
     const RETRY_MESSAGES = ["Let's try again!", "You got this!", "Nice try!", "Give it another shot!"];
-    // Change: Expanded color palette for 12 buttons
     const NEON_COLORS = [
         '#ff3c82', '#ff9a3c', '#f7ff3c', '#3cff9a', 
         '#3c9aff', '#c13cff', '#00ffff', '#ff5733', 
@@ -244,7 +242,7 @@
         message: document.getElementById('message'),
         timerBar: document.getElementById('timer-bar'),
         buttonContainer: document.getElementById('button-container'),
-        buttons: [], // Change: Will be populated dynamically
+        buttons: [],
         currentScoreEl: document.getElementById('currentScore'),
         bestScoreEl: document.getElementById('bestScore'),
         helpBtn: document.getElementById('helpBtn'),
@@ -265,14 +263,13 @@
     elements.helpBtn.addEventListener('click', pauseGame);
     elements.resumeBtn.addEventListener('click', resumeGame);
     
-    // Change: New function to create buttons dynamically
     function createButtons() {
         for (let i = 0; i < NUM_BUTTONS; i++) {
             const btn = document.createElement('button');
             btn.className = 'color-button';
             const color = NEON_COLORS[i];
             btn.style.borderColor = color;
-            btn.style.color = color; // Used for flash effect
+            btn.style.color = color;
             btn.style.boxShadow = `0 0 15px ${color}`;
             btn.addEventListener('click', () => handlePlayerInput(i));
             elements.buttonContainer.appendChild(btn);
@@ -281,7 +278,7 @@
     }
 
     function startGame() {
-      createButtons(); // Create buttons before game starts
+      createButtons();
       elements.startScreen.classList.add('hidden');
       elements.gameScreen.classList.remove('hidden');
       elements.helpBtn.classList.remove('hidden');
@@ -299,7 +296,6 @@
       userSequence = [];
       updateButtonsState(true);
       elements.message.textContent = '...WATCH...';
-      // Change: Random number now up to 12
       sequence.push(Math.floor(Math.random() * NUM_BUTTONS));
       playSequence();
       setTimeout(() => {
