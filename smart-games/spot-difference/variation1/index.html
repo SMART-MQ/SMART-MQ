@@ -1,436 +1,434 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>SMART Memory Game</title>
-  <style>
-    body {
-      font-family: "Calibri", sans-serif;
-      font-size: 2rem;
-      background-color: #fff9c4;
-      margin: 0;
-      padding: 10px;
-      text-align: center;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #game {
-      max-width: 100%;
-      margin: 0 auto;
-      font-size: 2.2rem;
-    }
-    h1 {
-      font-size: 3rem;
-      margin: 15px 0;
-    }
-    #game h1 {
-      font-size: 2.2rem;
-      margin-bottom: 10px;
-    }
-    #roundNumber {
-      font-size: 1.8rem;
-      margin-bottom: 15px;
-      font-weight: bold;
-      color: #e91e63;
-    }
-    .grid {
-      display: grid;
-      gap: 15px 15px;
-      justify-content: center;
-      margin: 0 auto 20px;
-      user-select: none;
-      max-width: max-content;
-    }
-    .grid.guessing .cell:hover {
-      transform: scale(1.05);
-      border-color: #f48fb1;
-      box-shadow: 1px 4px 10px rgba(244, 143, 177, 0.4);
-    }
-    .cell {
-      cursor: pointer;
-      position: relative;
-      background-color: #fff;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s ease;
-    }
-    .marker {
-      position: absolute;
-      bottom: 6px;
-      right: 6px;
-      font-size: 2.4rem;
-    }
-    #message, #timer, #roundInfo {
-      font-size: 1.8rem;
-      margin: 12px 0;
-    }
-    #cover, #end {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
-      min-height: 100vh;
-      text-align: center;
-    }
-    #cover h1, #end h1 {
-      font-size: 2.8rem;
-      margin-bottom: 15px;
-      color: #c2185b;
-    }
-    .instruction-box {
-      background: linear-gradient(to right, #f8bbd0, #f48fb1);
-      padding: 15px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 280px;
-      font-size: 1.4rem;
-      line-height: 1.4;
-      margin-bottom: 20px;
-    }
-    #cover button {
-      font-size: 2rem;
-      padding: 14px 28px;
-      border: none;
-      background-color: #ffd54f;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 1px 1px 6px rgba(0,0,0,0.1);
-    }
-    #cover button:hover {
-      background-color: #ffca28;
-    }
-    #end p {
-      font-size: 1.6rem;
-      margin: 20px 0;
-      max-width: 320px;
-      line-height: 1.4;
-      background: linear-gradient(to right, #f8bbd0, #f48fb1);
-      padding: 20px;
-      border-radius: 15px;
-      color: #880e4f;
-      font-weight: bold;
-      box-shadow: 0 0 10px #f48fb1;
-    }
-    #end #extraMessage {
-      font-size: 1.6rem;
-      max-width: 320px;
-      margin-top: 10px;
-      color: #880e4f;
-      font-weight: bold;
-    }
-    #countdownOverlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(255, 255, 255, 0.95);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      font-size: 8rem;
-      font-weight: bold;
-      color: #e91e63;
-    }
-    #transitionMessage {
-      display: none;
-      font-size: 3rem;
-      font-weight: bold;
-      color: #e91e63;
-      margin: 20px 0;
-    }
-    #roundPopup {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      background: #f48fb1;
-      color: white;
-      font-weight: bold;
-      font-size: 4rem;
-      padding: 25px 50px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px #f48fb1;
-      z-index: 10000;
-      animation-fill-mode: forwards;
-    }
-    @keyframes popInOut {
-      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-      40% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-      60% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-    }
-    @media (max-width: 480px) {
-      .cell {
-        width: 60px !important;
-        height: 60px !important;
-        font-size: 2.2rem !important;
-      }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>SMART Game - Spot the Swap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background-color: #f3e8ff;
+            font-family: 'Fredoka One', cursive;
+            color: #3d3d3d;
+            text-align: center;
+            margin: 0;
+            padding: 10px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hidden { display: none !important; }
+
+        /* Page Containers */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            min-height: 95vh;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Typography & Titles */
+        h1 { font-size: 3rem; color: #4b0082; text-shadow: 3px 3px 0px #ff7f50; margin: 15px 0; }
+        .welcome-title {
+            font-size: 1.3em; color: #4b0082; background-color: #e6e6fa;
+            padding: 8px 20px; border-radius: 30px; border: 2px solid #d8bfd8; margin-bottom: 20px;
+        }
+        .instructions-list { list-style-type: '⭐'; padding-left: 25px; margin: 20px auto; text-align: left; max-width: 400px; }
+        .instructions-list li { font-size: 1.2em; margin-bottom: 15px; padding-left: 10px; line-height: 1.4; }
+
+        /* Game Area */
+        #game-area { width: 100%; }
+        #game-info { font-size: 1.5rem; font-weight: 700; color: #555; margin-bottom: 10px; }
+        #message { font-size: 1.2rem; font-weight: 700; color: #4b0082; min-height: 40px; margin-bottom: 15px; }
+        
+        .timer-bar-container {
+            width: 100%; height: 25px; background-color: #e9ecef; border-radius: 12px;
+            border: 2px solid #4b0082; margin: 15px auto; overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .timer-bar {
+            height: 100%; width: 100%; background: linear-gradient(90deg, #32cd32, #98fb98);
+            border-radius: 8px; transition: width 0.5s linear;
+        }
+
+        /* Grid & Cells */
+        .grid {
+            display: grid; gap: 15px; justify-content: center;
+            margin: 20px auto; user-select: none; max-width: max-content;
+        }
+        .cell {
+            cursor: pointer; position: relative; background-color: #fff;
+            border: 3px solid #d8bfd8; border-radius: 12px; box-shadow: 0 5px 0 #b39db3;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
+        }
+        .grid.guessing .cell:hover:not(.correct):not(.incorrect) {
+            transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 0 #b39db3;
+            border-color: #ff7f50;
+        }
+        .cell:active:not(.correct):not(.incorrect) {
+            transform: translateY(1px); box-shadow: 0 2px 0 #b39db3;
+        }
+
+        /* Cell Feedback States */
+        .cell.correct {
+            border-color: #32cd32; background-color: #d4edda;
+            transform: translateY(2px); box-shadow: 0 2px 0 #28a745;
+            cursor: not-allowed;
+        }
+        .cell.incorrect {
+            animation: shake 0.5s; border-color: #dc3545;
+        }
+        .marker {
+            position: absolute; bottom: 5px; right: 5px; font-size: 2.4rem;
+            animation: popIn 0.3s ease;
+        }
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
+        /* Buttons */
+        button {
+            background-color: #ff7f50; border: none; color: white; padding: 15px 30px;
+            margin: 10px; font-size: 1.5em; font-family: 'Fredoka One', cursive; font-weight: 700;
+            border-radius: 12px; cursor: pointer; transition: all 0.2s ease;
+            box-shadow: 0 5px 0 #e06c3a; text-transform: uppercase;
+        }
+        button:hover:not(:disabled) {
+            background-color: #ff9066; transform: translateY(-2px); box-shadow: 0 7px 0 #e06c3a;
+        }
+        .help-button {
+            position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px;
+            border-radius: 50%; font-size: 1.8em; z-index: 2000; padding: 0; line-height: 1;
+        }
+
+        /* Overlays & Popups */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); z-index: 1000; display: flex;
+            justify-content: center; align-items: center; padding: 15px;
+            transition: opacity 0.3s ease;
+        }
+        .overlay-content {
+            background-color: #e6e6fa; padding: 30px; border-radius: 15px;
+            border: 3px solid #4b0082; width: 100%; max-width: 500px;
+        }
+        #countdownOverlay {
+            font-size: 8rem; font-weight: bold; color: #4b0082;
+            background-color: rgba(243, 232, 255, 0.95);
+        }
+        #round-fanfare {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background-color: rgba(75, 0, 130, 0.9); color: white; padding: 20px 40px;
+            border-radius: 20px; font-size: 3em; z-index: 9999;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            pointer-events: none;
+            opacity: 0;
+        }
+        .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
+        @keyframes fanfare-anim {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        /* Final Summary */
+        #finalSummary { text-align: center; }
+        #finalSummary p { margin: 15px 0; font-size: 1.2em; line-height: 1.5; }
+        #personal-best { font-size: 1.8em; color: #4b0082; margin: 20px 0; font-weight: bold; }
+        #final-prompt { color: #c71585; font-weight: bold; }
+
+        @media (max-width: 480px) {
+            .cell { width: 60px !important; height: 60px !important; font-size: 2.2rem !important; }
+            h1 { font-size: 2.5rem; }
+            .instructions-list li { font-size: 1em; }
+        }
+    </style>
 </head>
 <body>
-  <div id="cover">
-    <h1>SMART Memory Game</h1>
-    <div class="instruction-box">
-      <p><strong>How to play:</strong></p>
-      <p>You will be shown a grid of food emojis. Memorise it!</p>
-      <p>Then, you’ll see a new grid with some differences.</p>
-      <p>Spot the changes to progress through each round!</p>
+
+    <div id="cover" class="container">
+        <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
+        <h1>Spot the Swap</h1>
+        <ul class="instructions-list">
+            <li>You will be shown a grid of food emojis. Memorise it!</li>
+            <li>The grid will re-appear, but some emojis will have swapped.</li>
+            <li>Your mission is to press on all the swapped emojis!</li>
+        </ul>
+        <button onclick="startGame()">Let's Play!</button>
     </div>
-    <button onclick="startGame()">Play</button>
-  </div>
 
-  <div id="game" style="display: none;">
-    <h1>Spot the Difference</h1>
-    <div id="gameUI">
-      <div id="roundNumber"></div>
-      <div id="roundInfo"></div>
-      <div id="emojiGrid" class="grid"></div>
-      <div id="timer"></div>
-      <div id="message"></div>
+    <div id="game" class="container hidden">
+        <div id="game-area">
+            <div id="game-info"></div>
+            <div id="message"></div>
+            <div class="timer-bar-container hidden">
+                <div id="timer-bar" class="timer-bar"></div>
+            </div>
+            <div id="emojiGrid" class="grid"></div>
+        </div>
     </div>
-    <div id="transitionMessage">Now, spot the difference!</div>
-  </div>
 
-  <div id="roundPopup"></div>
+    <div id="finalSummary" class="container hidden">
+        <h1>Well Done!</h1>
+        <div class="overlay-content">
+            <p id="personal-best"></p>
+            <p id="final-prompt">Make sure you press the red arrow on the bottom right of the screen to finish.</p>
+            <p>You will have earned an extra $2.50 for your SMART bank!</p>
+        </div>
+    </div>
+    
+    <button id="helpBtn" class="help-button hidden" onclick="toggleHelp(true)">?</button>
+    
+    <div id="help-overlay" class="overlay hidden" onclick="toggleHelp(false)">
+        <div class="overlay-content" onclick="event.stopPropagation()">
+            <h2 class="welcome-title">How to Play</h2>
+            <ul class="instructions-list">
+                <li>Memorise the grid of food emojis.</li>
+                <li>When the grid comes back, find the emojis that have changed.</li>
+                <li>Press on all the swapped emojis to win the round!</li>
+            </ul>
+            <button onclick="toggleHelp(false)">Got it!</button>
+        </div>
+    </div>
 
-  <div id="end" style="display: none;">
-    <h1>Well done!</h1>
-    <p id="congratsMessage"></p>
-    <p id="extraMessage">Now, finish the survey and you will have earned an extra $2.50 for your SMART bank</p>
-  </div>
+    <div id="countdownOverlay" class="overlay hidden"><div id="countdownText"></div></div>
+    <div id="round-fanfare"></div>
 
-  <div id="countdownOverlay"><div id="countdownText"></div></div>
-
-  <script>
+<script>
     const foodEmojis = [...'🍏🍎🍐🍊🍋🍌🍉🍇🍓🫐🍈🍒🍑🥭🍍🥥🥝🍅🍆🥑🥦🥒🌶️🫑🌽🥕🧄🧅🥔🍠🥐🥯🍞🥖🫓🥨🧀🥚🍳🥞🧇🥓🥩🍗🍖🌭🍔🍟🍕🥪🥙🌮🌯🥗🥘🍝🍜🍲🍛🍣🍱🥟🍤🍙🍚🍘🥠🥡🥢🍦🍧🍨🍩🍪🎂🍰🧁🍫🍬🍭🍮🍯'];
     const rounds = [
-      { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 },
-      { gridSize: 4, time: 20, differences: 1, columns: 2, cellSize: 140 },
-      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 90 },
-      { gridSize: 6, time: 30, differences: 1, columns: 3, cellSize: 90 },
-      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 70 },
-      { gridSize: 8, time: 45, differences: 2, columns: 4, cellSize: 70 },
-      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 90 },
-      { gridSize: 10, time: 60, differences: 2, columns: 3, cellSize: 90 },
-      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 70 },
-      { gridSize: 12, time: 60, differences: 3, columns: 4, cellSize: 70 }
+        { gridSize: 4, time: 10, differences: 1, columns: 2, cellSize: 140 },
+        { gridSize: 4, time: 10, differences: 1, columns: 2, cellSize: 140 },
+        { gridSize: 6, time: 15, differences: 1, columns: 3, cellSize: 90 },
+        { gridSize: 6, time: 15, differences: 1, columns: 3, cellSize: 90 },
+        { gridSize: 8, time: 20, differences: 2, columns: 4, cellSize: 70 },
+        { gridSize: 8, time: 20, differences: 2, columns: 4, cellSize: 70 },
+        { gridSize: 10, time: 25, differences: 2, columns: 3, cellSize: 90 },
+        { gridSize: 10, time: 25, differences: 2, columns: 3, cellSize: 90 },
+        { gridSize: 12, time: 30, differences: 3, columns: 4, cellSize: 70 },
+        { gridSize: 12, time: 30, differences: 3, columns: 4, cellSize: 70 }
     ];
 
     let currentRound = 0;
     let originalGrid = [], modifiedGrid = [], changedIndices = [];
     let foundDifferences = new Set();
-    const roundResults = [];
+    let incorrectGuesses = new Set();
+    let personalBestDifferences = 0;
+    let memorizationInterval;
+    let isPaused = false;
 
-    const gridElement = document.getElementById('emojiGrid');
-    const timerElement = document.getElementById('timer');
-    const messageElement = document.getElementById('message');
-    const roundInfoElement = document.getElementById('roundInfo');
-    const roundNumberElement = document.getElementById('roundNumber');
-    const transitionMessage = document.getElementById('transitionMessage');
-    const gameUI = document.getElementById('gameUI');
-    const roundPopup = document.getElementById('roundPopup');
+    let gameStartTime;
+    const maxGameDurationInSeconds = 300; // 5 minutes
+
+    // DOM Elements
     const cover = document.getElementById('cover');
     const game = document.getElementById('game');
-    const end = document.getElementById('end');
+    const finalSummary = document.getElementById('finalSummary');
+    const gridElement = document.getElementById('emojiGrid');
+    const timerBarContainer = document.querySelector('.timer-bar-container');
+    const timerBar = document.getElementById('timer-bar');
+    const messageElement = document.getElementById('message');
+    const gameInfoElement = document.getElementById('game-info');
+    const roundFanfare = document.getElementById('round-fanfare');
     const countdownOverlay = document.getElementById('countdownOverlay');
     const countdownText = document.getElementById('countdownText');
-    const congratsMessage = document.getElementById('congratsMessage');
+    const personalBestElement = document.getElementById('personal-best');
+    const helpBtn = document.getElementById('helpBtn');
+    const helpOverlay = document.getElementById('help-overlay');
+
+    function startGame() {
+        cover.classList.add('hidden');
+        showStartCountdown(() => {
+            gameStartTime = Date.now();
+            game.classList.remove('hidden');
+            helpBtn.classList.remove('hidden');
+            startRound();
+        });
+    }
 
     function showStartCountdown(callback) {
-      const steps = ["3", "2", "1", "GO!"];
-      let i = 0;
-      countdownOverlay.style.display = "flex";
-      countdownText.textContent = steps[i];
-      const interval = setInterval(() => {
-        i++;
-        if (i < steps.length) {
-          countdownText.textContent = steps[i];
-        } else {
-          clearInterval(interval);
-          countdownOverlay.style.display = "none";
-          callback();
-        }
-      }, 800);
+        const steps = ["3", "2", "1", "GO!"];
+        let i = 0;
+        countdownOverlay.classList.remove('hidden');
+        countdownText.textContent = steps[i];
+        const interval = setInterval(() => {
+            i++;
+            if (i < steps.length) {
+                countdownText.textContent = steps[i];
+            } else {
+                clearInterval(interval);
+                countdownOverlay.classList.add('hidden');
+                callback();
+            }
+        }, 800);
     }
-
-    function renderGrid(grid, columns, cellSize, clickable = false) {
-      gridElement.innerHTML = '';
-      gridElement.className = 'grid';
-      gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-      gridElement.style.justifyContent = 'center';
-      gridElement.style.margin = '0 auto';
-      gridElement.style.columnGap = '15px';
-
-      if (currentRound === 0 || currentRound === 1) {
-        gridElement.style.columnGap = '20px';
-      }
-      if (currentRound === 6 || currentRound === 7) {
-        gridElement.style.justifyContent = 'center';
-        gridElement.style.margin = '0 auto';
-        gridElement.style.columnGap = '15px';
-      }
-      if (currentRound === 2 || currentRound === 3) {
-        gridElement.style.columnGap = '15px';
-      }
-
-      grid.forEach((emoji, i) => {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        cell.textContent = emoji;
-        cell.style.width = `${cellSize}px`;
-        cell.style.height = `${cellSize}px`;
-        cell.style.fontSize = `${cellSize * 0.6}px`;
-        if (clickable) cell.addEventListener('click', () => handleSelect(i, cell));
-        gridElement.appendChild(cell);
-      });
-      gridElement.classList.toggle('guessing', clickable);
-    }
-
-    function modifyGrid(grid, count) {
-      const newGrid = [...grid];
-      const indices = [];
-      while (indices.length < count) {
-        const i = Math.floor(Math.random() * grid.length);
-        if (!indices.includes(i)) {
-          let newEmoji;
-          do {
-            newEmoji = foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
-          } while (newEmoji === newGrid[i]);
-          newGrid[i] = newEmoji;
-          indices.push(i);
-        }
-      }
-      return { newGrid, changedIndices: indices };
-    }
-
-    function displayRoundIntro(round, callback) {
-      gridElement.innerHTML = '';
-      roundNumberElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`;
-      roundInfoElement.textContent = `This time there will be ${round.differences} difference${round.differences > 1 ? 's' : ''} to spot.`;
-      timerElement.textContent = '';
-      messageElement.textContent = '';
-      setTimeout(callback, 2000);
-    }
-
-    function startCountdown(seconds, onComplete) {
-      timerElement.textContent = `Memorize this! ${seconds} seconds remaining`;
-      const countdownInterval = setInterval(() => {
-        seconds--;
-        timerElement.textContent = `Memorize this! ${seconds} seconds remaining`;
-        if (seconds <= 0) {
-          clearInterval(countdownInterval);
-          onComplete();
-        }
-      }, 1000);
-    }
-
-    function showRoundPopup(text, callback) {
-      roundPopup.textContent = text;
-      roundPopup.style.animation = 'popInOut 2s forwards';
-      roundPopup.style.display = 'block';
-      roundPopup.addEventListener('animationend', () => {
-        roundPopup.style.display = 'none';
-        callback();
-      }, { once: true });
+    
+    function triggerFanfare(text, callback) {
+        roundFanfare.textContent = text;
+        roundFanfare.classList.remove('fanfare-animate');
+        void roundFanfare.offsetWidth; // Trigger reflow
+        roundFanfare.classList.add('fanfare-animate');
+        setTimeout(callback, 1500);
     }
 
     function startRound() {
-      const round = rounds[currentRound];
-      foundDifferences = new Set();
-      showRoundPopup(`Round ${currentRound + 1} of ${rounds.length}`, () => {
-        displayRoundIntro(round, () => {
-          messageElement.textContent = '';
-          originalGrid = Array.from({ length: round.gridSize }, () =>
-            foodEmojis[Math.floor(Math.random() * foodEmojis.length)]
-          );
-          renderGrid(originalGrid, round.columns, round.cellSize, false);
-          startCountdown(round.time, () => {
-            const result = modifyGrid(originalGrid, round.differences);
-            modifiedGrid = result.newGrid;
-            changedIndices = result.changedIndices;
+        if (isPaused) return;
+        const round = rounds[currentRound];
+        foundDifferences.clear();
+        incorrectGuesses.clear();
+        gridElement.innerHTML = '';
+        messageElement.textContent = '';
+        timerBarContainer.classList.add('hidden');
 
-            gameUI.style.display = 'none';
-            messageElement.textContent = '';
-            timerElement.textContent = '';
-            roundInfoElement.textContent = '';
-            roundNumberElement.textContent = '';
-            gridElement.style.display = 'none';
-
-            transitionMessage.style.display = 'block';
-
+        triggerFanfare(`Round ${currentRound + 1}`, () => {
+            gameInfoElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`;
+            messageElement.innerHTML = `Get ready to memorise...<br>There will be ${round.differences} swap${round.differences > 1 ? 's' : ''}.`;
+            
             setTimeout(() => {
-              transitionMessage.style.display = 'none';
-
-              gameUI.style.display = 'block';
-              gridElement.style.display = 'grid';
-              roundNumberElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`;
-              roundInfoElement.textContent = `Find the difference${round.differences > 1 ? 's' : ''}!`;
-              timerElement.textContent = '';
-              messageElement.textContent = '';
-
-              renderGrid(modifiedGrid, round.columns, round.cellSize, true);
-            }, 3000);
-          });
+                if (isPaused) return;
+                originalGrid = Array.from({ length: round.gridSize }, () =>
+                    foodEmojis[Math.floor(Math.random() * foodEmojis.length)]
+                );
+                renderGrid(originalGrid, round.columns, round.cellSize, false);
+                startMemorizationPhase(round);
+            }, 2500);
         });
-      });
     }
 
-    function handleSelect(index, cell) {
-      if (cell.querySelector('.marker')) return;
-      if (changedIndices.includes(index)) {
-        if (!foundDifferences.has(index)) {
-          foundDifferences.add(index);
-          const marker = document.createElement('div');
-          marker.className = 'marker';
-          marker.textContent = '✅';
-          cell.appendChild(marker);
-          messageElement.textContent = `Correct! ${foundDifferences.size} of ${rounds[currentRound].differences} found.`;
-          if (foundDifferences.size === rounds[currentRound].differences) {
-            messageElement.textContent = '🎉 Great job! Moving to next round...';
-            const totalCorrect = foundDifferences.size;
-            const totalIncorrect = document.querySelectorAll('.marker').length - totalCorrect;
-            roundResults.push({ round: currentRound + 1, correct: totalCorrect, incorrect: totalIncorrect });
-            setTimeout(() => {
-              currentRound++;
-              if (currentRound < rounds.length) {
-                startRound();
-              } else {
-                showCongratsMessage();
-                game.style.display = 'none';
-                end.style.display = 'flex';
-                window.parent.postMessage("showNext", "*"); // Tell Qualtrics game is done
-              }
-            }, 2000);
-          }
+    function startMemorizationPhase(round) {
+        messageElement.textContent = 'Memorise this grid!';
+        timerBarContainer.classList.remove('hidden');
+        timerBar.style.transition = `width ${round.time}s linear`;
+        timerBar.style.width = '100%';
+        setTimeout(() => timerBar.style.width = '0%', 100);
+
+        memorizationInterval = setTimeout(() => {
+            if (isPaused) return;
+            startGuessingPhase();
+        }, round.time * 1000);
+    }
+
+    function startGuessingPhase() {
+        timerBar.style.transition = 'width 0.5s linear';
+        timerBarContainer.classList.add('hidden');
+        
+        const result = modifyGrid(originalGrid, rounds[currentRound].differences);
+        modifiedGrid = result.newGrid;
+        changedIndices = result.changedIndices;
+
+        gridElement.style.opacity = '0';
+        messageElement.textContent = 'Now, find the swaps!';
+
+        setTimeout(() => {
+            if (isPaused) return;
+            renderGrid(modifiedGrid, rounds[currentRound].columns, rounds[currentRound].cellSize, true);
+            gridElement.style.opacity = '1';
+        }, 500);
+    }
+
+    function renderGrid(gridData, columns, cellSize, clickable) {
+        gridElement.innerHTML = '';
+        gridElement.className = `grid ${clickable ? 'guessing' : ''}`;
+        gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+        gridData.forEach((emoji, i) => {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.textContent = emoji;
+            cell.style.width = `${cellSize}px`;
+            cell.style.height = `${cellSize}px`;
+            cell.style.fontSize = `${cellSize * 0.6}px`;
+            if (clickable) cell.addEventListener('click', () => handlePress(i, cell));
+            gridElement.appendChild(cell);
+        });
+    }
+
+    function modifyGrid(grid, count) {
+        const newGrid = [...grid];
+        const indices = [];
+        let attempts = 0;
+        while (indices.length < count && attempts < 1000) {
+            const i = Math.floor(Math.random() * grid.length);
+            if (!indices.includes(i)) {
+                let newEmoji;
+                do {
+                    newEmoji = foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
+                } while (newEmoji === newGrid[i] || grid.includes(newEmoji)); // Ensure new emoji is not elsewhere in original
+                newGrid[i] = newEmoji;
+                indices.push(i);
+            }
+            attempts++;
         }
-      } else {
-        const marker = document.createElement('div');
-        marker.className = 'marker';
-        marker.textContent = '❌';
-        cell.appendChild(marker);
-        messageElement.textContent = 'Try again!';
-      }
+        return { newGrid, changedIndices: indices.sort((a,b) => a-b) };
     }
 
-    function showCongratsMessage() {
-      let totalCorrect = roundResults.reduce((sum, r) => sum + r.correct, 0);
-      congratsMessage.textContent = `Congratulations, you correctly spotted ${totalCorrect} difference${totalCorrect !== 1 ? 's' : ''}!`;
+    function handlePress(index, cell) {
+        if (isPaused || cell.classList.contains('correct') || incorrectGuesses.has(index)) return;
+
+        if (changedIndices.includes(index)) {
+            if (!foundDifferences.has(index)) {
+                foundDifferences.add(index);
+                cell.classList.add('correct');
+                const marker = document.createElement('div');
+                marker.className = 'marker';
+                marker.textContent = '✅';
+                cell.appendChild(marker);
+                messageElement.textContent = `Awesome! ${foundDifferences.size} of ${rounds[currentRound].differences} found.`;
+
+                if (foundDifferences.size === rounds[currentRound].differences) {
+                    messageElement.textContent = '🎉 You found them all! Great job!';
+                    if (rounds[currentRound].differences > personalBestDifferences) {
+                        personalBestDifferences = rounds[currentRound].differences;
+                    }
+                    setTimeout(endRoundSequence, 2000);
+                }
+            }
+        } else {
+            incorrectGuesses.add(index);
+            cell.classList.add('incorrect');
+            messageElement.textContent = 'Not that one, try again!';
+            setTimeout(() => {
+                cell.classList.remove('incorrect');
+                if (foundDifferences.size < rounds[currentRound].differences) {
+                   messageElement.textContent = `Keep looking! ${foundDifferences.size} of ${rounds[currentRound].differences} found.`;
+                }
+            }, 800);
+        }
+    }
+    
+    function endRoundSequence() {
+        currentRound++;
+        const elapsedTimeInSeconds = (Date.now() - gameStartTime) / 1000;
+        if (currentRound >= rounds.length || elapsedTimeInSeconds >= maxGameDurationInSeconds) {
+            endGame();
+        } else {
+            startRound();
+        }
     }
 
-    function startGame() {
-      cover.style.display = 'none';
-      showStartCountdown(() => {
-        game.style.display = 'block';
-        startRound();
-      });
+    function endGame() {
+        game.classList.add('hidden');
+        helpBtn.classList.add('hidden');
+        personalBestElement.innerHTML = `Your Personal Best:<br><span>Found ${personalBestDifferences} swap${personalBestDifferences !== 1 ? 's' : ''} in one round!</span>`;
+        finalSummary.classList.remove('hidden');
+        window.parent.postMessage("showNext", "*");
     }
-  </script>
+
+    function toggleHelp(show) {
+        isPaused = show;
+        helpOverlay.classList.toggle('hidden', !show);
+        if (isPaused) {
+            clearTimeout(memorizationInterval);
+            timerBar.style.transition = 'none'; // Stop animation
+        } else {
+            // Resume logic could go here if needed, but for now it just unpauses
+        }
+    }
+</script>
 </body>
 </html>
