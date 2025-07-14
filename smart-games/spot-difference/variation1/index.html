@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
     <style>
+        /* CSS is unchanged from the previous version */
         * { box-sizing: border-box; }
         body {
             background-color: #FFFDE7; /* Light sunny yellow */
@@ -19,14 +20,10 @@
             -webkit-tap-highlight-color: transparent;
         }
         .hidden { display: none !important; }
-
-        /* Page Containers */
         .container {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 10px; min-height: 95vh; max-width: 600px; margin: 0 auto;
         }
-
-        /* Typography & Titles */
         h1 { font-size: 3rem; color: #0288D1; text-shadow: 3px 3px 0px #81D4FA; margin: 15px 0; }
         .welcome-title {
             font-size: 1.3em; color: #01579B; background-color: #E1F5FE;
@@ -34,12 +31,9 @@
         }
         .instructions-list { list-style-type: '⭐'; padding-left: 25px; margin: 20px auto; text-align: left; max-width: 400px; }
         .instructions-list li { font-size: 1.2em; margin-bottom: 15px; padding-left: 10px; line-height: 1.4; }
-
-        /* Game Area */
         #game-area { width: 100%; }
         #game-info { font-size: 1.5rem; font-weight: 700; color: #546E7A; margin-bottom: 10px; }
         #message { font-size: 1.2rem; font-weight: 700; color: #0277BD; min-height: 40px; margin-bottom: 15px; }
-        
         .timer-bar-container {
             width: 100%; height: 25px; background-color: #CFD8DC; border-radius: 12px;
             border: 2px solid #0288D1; margin: 15px auto; overflow: hidden;
@@ -49,8 +43,6 @@
             height: 100%; width: 100%; background: linear-gradient(90deg, #4FC3F7, #B3E5FC);
             border-radius: 8px; transition: width 0.5s linear;
         }
-
-        /* Grid & Cells */
         .grid {
             display: grid; gap: 15px; justify-content: center;
             margin: 20px auto; user-select: none; max-width: max-content;
@@ -68,8 +60,6 @@
         .cell:active:not(.correct):not(.incorrect) {
             transform: translateY(1px); box-shadow: 0 2px 0 #90A4AE;
         }
-
-        /* Cell Feedback States */
         .cell.correct {
             border-color: #66BB6A; background-color: #E8F5E9;
             transform: translateY(2px); box-shadow: 0 2px 0 #43A047;
@@ -82,8 +72,6 @@
         }
         @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
-
-        /* Buttons */
         button {
             background-color: #8BC34A; border: none; color: white; padding: 15px 30px;
             margin: 10px; font-size: 1.5em; font-family: 'Fredoka One', cursive; font-weight: 700;
@@ -97,8 +85,6 @@
             position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px;
             border-radius: 50%; font-size: 1.8em; z-index: 2000; padding: 0; line-height: 1;
         }
-
-        /* Overlays & Popups */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0,0,0,0.6); z-index: 1000; display: flex;
@@ -125,13 +111,10 @@
             50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
             100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
         }
-
-        /* Final Summary */
         #finalSummary { text-align: center; }
         #finalSummary p { margin: 15px 0; font-size: 1.2em; line-height: 1.5; }
         #personal-best { font-size: 1.8em; color: #01579B; margin: 20px 0; font-weight: bold; }
         #final-prompt { color: #0277BD; font-weight: bold; }
-
         @media (max-width: 480px) {
             .cell { width: 60px !important; height: 60px !important; font-size: 2.2rem !important; }
             h1 { font-size: 2.5rem; }
@@ -140,7 +123,6 @@
     </style>
 </head>
 <body>
-
     <div id="cover" class="container">
         <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
         <h1>Spot the Difference</h1>
@@ -151,7 +133,6 @@
         </ul>
         <button onclick="startGame()">Let's Play!</button>
     </div>
-
     <div id="game" class="container hidden">
         <div id="game-area">
             <div id="game-info"></div>
@@ -162,7 +143,6 @@
             <div id="emojiGrid" class="grid"></div>
         </div>
     </div>
-
     <div id="finalSummary" class="container hidden">
         <h1>Well Done!</h1>
         <div class="overlay-content">
@@ -171,9 +151,7 @@
             <p>You will have earned an extra $2.50 for your SMART bank!</p>
         </div>
     </div>
-    
     <button id="helpBtn" class="help-button hidden" onclick="toggleHelp(true)">?</button>
-    
     <div id="help-overlay" class="overlay hidden" onclick="toggleHelp(false)">
         <div class="overlay-content" onclick="event.stopPropagation()">
             <h2 class="welcome-title">How to Play</h2>
@@ -185,12 +163,21 @@
             <button onclick="toggleHelp(false)">Got it!</button>
         </div>
     </div>
-
     <div id="countdownOverlay" class="overlay hidden"><div id="countdownText"></div></div>
     <div id="round-fanfare"></div>
 
 <script>
-    const foodEmojis = [...'🍏🍎🍐🍊🍋🍌🍉🍇🍓🫐🍈🍒🍑🥭🍍🥥🥝🍅🍆🥑🥦🥒🌶️🫑🌽🥕🧄🧅🥔🍠🥐🥯🍞🥖🫓🥨🧀🥚🍳🥞🧇🥓🥩🍗🍖🌭🍔🍟🍕🥪🥙🌮🌯🥗🥘🍝🍜🍲🍛🍣🍱🥟🍤🍙🍚🍘🥠🥡🥢🍦🍧🍨🍩🍪🎂🍰🧁🍫🍬🍭🍮🍯'];
+    // --- FIX: SHUFFLE THE ENTIRE EMOJI ARRAY AT THE START ---
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+    const foodEmojis = shuffleArray([...new Set([...'🍏🍎🍐🍊🍋🍌🍉🍇🍓🫐🍈🍒🍑🥭🍍🥥🥝🍅🍆🥑🥦🥒🌶️🫑🌽🥕🧄🧅🥔🍠🥐🥯🍞🥖🫓🥨🧀🥚🍳🥞🧇🥓🥩🍗🍖🌭🍔🍟🍕🥪🥙🌮🌯🥗🥘🍝🍜🍲🍛🍣🍱🥟🍤🍙🍚🍘🥠🥡🥢🍦🍧🍨🍩🍪🎂🍰🧁🍫🍬🍭🍮🍯'])]);
+    let emojiIndex = 0; // Keep track of which emojis we've used
+
     const rounds = [
         { gridSize: 4, time: 10, differences: 1, columns: 2, cellSize: 140 },
         { gridSize: 4, time: 10, differences: 1, columns: 2, cellSize: 140 },
@@ -203,7 +190,6 @@
         { gridSize: 12, time: 30, differences: 3, columns: 4, cellSize: 70 },
         { gridSize: 12, time: 30, differences: 3, columns: 4, cellSize: 70 }
     ];
-
     let currentRound = 0;
     let originalGrid = [], modifiedGrid = [], changedIndices = [];
     let foundDifferences = new Set();
@@ -211,11 +197,8 @@
     let personalBestDifferences = 0;
     let memorizationTimeout;
     let isPaused = false;
-
     let gameStartTime;
     const maxGameDurationInSeconds = 300; // 5 minutes
-
-    // DOM Elements
     const cover = document.getElementById('cover');
     const game = document.getElementById('game');
     const finalSummary = document.getElementById('finalSummary');
@@ -248,20 +231,15 @@
         countdownText.textContent = steps[i];
         const interval = setInterval(() => {
             i++;
-            if (i < steps.length) {
-                countdownText.textContent = steps[i];
-            } else {
-                clearInterval(interval);
-                countdownOverlay.classList.add('hidden');
-                callback();
-            }
+            if (i < steps.length) { countdownText.textContent = steps[i]; } 
+            else { clearInterval(interval); countdownOverlay.classList.add('hidden'); callback(); }
         }, 800);
     }
     
     function triggerFanfare(text, callback) {
         roundFanfare.textContent = text;
         roundFanfare.classList.remove('fanfare-animate');
-        void roundFanfare.offsetWidth; // Trigger reflow to restart animation
+        void roundFanfare.offsetWidth;
         roundFanfare.classList.add('fanfare-animate');
         setTimeout(callback, 1500);
     }
@@ -274,17 +252,17 @@
         gridElement.innerHTML = '';
         messageElement.textContent = '';
         timerBarContainer.classList.add('hidden');
-
         triggerFanfare(`Round ${currentRound + 1}`, () => {
-            if (isPaused) return; // Check again after fanfare
-            gameInfoElement.textContent = `Round ${currentRound + 1}`; // MODIFIED: Removed "of X"
+            if (isPaused) return;
+            gameInfoElement.textContent = `Round ${currentRound + 1}`;
             messageElement.innerHTML = `Get ready to memorise...<br>There will be ${round.differences} difference${round.differences > 1 ? 's' : ''}.`;
-            
             setTimeout(() => {
                 if (isPaused) return;
-                originalGrid = Array.from({ length: round.gridSize }, () =>
-                    foodEmojis[Math.floor(Math.random() * foodEmojis.length)]
-                );
+                // --- FIX: USE THE SHUFFLED EMOJI SLICE ---
+                if (emojiIndex + round.gridSize > foodEmojis.length) { emojiIndex = 0; } // reshuffle if we run out
+                originalGrid = foodEmojis.slice(emojiIndex, emojiIndex + round.gridSize);
+                emojiIndex += round.gridSize;
+
                 renderGrid(originalGrid, round.columns, round.cellSize, false);
                 startMemorizationPhase(round);
             }, 2500);
@@ -295,14 +273,11 @@
         messageElement.textContent = 'Memorise this grid!';
         timerBarContainer.classList.remove('hidden');
         timerBar.style.width = '100%';
-        timerBar.style.transition = 'none'; // Reset transition for instant fill
-        
-        // Use requestAnimationFrame to ensure the 100% width is rendered before starting the transition
+        timerBar.style.transition = 'none';
         requestAnimationFrame(() => {
             timerBar.style.transition = `width ${round.time}s linear`;
             timerBar.style.width = '0%';
         });
-
         clearTimeout(memorizationTimeout);
         memorizationTimeout = setTimeout(() => {
             if (isPaused) return;
@@ -312,14 +287,11 @@
 
     function startGuessingPhase() {
         timerBarContainer.classList.add('hidden');
-        
         const result = modifyGrid(originalGrid, rounds[currentRound].differences);
         modifiedGrid = result.newGrid;
         changedIndices = result.changedIndices;
-
         gridElement.style.opacity = '0';
         messageElement.textContent = 'Now, find the differences!';
-
         setTimeout(() => {
             if (isPaused) return;
             renderGrid(modifiedGrid, rounds[currentRound].columns, rounds[currentRound].cellSize, true);
@@ -332,7 +304,6 @@
         gridElement.innerHTML = '';
         gridElement.className = `grid ${clickable ? 'guessing' : ''}`;
         gridElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-
         gridData.forEach((emoji, i) => {
             const cell = document.createElement('div');
             cell.className = 'cell';
@@ -354,8 +325,9 @@
             if (!indices.includes(i)) {
                 let newEmoji;
                 do {
+                    // --- FIX: MAKE SURE THE NEW EMOJI ISN'T IN THE ORIGINAL GRID ---
                     newEmoji = foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
-                } while (newEmoji === newGrid[i] || grid.includes(newEmoji));
+                } while (grid.includes(newEmoji));
                 newGrid[i] = newEmoji;
                 indices.push(i);
             }
@@ -366,7 +338,6 @@
 
     function handlePress(index, cell) {
         if (isPaused || cell.classList.contains('correct') || incorrectGuesses.has(index)) return;
-
         if (changedIndices.includes(index)) {
             if (!foundDifferences.has(index)) {
                 foundDifferences.add(index);
@@ -376,7 +347,6 @@
                 marker.textContent = '✅';
                 cell.appendChild(marker);
                 messageElement.textContent = `Awesome! ${foundDifferences.size} of ${rounds[currentRound].differences} found.`;
-
                 if (foundDifferences.size === rounds[currentRound].differences) {
                     messageElement.textContent = '🎉 You found them all! Great job!';
                     if (rounds[currentRound].differences > personalBestDifferences) {
@@ -426,9 +396,8 @@
             timerBar.style.transition = 'none';
             timerBar.style.width = width;
         } else {
-            // Resume memorization if it was interrupted
             if (timerBarContainer.classList.contains('hidden') === false) {
-                startRound(); // Easiest to just restart the current round's flow
+                startRound();
             }
         }
     }
