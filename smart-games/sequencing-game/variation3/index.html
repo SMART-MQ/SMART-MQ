@@ -3,296 +3,415 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SMART Memory Game - Reverse Order</title>
+  <title>SMART Cosmic Rewind</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
   <style>
-    body {
+    :root {
+      --bg-color: #191932;
+      --primary-glow: #23d9d9;
+      --text-color: #f0f0f0;
+      
+      --btn1-color: #ff3c82; /* Neon Pink/Magenta */
+      --btn2-color: #ff9a3c; /* Neon Orange */
+      --btn3-color: #3cff9a; /* Neon Green */
+      --btn4-color: #3c9aff; /* Neon Blue */
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
       margin: 0;
-      font-family: 'Arial Rounded MT Bold', sans-serif;
-      background: linear-gradient(to bottom right, #fce4ec, #e1f5fe);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      padding: 0;
+      font-family: 'Bungee', cursive;
+      background-color: var(--bg-color);
+      color: var(--text-color);
       text-align: center;
-      color: #333;
-      flex-direction: column;
-      padding: 2vw;
-      box-sizing: border-box;
+      overflow: hidden;
+      position: relative;
     }
-    .content {
-      padding: 5vw;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      max-width: 100%;
-      width: 100%;
-      box-sizing: border-box;
-      margin-bottom: 10px;
-    }
-    h1 {
-      font-size: 6vw;
-      background: linear-gradient(90deg, #ffb3ba, #ffdfba, #ffffba, #baffc9, #bae1ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-weight: bold;
-    }
-    h2, .score {
-      font-size: 5vw;
-      color: #444;
-      margin: 10px 0;
-    }
-    .play-button {
-      font-size: 5vw;
-      padding: 3vw 6vw;
-      background-color: #ffd6e8;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-    .scoreboard {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-    .score {
-      font-size: 4.5vw;
-    }
-    #timerBox {
-      position: fixed;
-      bottom: 15px;
-      right: 15px;
-      background: #ffffffcc;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 5vw;
-      font-weight: bold;
-      color: #222;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .button-container {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 6vw;
-      margin-top: 30px;
-    }
-    .color-button {
-      width: 22vw;
-      height: 22vw;
+    
+    .hidden { display: none !important; }
+    .fadeable { transition: opacity 0.4s ease-in-out, visibility 0.4s; }
+    .is-faded-out { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+    .star {
+      position: absolute;
+      background-color: white;
       border-radius: 50%;
-      border: none;
-      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
-      cursor: pointer;
-      transition: transform 0.2s;
+      animation: twinkle 10s infinite linear;
     }
-    .color-button.flash {
-      opacity: 0.5;
-      transform: scale(1.1);
-      border: 3px solid #333;
-    }
-    #instructionModal, #finalPopup {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: linear-gradient(to bottom right, #fce4ec, #e1f5fe);
-      display: none;
+    @keyframes twinkle { 0% { opacity: 0; transform: translateY(0); } 50% { opacity: 0.8; } 100% { opacity: 0; transform: translateY(-100px); } }
+
+    .screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      z-index: 999;
-      padding: 5vw;
-      box-sizing: border-box;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
     }
-    #instructionBox, #finalPopup > div {
-      background: white;
-      padding: 5vw;
-      border-radius: 15px;
-      max-width: 90vw;
-      width: 100%;
-      text-align: center;
-      box-sizing: border-box;
+
+    .overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7); z-index: 1000; display: flex;
+      justify-content: center; align-items: center; padding: 15px;
     }
-    #instructionBox h2, #finalPopup h2 {
-      font-size: 5vw;
-      background: linear-gradient(90deg, #ffb3ba, #ffdfba);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    
+    .overlay-content {
+      background: rgba(25, 25, 50, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 30px; border-radius: 20px; 
+      border: 2px solid var(--primary-glow); width: 100%; max-width: 500px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 0 20px rgba(35, 217, 217, 0.3);
     }
-    #instructionBox ul {
-      list-style-type: disc;
-      padding-left: 5vw;
-      line-height: 1.8;
-      text-align: left;
-      font-size: 4vw;
+
+    h1 {
+      font-size: clamp(3em, 12vw, 5em);
+      color: #fff;
+      text-shadow: 0 0 2px #fff, 0 0 8px var(--primary-glow), 0 0 15px var(--primary-glow);
+      letter-spacing: 2px;
+      margin: 0;
+      line-height: 1;
     }
-    #message {
-      font-size: 4vw;
-      margin-top: 10px;
+    
+    h2 { font-size: clamp(2em, 7vw, 2.5em); color: var(--primary-glow); }
+    p, li { font-size: clamp(1em, 4vw, 1.2em); line-height: 1.5; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+    
+    .subtitle {
+        font-size: clamp(1.2em, 5vw, 1.5em);
+        color: var(--text-color);
+        margin-bottom: 20px;
     }
-    #finalPopup p {
-      font-size: 4vw;
-      color: #333;
+    
+    /* Instruction emphasis for the reverse rule */
+    .emphasis {
+        color: var(--primary-glow);
+        font-size: 1.3em;
+    }
+
+    #game-area { width: 100%; max-width: 600px; }
+    .scoreboard { display: flex; justify-content: space-around; font-size: 1.2em; margin-bottom: 15px; }
+    #message { font-size: 1.5em; color: #fff; min-height: 1.5em; margin: 20px 0; text-shadow: 0 0 5px var(--primary-glow); }
+
+    .timer-bar-container {
+      width: 90%; max-width: 500px; height: 15px; background-color: rgba(0,0,0,0.3);
+      border-radius: 10px; border: 2px solid var(--primary-glow);
+      margin: 15px auto; overflow: hidden; box-shadow: 0 0 10px rgba(35, 217, 217, 0.3);
+    }
+    .timer-bar {
+      height: 100%; width: 100%; background-color: var(--primary-glow);
+      border-radius: 6px; transition: width 1s linear;
+    }
+
+    .button-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
       margin-top: 20px;
+      max-width: 400px;
+      margin: 0 auto;
     }
+
+    .color-button {
+      aspect-ratio: 1 / 1;
+      border: 3px solid;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.1s ease-out;
+      background-color: transparent;
+    }
+    #btn1 { border-color: var(--btn1-color); box-shadow: 0 0 15px var(--btn1-color); }
+    #btn2 { border-color: var(--btn2-color); box-shadow: 0 0 15px var(--btn2-color); }
+    #btn3 { border-color: var(--btn3-color); box-shadow: 0 0 15px var(--btn3-color); }
+    #btn4 { border-color: var(--btn4-color); box-shadow: 0 0 15px var(--btn4-color); }
+
+    .color-button:active:not(:disabled), .color-button.flash {
+      transform: scale(0.95);
+      filter: brightness(2.5);
+    }
+    #btn1.flash { background-color: var(--btn1-color); }
+    #btn2.flash { background-color: var(--btn2-color); }
+    #btn3.flash { background-color: var(--btn3-color); }
+    #btn4.flash { background-color: var(--btn4-color); }
+
+    .color-button:disabled { filter: brightness(0.4); cursor: not-allowed; }
+    
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+    .shake-container { animation: shake 0.4s; }
+
+    .play-button {
+      background: transparent;
+      border: 2px solid var(--primary-glow);
+      color: var(--primary-glow);
+      padding: 15px 30px; margin-top: 20px; font-size: 1.3em;
+      font-family: 'Bungee', cursive; border-radius: 12px;
+      cursor: pointer; transition: all 0.2s ease;
+      text-shadow: 0 0 5px var(--primary-glow);
+      box-shadow: 0 0 10px rgba(35, 217, 217, 0.5) inset;
+    }
+    .play-button:hover:not(:disabled) { background: var(--primary-glow); color: var(--bg-color); text-shadow: none; }
+
+    .help-button {
+      position: fixed; bottom: 15px; right: 15px; width: 55px; height: 55px;
+      border-radius: 50%; font-size: 2em; z-index: 500;
+      background-color: var(--primary-glow); color: var(--bg-color);
+      border: none; box-shadow: 0 0 15px var(--primary-glow);
+      cursor: pointer; line-height: 1; transition: transform 0.2s;
+    }
+    .help-button:hover { transform: scale(1.1); }
+    
+    #fanfare {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 3em; color: #fff; z-index: 9999;
+      text-shadow: 0 0 5px #fff, 0 0 10px var(--primary-glow);
+    }
+    @keyframes fanfare-anim { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
+    .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
   </style>
 </head>
 <body>
-  <div class="content" id="startScreen">
-    <h1>Welcome to the SMART Memory Game!</h1>
-    <p><strong>Repeat the pattern in REVERSE order!</strong></p>
-    <button class="play-button" onclick="showInstructions()">Play</button>
+  
+  <div class="stars"></div>
+
+  <div id="start-screen" class="screen">
+    <p class="subtitle">Welcome to the SMART Challenge</p>
+    <h1>Cosmic Rewind</h1>
+    <p class="subtitle emphasis">A new challenge: Repeat the sequence in REVERSE!</p>
+    <button class="play-button" id="startBtn">Start Game</button>
   </div>
 
-  <div id="instructionModal">
-    <div id="instructionBox">
-      <h2>Instructions</h2>
-      <ul>
-        <li>Watch the sequence of colours flash on the screen.</li>
-        <li>Repeat the pattern in REVERSE order by clicking the buttons.</li>
-        <li>Try to beat your personal best in 10 minutes!</li>
-      </ul>
-      <div style="text-align:center; margin-top: 20px;">
-        <button class="play-button" onclick="startGame()">Start</button>
+  <div id="game-screen" class="screen hidden">
+    <div id="game-area">
+      <div id="timer-bar-container" class="timer-bar-container">
+        <div id="timer-bar" class="timer-bar"></div>
+      </div>
+      <div class="scoreboard">
+        <span id="currentScore">Score: 0</span>
+        <span id="bestScore">Best: 0</span>
+      </div>
+      <p id="message">Get Ready...</p>
+      <div id="button-container" class="button-container">
+        <button class="color-button" id="btn1"></button>
+        <button class="color-button" id="btn2"></button>
+        <button class="color-button" id="btn3"></button>
+        <button class="color-button" id="btn4"></button>
       </div>
     </div>
   </div>
 
-  <div class="content" id="gameArea" style="display:none; position: relative;">
-    <h2>Repeat the sequence in reverse!</h2>
-    <div class="scoreboard">
-      <p class="score" id="currentScore">Current Score: 0</p>
-      <p class="score" id="bestScore">Personal Best: 0</p>
-    </div>
-    <p id="message"></p>
-    <div class="button-container" id="buttonContainer"></div>
-  </div>
+  <button id="helpBtn" class="help-button hidden">?</button>
+  <div id="fanfare" class="hidden"></div>
 
-  <div id="timerBox">10:00</div>
-
-  <div id="finalPopup">
-    <div>
-      <h2>Congratulations!</h2>
-      <p id="finalMessage"></p>
-      <p>Now, finish the survey and you will have earned an extra $2.50 for your SMART bank.</p>
+  <div id="help-overlay" class="overlay fadeable is-faded-out">
+    <div class="overlay-content">
+      <h2>How To Play</h2>
+      <p>Watch the neon sequence.<br>Here's the twist: Repeat the pattern by pressing the squares in <span class="emphasis">REVERSE</span> order!</p>
+      <button class="play-button" id="resumeBtn">Resume</button>
     </div>
   </div>
 
-  <audio id="flashSound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
-  <audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.mp3"></audio>
+  <div id="final-summary-overlay" class="overlay fadeable is-faded-out">
+    <div class="overlay-content">
+      <h2>Time's Up!</h2>
+      <p style="font-size: 1.5em; color: var(--primary-glow);">Great Job!</p>
+      <p>Your personal best score:</p>
+      <p id="final-best-score" style="font-size: 3em; color: #fff; margin: 10px 0; text-shadow: 0 0 8px var(--primary-glow);">0</p>
+      <p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>
+    </div>
+  </div>
+
+  <audio id="flashSound" src="https://assets.codepen.io/217233/synth_C4.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="https://assets.codepen.io/217233/synth_misc_1.mp3" preload="auto"></audio>
 
   <script>
-    const colors = ["#ffb3ba", "#bae1ff", "#ffffba", "#baffc9"];
-    let sequence = [], userSequence = [], buttons = [];
-    let score = 0, best = 0, timeLeft = 600, timer;
-
-    function showInstructions() {
-      document.getElementById("startScreen").style.display = "none";
-      document.getElementById("instructionModal").style.display = "flex";
+    const starsContainer = document.querySelector('.stars');
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.width = `${Math.random() * 2}px`;
+        star.style.height = star.style.width;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.animationDelay = `${Math.random() * 10}s`;
+        star.style.animationDuration = `${5 + Math.random() * 5}s`;
+        starsContainer.appendChild(star);
     }
+  
+    const GAME_TIME = 300;
+    const RETRY_MESSAGES = ["Let's try again!", "You got this!", "Nice try!", "Give it another shot!"];
+
+    const elements = {
+        startScreen: document.getElementById('start-screen'),
+        gameScreen: document.getElementById('game-screen'),
+        startBtn: document.getElementById('startBtn'),
+        message: document.getElementById('message'),
+        timerBar: document.getElementById('timer-bar'),
+        buttonContainer: document.getElementById('button-container'),
+        buttons: ["btn1", "btn2", "btn3", "btn4"].map(id => document.getElementById(id)),
+        currentScoreEl: document.getElementById('currentScore'),
+        bestScoreEl: document.getElementById('bestScore'),
+        helpBtn: document.getElementById('helpBtn'),
+        helpOverlay: document.getElementById('help-overlay'),
+        resumeBtn: document.getElementById('resumeBtn'),
+        finalOverlay: document.getElementById('final-summary-overlay'),
+        finalBestScore: document.getElementById('final-best-score'),
+        fanfare: document.getElementById('fanfare'),
+        flashSound: document.getElementById('flashSound'),
+        wrongSound: document.getElementById('wrongSound'),
+    };
+
+    let sequence = [], userSequence = [], score = 0, best = 0;
+    let timer, timeLeft = GAME_TIME;
+    let isPlayerTurn = false, isGameRunning = false, isPaused = false;
+
+    elements.startBtn.addEventListener('click', startGame);
+    elements.helpBtn.addEventListener('click', pauseGame);
+    elements.resumeBtn.addEventListener('click', resumeGame);
+    elements.buttons.forEach((btn, i) => {
+      btn.addEventListener('click', () => handlePlayerInput(i));
+    });
 
     function startGame() {
-      document.getElementById("instructionModal").style.display = "none";
-      document.getElementById("gameArea").style.display = "block";
-      score = 0;
-      sequence = [];
+      elements.startScreen.classList.add('hidden');
+      elements.gameScreen.classList.remove('hidden');
+      elements.helpBtn.classList.remove('hidden');
+      triggerFanfare("Get Ready", 1500);
+      setTimeout(() => {
+        isGameRunning = true;
+        startTimer();
+        nextRound();
+      }, 1500);
+    }
+    
+    function nextRound() {
+      if (!isGameRunning) return;
+      isPlayerTurn = false;
       userSequence = [];
-      timeLeft = 600;
-      document.getElementById("currentScore").textContent = "Current Score: 0";
-      document.getElementById("bestScore").textContent = "Personal Best: " + best;
-      document.getElementById("message").textContent = "";
-      createButtons();
-      startTimer();
-      nextRound();
+      updateButtonsState(true);
+      elements.message.textContent = '...WATCH...';
+      sequence.push(Math.floor(Math.random() * 4));
+      playSequence();
+      setTimeout(() => {
+        isPlayerTurn = true;
+        updateButtonsState(false);
+        // Emphasize the reverse rule during gameplay
+        elements.message.textContent = 'IN REVERSE!';
+      }, sequence.length * 600 + 400);
+    }
+    
+    function endGame() {
+        isGameRunning = false;
+        clearInterval(timer);
+        elements.finalBestScore.textContent = best;
+        elements.finalOverlay.classList.remove('is-faded-out');
+        elements.helpBtn.classList.add('hidden');
+        updateButtonsState(true);
+        window.parent.postMessage("showNext", "*");
     }
 
-    function createButtons() {
-      const container = document.getElementById("buttonContainer");
-      container.innerHTML = "";
-      buttons = [];
+    function handlePlayerInput(index) {
+        if (!isPlayerTurn) return;
+        flashButton(elements.buttons[index]);
+        userSequence.push(index);
 
-      for (let i = 0; i < 4; i++) {
-        const btn = document.createElement("button");
-        btn.className = "color-button";
-        btn.style.backgroundColor = colors[i];
-        btn.dataset.index = i;
-        btn.addEventListener("click", () => {
-          flash(btn);
-          userSequence.push(parseInt(btn.dataset.index));
-          check();
-        });
-        container.appendChild(btn);
-        buttons.push(btn);
-      }
+        // --- CORE REVERSE LOGIC ---
+        const reversedSequence = [...sequence].reverse();
+        const currentIndex = userSequence.length - 1;
+        
+        if (userSequence[currentIndex] !== reversedSequence[currentIndex]) {
+            handleIncorrect();
+            return;
+        }
+        
+        if (userSequence.length === sequence.length) {
+            handleCorrect();
+        }
+    }
+    
+    function handleCorrect() {
+        isPlayerTurn = false;
+        score++;
+        if (score > best) {
+            best = score;
+            triggerFanfare("NEW BEST!", 1000);
+        }
+        updateScoreboard();
+        setTimeout(nextRound, 1000);
+    }
+    
+    function handleIncorrect() {
+        isPlayerTurn = false;
+        elements.wrongSound.play();
+        elements.message.textContent = RETRY_MESSAGES[Math.floor(Math.random() * RETRY_MESSAGES.length)];
+        elements.buttonContainer.classList.add('shake-container');
+        score = 0;
+        sequence = [];
+        updateScoreboard();
+        setTimeout(() => {
+            elements.buttonContainer.classList.remove('shake-container');
+            nextRound();
+        }, 1500);
+    }
+    
+    function startTimer() {
+        timer = setInterval(() => {
+            if (isPaused || !isGameRunning) return;
+            timeLeft--;
+            elements.timerBar.style.width = (timeLeft / GAME_TIME) * 100 + '%';
+            if (timeLeft <= 0) endGame();
+        }, 1000);
     }
 
-    function flash(button) {
-      document.getElementById("flashSound").play();
-      button.classList.add("flash");
-      setTimeout(() => button.classList.remove("flash"), 400);
+    function pauseGame() {
+        if (!isGameRunning) return;
+        isPaused = true;
+        elements.helpOverlay.classList.remove('is-faded-out');
     }
 
+    function resumeGame() {
+        isPaused = false;
+        elements.helpOverlay.classList.add('is-faded-out');
+    }
+    
     function playSequence() {
       let i = 0;
       const interval = setInterval(() => {
-        flash(buttons[sequence[i]]);
+        if(i >= sequence.length) { clearInterval(interval); return; }
+        flashButton(elements.buttons[sequence[i]]);
         i++;
-        if (i >= sequence.length) clearInterval(interval);
-      }, 800);
+      }, 600);
+    }
+    
+    function flashButton(btn) {
+        elements.flashSound.currentTime = 0;
+        elements.flashSound.play();
+        btn.classList.add("flash");
+        setTimeout(() => btn.classList.remove("flash"), 300);
+    }
+    
+    function triggerFanfare(text, duration) {
+        elements.fanfare.textContent = text;
+        elements.fanfare.classList.remove('hidden', 'fanfare-animate');
+        void elements.fanfare.offsetWidth;
+        elements.fanfare.classList.add('fanfare-animate');
+        setTimeout(() => elements.fanfare.classList.add('hidden'), duration);
+    }
+    
+    function updateScoreboard() {
+        elements.currentScoreEl.textContent = `Score: ${score}`;
+        elements.bestScoreEl.textContent = `Best: ${best}`;
     }
 
-    function check() {
-      const i = userSequence.length - 1;
-      const reversed = [...sequence].reverse();
-      if (userSequence[i] !== reversed[i]) {
-        document.getElementById("wrongSound").play();
-        document.getElementById("message").textContent = "Try again!";
-        sequence = [];
-        userSequence = [];
-        setTimeout(nextRound, 1000);
-      } else if (userSequence.length === reversed.length) {
-        score++;
-        if (score > best) best = score;
-        document.getElementById("currentScore").textContent = "Current Score: " + score;
-        document.getElementById("bestScore").textContent = "Personal Best: " + best;
-        document.getElementById("message").textContent = "Well done!";
-        userSequence = [];
-        setTimeout(nextRound, 1000);
-      }
+    function updateButtonsState(disabled) {
+        elements.buttons.forEach(btn => btn.disabled = disabled);
     }
 
-    function nextRound() {
-      const next = Math.floor(Math.random() * 4);
-      sequence.push(next);
-      userSequence = [];
-      playSequence();
-    }
-
-    function startTimer() {
-      clearInterval(timer);
-      timer = setInterval(() => {
-        timeLeft--;
-        const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-        const sec = String(timeLeft % 60).padStart(2, '0');
-        document.getElementById("timerBox").textContent = min + ":" + sec;
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          document.getElementById("message").textContent = "Time's up!";
-          buttons.forEach(btn => btn.disabled = true);
-          showFinalPopup();
-        }
-      }, 1000);
-    }
-
-    function showFinalPopup() {
-      document.getElementById("finalMessage").textContent = `Your personal best was: ${best}`;
-      document.getElementById("finalPopup").style.display = "flex";
-      // ✅ Notify Qualtrics that the game is finished
-      window.parent.postMessage("showNext", "*");
-    }
   </script>
 </body>
 </html>
-
