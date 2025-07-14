@@ -8,100 +8,107 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
     <style>
-        /* CSS is unchanged from the previous version */
+        /* --- JUNGLE/NATURE THEME --- */
         * { box-sizing: border-box; }
         body {
-            background-color: #FFFDE7; /* Light sunny yellow */
+            background-color: #F1F8E9; /* Light Leaf Green */
             font-family: 'Fredoka One', cursive;
-            color: #3D4451; /* Dark Slate Gray */
+            color: #3E2723; /* Dark Brown */
             text-align: center;
             margin: 0;
             padding: 10px;
             -webkit-tap-highlight-color: transparent;
         }
         .hidden { display: none !important; }
+
         .container {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 10px; min-height: 95vh; max-width: 600px; margin: 0 auto;
         }
-        h1 { font-size: 3rem; color: #0288D1; text-shadow: 3px 3px 0px #81D4FA; margin: 15px 0; }
+
+        h1 { font-size: 3rem; color: #33691E; text-shadow: 3px 3px 0px #AED581; margin: 15px 0; }
         .welcome-title {
-            font-size: 1.3em; color: #01579B; background-color: #E1F5FE;
-            padding: 8px 20px; border-radius: 30px; border: 2px solid #B3E5FC; margin-bottom: 20px;
+            font-size: 1.3em; color: #3E2723; background-color: #E6EE9C;
+            padding: 8px 20px; border-radius: 30px; border: 2px solid #DCE775; margin-bottom: 20px;
         }
-        .instructions-list { list-style-type: '⭐'; padding-left: 25px; margin: 20px auto; text-align: left; max-width: 400px; }
+        .instructions-list { list-style-type: '🌿'; padding-left: 25px; margin: 20px auto; text-align: left; max-width: 400px; }
         .instructions-list li { font-size: 1.2em; margin-bottom: 15px; padding-left: 10px; line-height: 1.4; }
+
         #game-area { width: 100%; }
-        #game-info { font-size: 1.5rem; font-weight: 700; color: #546E7A; margin-bottom: 10px; }
-        #message { font-size: 1.2rem; font-weight: 700; color: #0277BD; min-height: 40px; margin-bottom: 15px; }
+        #game-info { font-size: 1.5rem; font-weight: 700; color: #5D4037; margin-bottom: 10px; }
+        #message { font-size: 1.2rem; font-weight: 700; color: #43A047; min-height: 40px; margin-bottom: 15px; }
+        
         .timer-bar-container {
-            width: 100%; height: 25px; background-color: #CFD8DC; border-radius: 12px;
-            border: 2px solid #0288D1; margin: 15px auto; overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%; height: 25px; background-color: #A1887F; border-radius: 12px;
+            border: 2px solid #5D4037; margin: 15px auto; overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
         .timer-bar {
-            height: 100%; width: 100%; background: linear-gradient(90deg, #4FC3F7, #B3E5FC);
+            height: 100%; width: 100%; background: linear-gradient(90deg, #FFB74D, #FFD54F);
             border-radius: 8px; transition: width 0.5s linear;
         }
+
         .grid {
             display: grid; gap: 15px; justify-content: center;
             margin: 20px auto; user-select: none; max-width: max-content;
+            padding: 15px; background-color: rgba(255,255,255,0.4); border-radius: 20px;
         }
         .cell {
-            cursor: pointer; position: relative; background-color: #fff;
-            border: 3px solid #CFD8DC; border-radius: 12px; box-shadow: 0 5px 0 #90A4AE;
+            cursor: pointer; position: relative; background-color: #D7CCC8; /* Stone color */
+            border: 3px solid #A1887F; border-radius: 12px; box-shadow: 0 5px 0 #795548; /* Stone shadow */
             display: flex; align-items: center; justify-content: center;
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
         }
         .grid.guessing .cell:hover:not(.correct):not(.incorrect) {
-            transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 0 #90A4AE;
-            border-color: #8BC34A; /* Green accent on hover */
+            transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 0 #795548;
+            border-color: #FFB300; /* Amber accent on hover */
         }
         .cell:active:not(.correct):not(.incorrect) {
-            transform: translateY(1px); box-shadow: 0 2px 0 #90A4AE;
+            transform: translateY(1px); box-shadow: 0 2px 0 #795548;
         }
+
         .cell.correct {
             border-color: #66BB6A; background-color: #E8F5E9;
-            transform: translateY(2px); box-shadow: 0 2px 0 #43A047;
-            cursor: not-allowed;
+            transform: translateY(2px); box-shadow: 0 2px 0 #43A047; cursor: not-allowed;
         }
         .cell.incorrect { animation: shake 0.5s; border-color: #EF5350; }
         .marker {
-            position: absolute; bottom: 5px; right: 5px; font-size: 2.4rem;
-            animation: popIn 0.3s ease;
+            position: absolute; bottom: 5px; right: 5px; font-size: 2.4rem; animation: popIn 0.3s ease;
         }
         @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
         button {
-            background-color: #8BC34A; border: none; color: white; padding: 15px 30px;
+            background-color: #FF9800; border: none; color: #fff; padding: 15px 30px;
             margin: 10px; font-size: 1.5em; font-family: 'Fredoka One', cursive; font-weight: 700;
             border-radius: 12px; cursor: pointer; transition: all 0.2s ease;
-            box-shadow: 0 5px 0 #689F38; text-transform: uppercase;
+            box-shadow: 0 5px 0 #E65100; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
         button:hover:not(:disabled) {
-            background-color: #9CCC65; transform: translateY(-2px); box-shadow: 0 7px 0 #689F38;
+            background-color: #FFA726; transform: translateY(-2px); box-shadow: 0 7px 0 #E65100;
         }
         .help-button {
             position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px;
             border-radius: 50%; font-size: 1.8em; z-index: 2000; padding: 0; line-height: 1;
         }
+
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.6); z-index: 1000; display: flex;
+            background-color: rgba(62, 39, 35, 0.7); z-index: 1000; display: flex;
             justify-content: center; align-items: center; padding: 15px;
             transition: opacity 0.3s ease;
         }
         .overlay-content {
-            background-color: #E1F5FE; padding: 30px; border-radius: 15px;
-            border: 3px solid #0288D1; width: 100%; max-width: 500px;
+            background-color: #F1F8E9; padding: 30px; border-radius: 15px;
+            border: 3px solid #8D6E63; width: 100%; max-width: 500px;
         }
         #countdownOverlay {
-            font-size: 8rem; font-weight: bold; color: #0288D1;
-            background-color: rgba(255, 253, 231, 0.95);
+            font-size: 8rem; font-weight: bold; color: #33691E;
+            background-color: rgba(241, 248, 233, 0.95);
         }
         #round-fanfare {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background-color: rgba(2, 136, 209, 0.9); color: white; padding: 20px 40px;
+            background-color: rgba(51, 105, 30, 0.9); color: white; padding: 20px 40px;
             border-radius: 20px; font-size: 3em; z-index: 9999;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3); pointer-events: none; opacity: 0;
         }
@@ -111,28 +118,26 @@
             50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
             100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
         }
+
         #finalSummary { text-align: center; }
         #finalSummary p { margin: 15px 0; font-size: 1.2em; line-height: 1.5; }
-        #personal-best { font-size: 1.8em; color: #01579B; margin: 20px 0; font-weight: bold; }
-        #final-prompt { color: #0277BD; font-weight: bold; }
-        @media (max-width: 480px) {
-            .cell { width: 60px !important; height: 60px !important; font-size: 2.2rem !important; }
-            h1 { font-size: 2.5rem; }
-            .instructions-list li { font-size: 1em; }
-        }
+        #star-summary { font-size: 1.8em; color: #BF360C; margin: 20px 0; font-weight: bold; }
+        #final-prompt { color: #33691E; font-weight: bold; }
     </style>
 </head>
 <body>
+    <!-- --- CHANGE: Text changed to "Food Festival" theme --- -->
     <div id="cover" class="container">
-        <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
+        <h2 class="welcome-title">Food Festival</h2>
         <h1>Spot the Difference</h1>
         <ul class="instructions-list">
-            <li>You will be shown a grid of food emojis. Memorise it!</li>
-            <li>The grid will re-appear, but some emojis will have changed.</li>
-            <li>Your mission is to press on all the changed emojis!</li>
+            <li>A grid of delicious food will appear. Memorise what's on the menu!</li>
+            <li>The grid will re-appear, but some foods will have changed.</li>
+            <li>Your mission is to press on all the changed foods to earn stars!</li>
         </ul>
-        <button onclick="startGame()">Let's Play!</button>
+        <button onclick="startGame()">Play Now</button>
     </div>
+
     <div id="game" class="container hidden">
         <div id="game-area">
             <div id="game-info"></div>
@@ -143,31 +148,35 @@
             <div id="emojiGrid" class="grid"></div>
         </div>
     </div>
+    
+    <!-- --- CHANGE: Text changed to be more general --- -->
     <div id="finalSummary" class="container hidden">
-        <h1>Well Done!</h1>
+        <h1>Great Job!</h1>
         <div class="overlay-content">
-            <p id="personal-best"></p>
+            <p id="star-summary"></p>
             <p id="final-prompt">Make sure you press the red arrow on the bottom right of the screen to finish.</p>
             <p>You will have earned an extra $2.50 for your SMART bank!</p>
         </div>
     </div>
+    
     <button id="helpBtn" class="help-button hidden" onclick="toggleHelp(true)">?</button>
+    
     <div id="help-overlay" class="overlay hidden" onclick="toggleHelp(false)">
         <div class="overlay-content" onclick="event.stopPropagation()">
             <h2 class="welcome-title">How to Play</h2>
             <ul class="instructions-list">
                 <li>Memorise the grid of food emojis.</li>
                 <li>When the grid comes back, find the emojis that have changed.</li>
-                <li>Press on all the changed emojis to win the round!</li>
+                <li>Press on all the changed emojis to win the round and get stars!</li>
             </ul>
             <button onclick="toggleHelp(false)">Got it!</button>
         </div>
     </div>
+
     <div id="countdownOverlay" class="overlay hidden"><div id="countdownText"></div></div>
     <div id="round-fanfare"></div>
 
 <script>
-    // --- FIX: SHUFFLE THE ENTIRE EMOJI ARRAY AT THE START ---
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -176,29 +185,29 @@
         return array;
     }
     const foodEmojis = shuffleArray([...new Set([...'🍏🍎🍐🍊🍋🍌🍉🍇🍓🫐🍈🍒🍑🥭🍍🥥🥝🍅🍆🥑🥦🥒🌶️🫑🌽🥕🧄🧅🥔🍠🥐🥯🍞🥖🫓🥨🧀🥚🍳🥞🧇🥓🥩🍗🍖🌭🍔🍟🍕🥪🥙🌮🌯🥗🥘🍝🍜🍲🍛🍣🍱🥟🍤🍙🍚🍘🥠🥡🥢🍦🍧🍨🍩🍪🎂🍰🧁🍫🍬🍭🍮🍯'])]);
-    let emojiIndex = 0; // Keep track of which emojis we've used
+    let emojiIndex = 0;
 
     const rounds = [
-        { gridSize: 4, time: 10, differences: 1, columns: 2, cellSize: 140 },
-        { gridSize: 4, time: 10, differences: 1, columns: 2, cellSize: 140 },
-        { gridSize: 6, time: 15, differences: 1, columns: 3, cellSize: 90 },
-        { gridSize: 6, time: 15, differences: 1, columns: 3, cellSize: 90 },
-        { gridSize: 8, time: 20, differences: 2, columns: 4, cellSize: 70 },
-        { gridSize: 8, time: 20, differences: 2, columns: 4, cellSize: 70 },
-        { gridSize: 10, time: 25, differences: 2, columns: 3, cellSize: 90 },
-        { gridSize: 10, time: 25, differences: 2, columns: 3, cellSize: 90 },
-        { gridSize: 12, time: 30, differences: 3, columns: 4, cellSize: 70 },
-        { gridSize: 12, time: 30, differences: 3, columns: 4, cellSize: 70 }
+        { gridSize: 4, time: 15, differences: 1, columns: 2, cellSize: 140 },
+        { gridSize: 4, time: 15, differences: 1, columns: 2, cellSize: 140 },
+        { gridSize: 6, time: 20, differences: 1, columns: 3, cellSize: 90 },
+        { gridSize: 6, time: 20, differences: 1, columns: 3, cellSize: 90 },
+        { gridSize: 8, time: 25, differences: 2, columns: 4, cellSize: 70 },
+        { gridSize: 8, time: 25, differences: 2, columns: 4, cellSize: 70 },
+        { gridSize: 10, time: 30, differences: 2, columns: 3, cellSize: 90 },
+        { gridSize: 10, time: 30, differences: 2, columns: 3, cellSize: 90 },
+        { gridSize: 12, time: 35, differences: 3, columns: 4, cellSize: 70 },
+        { gridSize: 12, time: 35, differences: 3, columns: 4, cellSize: 70 }
     ];
+
     let currentRound = 0;
     let originalGrid = [], modifiedGrid = [], changedIndices = [];
     let foundDifferences = new Set();
-    let incorrectGuesses = new Set();
-    let personalBestDifferences = 0;
+    let incorrectPressesThisRound = 0;
+    let totalStars = 0;
     let memorizationTimeout;
     let isPaused = false;
-    let gameStartTime;
-    const maxGameDurationInSeconds = 300; // 5 minutes
+
     const cover = document.getElementById('cover');
     const game = document.getElementById('game');
     const finalSummary = document.getElementById('finalSummary');
@@ -210,14 +219,13 @@
     const roundFanfare = document.getElementById('round-fanfare');
     const countdownOverlay = document.getElementById('countdownOverlay');
     const countdownText = document.getElementById('countdownText');
-    const personalBestElement = document.getElementById('personal-best');
+    const starSummaryElement = document.getElementById('star-summary');
     const helpBtn = document.getElementById('helpBtn');
     const helpOverlay = document.getElementById('help-overlay');
 
     function startGame() {
         cover.classList.add('hidden');
         showStartCountdown(() => {
-            gameStartTime = Date.now();
             game.classList.remove('hidden');
             helpBtn.classList.remove('hidden');
             startRound();
@@ -248,21 +256,20 @@
         if (isPaused) return;
         const round = rounds[currentRound];
         foundDifferences.clear();
-        incorrectGuesses.clear();
+        incorrectPressesThisRound = 0;
         gridElement.innerHTML = '';
         messageElement.textContent = '';
         timerBarContainer.classList.add('hidden');
+
         triggerFanfare(`Round ${currentRound + 1}`, () => {
             if (isPaused) return;
             gameInfoElement.textContent = `Round ${currentRound + 1}`;
-            messageElement.innerHTML = `Get ready to memorise...<br>There will be ${round.differences} difference${round.differences > 1 ? 's' : ''}.`;
+            messageElement.innerHTML = `Get ready to memorise...<br>There are ${round.differences} difference${round.differences > 1 ? 's' : ''}.`;
             setTimeout(() => {
                 if (isPaused) return;
-                // --- FIX: USE THE SHUFFLED EMOJI SLICE ---
-                if (emojiIndex + round.gridSize > foodEmojis.length) { emojiIndex = 0; } // reshuffle if we run out
+                if (emojiIndex + round.gridSize > foodEmojis.length) { emojiIndex = 0; }
                 originalGrid = foodEmojis.slice(emojiIndex, emojiIndex + round.gridSize);
                 emojiIndex += round.gridSize;
-
                 renderGrid(originalGrid, round.columns, round.cellSize, false);
                 startMemorizationPhase(round);
             }, 2500);
@@ -270,14 +277,16 @@
     }
 
     function startMemorizationPhase(round) {
-        messageElement.textContent = 'Memorise this grid!';
+        messageElement.textContent = 'Memorise the menu!';
         timerBarContainer.classList.remove('hidden');
-        timerBar.style.width = '100%';
+        
+        // --- FIX: This is the new, more robust timer animation logic ---
         timerBar.style.transition = 'none';
-        requestAnimationFrame(() => {
-            timerBar.style.transition = `width ${round.time}s linear`;
-            timerBar.style.width = '0%';
-        });
+        timerBar.style.width = '100%';
+        void timerBar.offsetWidth; // Force browser to register the 100% width
+        timerBar.style.transition = `width ${round.time}s linear`;
+        timerBar.style.width = '0%';
+
         clearTimeout(memorizationTimeout);
         memorizationTimeout = setTimeout(() => {
             if (isPaused) return;
@@ -324,10 +333,8 @@
             const i = Math.floor(Math.random() * grid.length);
             if (!indices.includes(i)) {
                 let newEmoji;
-                do {
-                    // --- FIX: MAKE SURE THE NEW EMOJI ISN'T IN THE ORIGINAL GRID ---
-                    newEmoji = foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
-                } while (grid.includes(newEmoji));
+                do { newEmoji = foodEmojis[Math.floor(Math.random() * foodEmojis.length)]; } 
+                while (grid.includes(newEmoji));
                 newGrid[i] = newEmoji;
                 indices.push(i);
             }
@@ -337,7 +344,8 @@
     }
 
     function handlePress(index, cell) {
-        if (isPaused || cell.classList.contains('correct') || incorrectGuesses.has(index)) return;
+        if (isPaused || cell.classList.contains('correct') || cell.classList.contains('incorrect-temp')) return;
+
         if (changedIndices.includes(index)) {
             if (!foundDifferences.has(index)) {
                 foundDifferences.add(index);
@@ -346,21 +354,28 @@
                 marker.className = 'marker';
                 marker.textContent = '✅';
                 cell.appendChild(marker);
-                messageElement.textContent = `Awesome! ${foundDifferences.size} of ${rounds[currentRound].differences} found.`;
+                messageElement.textContent = `Great find! ${foundDifferences.size} of ${rounds[currentRound].differences} found.`;
+
                 if (foundDifferences.size === rounds[currentRound].differences) {
-                    messageElement.textContent = '🎉 You found them all! Great job!';
-                    if (rounds[currentRound].differences > personalBestDifferences) {
-                        personalBestDifferences = rounds[currentRound].differences;
-                    }
-                    setTimeout(endRoundSequence, 2000);
+                    let starsEarned = 0;
+                    let starString = '';
+                    if (incorrectPressesThisRound === 0) { starsEarned = 3; starString = '★★★'; }
+                    else if (incorrectPressesThisRound <= 2) { starsEarned = 2; starString = '★★☆'; }
+                    else { starsEarned = 1; starString = '★☆☆'; }
+                    totalStars += starsEarned;
+                    
+                    messageElement.innerHTML = `Round Complete!<br>You earned ${starString}`;
+                    setTimeout(endRoundSequence, 2500);
                 }
             }
         } else {
-            incorrectGuesses.add(index);
+            incorrectPressesThisRound++;
+            cell.classList.add('incorrect-temp');
             cell.classList.add('incorrect');
-            messageElement.textContent = 'Not that one, try again!';
+            messageElement.textContent = 'Not that one, keep searching!';
             setTimeout(() => {
                 cell.classList.remove('incorrect');
+                cell.classList.remove('incorrect-temp');
                 if (foundDifferences.size < rounds[currentRound].differences) {
                    messageElement.textContent = `Keep looking! ${foundDifferences.size} of ${rounds[currentRound].differences} found.`;
                 }
@@ -370,8 +385,7 @@
     
     function endRoundSequence() {
         currentRound++;
-        const elapsedTimeInSeconds = (Date.now() - gameStartTime) / 1000;
-        if (currentRound >= rounds.length || elapsedTimeInSeconds >= maxGameDurationInSeconds) {
+        if (currentRound >= rounds.length) {
             endGame();
         } else {
             startRound();
@@ -381,7 +395,7 @@
     function endGame() {
         game.classList.add('hidden');
         helpBtn.classList.add('hidden');
-        personalBestElement.innerHTML = `Your Personal Best:<br><span>Found ${personalBestDifferences} difference${personalBestDifferences !== 1 ? 's' : ''} in one round!</span>`;
+        starSummaryElement.innerHTML = `You collected ${totalStars} out of 30 Stars! ⭐`;
         finalSummary.classList.remove('hidden');
         window.parent.postMessage("showNext", "*");
     }
@@ -396,9 +410,7 @@
             timerBar.style.transition = 'none';
             timerBar.style.width = width;
         } else {
-            if (timerBarContainer.classList.contains('hidden') === false) {
-                startRound();
-            }
+            if (timerBarContainer.classList.contains('hidden') === false) { startRound(); }
         }
     }
 </script>
