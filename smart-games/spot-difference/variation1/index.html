@@ -192,8 +192,6 @@
     let totalStars = 0;
     let isPaused = false;
     let isMemorizing = false;
-
-    // FIX: Variables to hold timers so they can be cleared
     let fanfareTimeout, introTimeout, memorizationTimeout;
 
     const cover = document.getElementById('cover');
@@ -317,23 +315,33 @@
         });
     }
 
+    // FIX: Rewritten function to be 100% reliable
     function modifyGrid(grid, count) {
         const newGrid = [...grid];
-        const indices = [];
-        let attempts = 0;
-        while (indices.length < count && attempts < 1000) {
-            const i = Math.floor(Math.random() * grid.length);
-            if (!indices.includes(i)) {
-                let newEmoji;
-                do { newEmoji = foodEmojis[Math.floor(Math.random() * foodEmojis.length)]; } 
-                while (grid.includes(newEmoji));
-                newGrid[i] = newEmoji;
-                indices.push(i);
-            }
-            attempts++;
+        const gridEmojiSet = new Set(grid);
+
+        // 1. Create a pool of emojis that are not in the current grid
+        const availableForSwap = foodEmojis.filter(emoji => !gridEmojiSet.has(emoji));
+        shuffleArray(availableForSwap);
+
+        // 2. Pick unique indices to change
+        const indicesToChange = [];
+        const allPossibleIndices = Array.from(Array(grid.length).keys());
+        shuffleArray(allPossibleIndices);
+        for(let i = 0; i < count; i++) {
+            indicesToChange.push(allPossibleIndices[i]);
         }
-        return { newGrid, changedIndices: indices.sort((a,b) => a-b) };
+
+        // 3. Swap the emojis
+        for(let i = 0; i < count; i++) {
+            const gridIndex = indicesToChange[i];
+            const newEmoji = availableForSwap.pop(); // Pop from the clean, shuffled pool
+            newGrid[gridIndex] = newEmoji;
+        }
+        
+        return { newGrid, changedIndices: indicesToChange.sort((a,b) => a-b) };
     }
+
 
     function handlePress(index, cell) {
         if (isPaused || cell.classList.contains('correct') || cell.classList.contains('incorrect-temp')) return;
@@ -391,18 +399,15 @@
         finalSummary.classList.remove('hidden');
         window.parent.postMessage("showNext", "*");
     }
-
-    // FIX: Updated pause/resume logic
+    
     function toggleHelp(show) {
         isPaused = show;
         helpOverlay.classList.toggle('hidden', !show);
 
         if (isPaused) {
-            // Stop all timers that advance the game
             clearTimeout(fanfareTimeout);
             clearTimeout(introTimeout);
             clearTimeout(memorizationTimeout);
-            // If the timer bar is running, freeze it
             if(isMemorizing) {
                 const computedStyle = window.getComputedStyle(timerBar);
                 const width = computedStyle.getPropertyValue('width');
@@ -410,11 +415,9 @@
                 timerBar.style.width = width;
             }
         } else {
-            // If we were in the intro or memorization phase, it's safest to restart the round
             if (gridElement.classList.contains('guessing') === false) {
                 startRound();
             }
-            // If we were in the guessing phase (grid has 'guessing' class), do nothing. The player can resume.
         }
     }
 </script>
