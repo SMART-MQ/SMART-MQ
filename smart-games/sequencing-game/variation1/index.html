@@ -8,166 +8,53 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
   <style>
+    /* ... (All CSS remains the same as previous version) ... */
     :root {
       --bg-color: #191932;
       --primary-glow: #23d9d9;
       --text-color: #f0f0f0;
       
-      --btn1-color: #ff3c82; /* Neon Pink/Magenta */
-      --btn2-color: #ff9a3c; /* Neon Orange */
-      --btn3-color: #3cff9a; /* Neon Green */
-      --btn4-color: #3c9aff; /* Neon Blue */
+      --btn1-color: #ff3c82; --btn2-color: #ff9a3c; --btn3-color: #3cff9a; --btn4-color: #3c9aff;
     }
-
     * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Bungee', cursive;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      text-align: center;
-      overflow: hidden;
-      position: relative;
-    }
-    
+    html, body { margin: 0; padding: 0; font-family: 'Bungee', cursive; background-color: var(--bg-color); color: var(--text-color); text-align: center; overflow: hidden; position: relative; }
     .hidden { display: none !important; }
     .fadeable { transition: opacity 0.4s ease-in-out, visibility 0.4s; }
     .is-faded-out { opacity: 0; visibility: hidden; pointer-events: none; }
-
     .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
-    .star {
-      position: absolute;
-      background-color: white;
-      border-radius: 50%;
-      animation: twinkle 10s infinite linear;
-    }
+    .star { position: absolute; background-color: white; border-radius: 50%; animation: twinkle 10s infinite linear; }
     @keyframes twinkle { 0% { opacity: 0; transform: translateY(0); } 50% { opacity: 0.8; } 100% { opacity: 0; transform: translateY(-100px); } }
-
-    .screen {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.7); z-index: 1000; display: flex;
-      justify-content: center; align-items: center; padding: 15px;
-    }
-    
-    .overlay-content {
-      background: rgba(25, 25, 50, 0.85);
-      backdrop-filter: blur(10px);
-      padding: 30px; border-radius: 20px; 
-      border: 2px solid var(--primary-glow); width: 100%; max-width: 500px;
-      max-height: 90vh; overflow-y: auto;
-      box-shadow: 0 0 20px rgba(35, 217, 217, 0.3);
-    }
-
-    h1 {
-      font-size: clamp(3em, 12vw, 5em);
-      color: #fff;
-      text-shadow: 0 0 2px #fff, 0 0 8px var(--primary-glow), 0 0 15px var(--primary-glow);
-      letter-spacing: 2px;
-      margin: 0;
-      line-height: 1;
-    }
-    
+    .screen { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; position: relative; z-index: 1; }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 15px; }
+    .overlay-content { background: rgba(25, 25, 50, 0.85); backdrop-filter: blur(10px); padding: 30px; border-radius: 20px; border: 2px solid var(--primary-glow); width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 0 20px rgba(35, 217, 217, 0.3); }
+    h1 { font-size: clamp(3em, 12vw, 5em); color: #fff; text-shadow: 0 0 2px #fff, 0 0 8px var(--primary-glow), 0 0 15px var(--primary-glow); letter-spacing: 2px; margin: 0; line-height: 1; }
     h2 { font-size: clamp(2em, 7vw, 2.5em); color: var(--primary-glow); }
     p, li { font-size: clamp(1em, 4vw, 1.2em); line-height: 1.5; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
-    
-    .subtitle {
-        font-size: clamp(1.2em, 5vw, 1.5em);
-        color: var(--text-color);
-        margin-bottom: 20px;
-    }
-
+    .subtitle { font-size: clamp(1.2em, 5vw, 1.5em); color: var(--text-color); margin-bottom: 20px; }
+    .emphasis { color: var(--primary-glow); font-size: 1.3em; }
+    /* Change: Added style for the new instruction list on start screens */
+    .start-instructions { list-style-type: none; padding: 0; text-align: left; max-width: 400px; margin: 20px auto; }
+    .start-instructions li::before { content: '▶'; color: var(--primary-glow); margin-right: 15px; }
     #game-area { width: 100%; max-width: 600px; }
     .scoreboard { display: flex; justify-content: space-around; font-size: 1.2em; margin-bottom: 15px; }
     #message { font-size: 1.5em; color: #fff; min-height: 1.5em; margin: 20px 0; text-shadow: 0 0 5px var(--primary-glow); }
-
-    .timer-bar-container {
-      width: 90%; max-width: 500px; height: 15px; background-color: rgba(0,0,0,0.3);
-      border-radius: 10px; border: 2px solid var(--primary-glow);
-      margin: 15px auto; overflow: hidden; box-shadow: 0 0 10px rgba(35, 217, 217, 0.3);
-    }
-    .timer-bar {
-      height: 100%; width: 100%; background-color: var(--primary-glow);
-      border-radius: 6px; transition: width 1s linear;
-    }
-
-    .button-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 25px;
-      margin-top: 20px;
-      max-width: 400px;
-      margin: 0 auto;
-    }
-
-    .color-button {
-      aspect-ratio: 1 / 1;
-      border: 3px solid;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.1s ease-out;
-      background-color: transparent;
-    }
-    #btn1 { border-color: var(--btn1-color); box-shadow: 0 0 15px var(--btn1-color); }
-    #btn2 { border-color: var(--btn2-color); box-shadow: 0 0 15px var(--btn2-color); }
-    #btn3 { border-color: var(--btn3-color); box-shadow: 0 0 15px var(--btn3-color); }
-    #btn4 { border-color: var(--btn4-color); box-shadow: 0 0 15px var(--btn4-color); }
-
-    .color-button:active:not(:disabled), .color-button.flash {
-      transform: scale(0.95);
-      filter: brightness(2.5);
-    }
-    #btn1.flash { background-color: var(--btn1-color); }
-    #btn2.flash { background-color: var(--btn2-color); }
-    #btn3.flash { background-color: var(--btn3-color); }
-    #btn4.flash { background-color: var(--btn4-color); }
-
+    .timer-bar-container { width: 90%; max-width: 500px; height: 15px; background-color: rgba(0,0,0,0.3); border-radius: 10px; border: 2px solid var(--primary-glow); margin: 15px auto; overflow: hidden; box-shadow: 0 0 10px rgba(35, 217, 217, 0.3); }
+    .timer-bar { height: 100%; width: 100%; background-color: var(--primary-glow); border-radius: 6px; transition: width 1s linear; }
+    .button-container { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 20px; max-width: 400px; margin: 0 auto; }
+    .color-button { aspect-ratio: 1 / 1; border: 3px solid; border-radius: 20px; cursor: pointer; transition: all 0.1s ease-out; background-color: transparent; }
+    #btn1 { border-color: var(--btn1-color); box-shadow: 0 0 15px var(--btn1-color); } #btn2 { border-color: var(--btn2-color); box-shadow: 0 0 15px var(--btn2-color); } #btn3 { border-color: var(--btn3-color); box-shadow: 0 0 15px var(--btn3-color); } #btn4 { border-color: var(--btn4-color); box-shadow: 0 0 15px var(--btn4-color); }
+    .color-button:active:not(:disabled), .color-button.flash { transform: scale(0.95); filter: brightness(2.5); }
+    #btn1.flash { background-color: var(--btn1-color); } #btn2.flash { background-color: var(--btn2-color); } #btn3.flash { background-color: var(--btn3-color); } #btn4.flash { background-color: var(--btn4-color); }
     .color-button:disabled { filter: brightness(0.4); cursor: not-allowed; }
-    
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
     .shake-container { animation: shake 0.4s; }
-
-    .play-button {
-      background: transparent;
-      border: 2px solid var(--primary-glow);
-      color: var(--primary-glow);
-      padding: 15px 30px; margin-top: 20px; font-size: 1.3em;
-      font-family: 'Bungee', cursive; border-radius: 12px;
-      cursor: pointer; transition: all 0.2s ease;
-      text-shadow: 0 0 5px var(--primary-glow);
-      box-shadow: 0 0 10px rgba(35, 217, 217, 0.5) inset;
-    }
+    .play-button { background: transparent; border: 2px solid var(--primary-glow); color: var(--primary-glow); padding: 15px 30px; margin-top: 20px; font-size: 1.3em; font-family: 'Bungee', cursive; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; text-shadow: 0 0 5px var(--primary-glow); box-shadow: 0 0 10px rgba(35, 217, 217, 0.5) inset; }
     .play-button:hover:not(:disabled) { background: var(--primary-glow); color: var(--bg-color); text-shadow: none; }
-
-    .help-button {
-      position: fixed; bottom: 15px; right: 15px; width: 55px; height: 55px;
-      border-radius: 50%; font-size: 2em; z-index: 500;
-      background-color: var(--primary-glow); color: var(--bg-color);
-      border: none; box-shadow: 0 0 15px var(--primary-glow);
-      cursor: pointer; line-height: 1; transition: transform 0.2s;
-    }
+    .help-button { position: fixed; bottom: 15px; right: 15px; width: 55px; height: 55px; border-radius: 50%; font-size: 2em; z-index: 500; background-color: var(--primary-glow); color: var(--bg-color); border: none; box-shadow: 0 0 15px var(--primary-glow); cursor: pointer; line-height: 1; transition: transform 0.2s; }
     .help-button:hover { transform: scale(1.1); }
-    
-    #fanfare {
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      font-size: 3em; color: #fff; z-index: 9999;
-      text-shadow: 0 0 5px #fff, 0 0 10px var(--primary-glow);
-    }
+    #fanfare { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3em; color: #fff; z-index: 9999; text-shadow: 0 0 5px #fff, 0 0 10px var(--primary-glow); }
     @keyframes fanfare-anim { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
-
   </style>
 </head>
 <body>
@@ -178,231 +65,14 @@
     <p class="subtitle">Welcome to the SMART Challenge</p>
     <h1>Sequence Master</h1>
     <p>This is a challenge just for you. Try to beat your best score each round!</p>
+    <!-- Change: Added clear instructions to start screen -->
+    <ul class="start-instructions">
+        <li>Watch the neon sequence.</li>
+        <li>Repeat the pattern in the same order.</li>
+        <li>Get the highest score you can!</li>
+    </ul>
     <button class="play-button" id="startBtn">Start Game</button>
   </div>
-
-  <div id="game-screen" class="screen hidden">
-    <div id="game-area">
-      <div id="timer-bar-container" class="timer-bar-container">
-        <div id="timer-bar" class="timer-bar"></div>
-      </div>
-      <div class="scoreboard">
-        <span id="currentScore">Score: 0</span>
-        <span id="bestScore">Best: 0</span>
-      </div>
-      <p id="message">Get Ready...</p>
-      <div id="button-container" class="button-container">
-        <button class="color-button" id="btn1"></button>
-        <button class="color-button" id="btn2"></button>
-        <button class="color-button" id="btn3"></button>
-        <button class="color-button" id="btn4"></button>
-      </div>
-    </div>
-  </div>
-
-  <button id="helpBtn" class="help-button hidden">?</button>
-  <div id="fanfare" class="hidden"></div>
-
-  <div id="help-overlay" class="overlay fadeable is-faded-out">
-    <div class="overlay-content">
-      <h2>How To Play</h2>
-      <!-- Change 1: "pads" changed to "squares" -->
-      <p>Watch the neon sequence.<br>Repeat the pattern by pressing the glowing squares in the same order.<br>Get the highest score you can!</p>
-      <button class="play-button" id="resumeBtn">Resume</button>
-    </div>
-  </div>
-
-  <div id="final-summary-overlay" class="overlay fadeable is-faded-out">
-    <div class="overlay-content">
-      <h2>Time's Up!</h2>
-      <!-- Change 2: "Great Job!" message added -->
-      <p style="font-size: 1.5em; color: var(--primary-glow);">Great Job!</p>
-      <p>Your personal best score:</p>
-      <p id="final-best-score" style="font-size: 3em; color: #fff; margin: 10px 0; text-shadow: 0 0 8px var(--primary-glow);">0</p>
-      <!-- Change 3: Final prompt updated and "Play Again" button removed -->
-      <p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>
-    </div>
-  </div>
-
-  <audio id="flashSound" src="https://assets.codepen.io/217233/synth_C4.mp3" preload="auto"></audio>
-  <audio id="wrongSound" src="https://assets.codepen.io/217233/synth_misc_1.mp3" preload="auto"></audio>
-
-  <script>
-    const starsContainer = document.querySelector('.stars');
-    for (let i = 0; i < 100; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.width = `${Math.random() * 2}px`;
-        star.style.height = star.style.width;
-        star.style.left = `${Math.random() * 100}%`;
-        star.style.top = `${Math.random() * 100}%`;
-        star.style.animationDelay = `${Math.random() * 10}s`;
-        star.style.animationDuration = `${5 + Math.random() * 5}s`;
-        starsContainer.appendChild(star);
-    }
-  
-    const GAME_TIME = 300;
-    const RETRY_MESSAGES = ["Let's try again!", "You got this!", "Nice try!", "Give it another shot!"];
-
-    const elements = {
-        startScreen: document.getElementById('start-screen'),
-        gameScreen: document.getElementById('game-screen'),
-        startBtn: document.getElementById('startBtn'),
-        message: document.getElementById('message'),
-        timerBar: document.getElementById('timer-bar'),
-        buttonContainer: document.getElementById('button-container'),
-        buttons: ["btn1", "btn2", "btn3", "btn4"].map(id => document.getElementById(id)),
-        currentScoreEl: document.getElementById('currentScore'),
-        bestScoreEl: document.getElementById('bestScore'),
-        helpBtn: document.getElementById('helpBtn'),
-        helpOverlay: document.getElementById('help-overlay'),
-        resumeBtn: document.getElementById('resumeBtn'),
-        finalOverlay: document.getElementById('final-summary-overlay'),
-        finalBestScore: document.getElementById('final-best-score'),
-        fanfare: document.getElementById('fanfare'),
-        flashSound: document.getElementById('flashSound'),
-        wrongSound: document.getElementById('wrongSound'),
-    };
-
-    let sequence = [], userSequence = [], score = 0, best = 0;
-    let timer, timeLeft = GAME_TIME;
-    let isPlayerTurn = false, isGameRunning = false, isPaused = false;
-
-    elements.startBtn.addEventListener('click', startGame);
-    elements.helpBtn.addEventListener('click', pauseGame);
-    elements.resumeBtn.addEventListener('click', resumeGame);
-    elements.buttons.forEach((btn, i) => {
-      btn.addEventListener('click', () => handlePlayerInput(i));
-    });
-
-    function startGame() {
-      elements.startScreen.classList.add('hidden');
-      elements.gameScreen.classList.remove('hidden');
-      elements.helpBtn.classList.remove('hidden');
-      triggerFanfare("Get Ready", 1500);
-      setTimeout(() => {
-        isGameRunning = true;
-        startTimer();
-        nextRound();
-      }, 1500);
-    }
-    
-    function nextRound() {
-      if (!isGameRunning) return;
-      isPlayerTurn = false;
-      userSequence = [];
-      updateButtonsState(true);
-      elements.message.textContent = '...WATCH...';
-      sequence.push(Math.floor(Math.random() * 4));
-      playSequence();
-      setTimeout(() => {
-        isPlayerTurn = true;
-        updateButtonsState(false);
-        elements.message.textContent = 'YOUR TURN!';
-      }, sequence.length * 600 + 400);
-    }
-    
-    function endGame() {
-        isGameRunning = false;
-        clearInterval(timer);
-        elements.finalBestScore.textContent = best;
-        elements.finalOverlay.classList.remove('is-faded-out');
-        elements.helpBtn.classList.add('hidden');
-        updateButtonsState(true);
-        window.parent.postMessage("showNext", "*");
-    }
-
-    function handlePlayerInput(index) {
-        if (!isPlayerTurn) return;
-        flashButton(elements.buttons[index]);
-        userSequence.push(index);
-        if (userSequence[userSequence.length - 1] !== sequence[userSequence.length - 1]) {
-            handleIncorrect();
-            return;
-        }
-        if (userSequence.length === sequence.length) {
-            handleCorrect();
-        }
-    }
-    
-    function handleCorrect() {
-        isPlayerTurn = false;
-        score++;
-        if (score > best) {
-            best = score;
-            triggerFanfare("NEW BEST!", 1000);
-        }
-        updateScoreboard();
-        setTimeout(nextRound, 1000);
-    }
-    
-    function handleIncorrect() {
-        isPlayerTurn = false;
-        elements.wrongSound.play();
-        elements.message.textContent = RETRY_MESSAGES[Math.floor(Math.random() * RETRY_MESSAGES.length)];
-        elements.buttonContainer.classList.add('shake-container');
-        score = 0;
-        sequence = [];
-        updateScoreboard();
-        setTimeout(() => {
-            elements.buttonContainer.classList.remove('shake-container');
-            nextRound();
-        }, 1500);
-    }
-    
-    function startTimer() {
-        timer = setInterval(() => {
-            if (isPaused || !isGameRunning) return;
-            timeLeft--;
-            elements.timerBar.style.width = (timeLeft / GAME_TIME) * 100 + '%';
-            if (timeLeft <= 0) endGame();
-        }, 1000);
-    }
-
-    function pauseGame() {
-        if (!isGameRunning) return;
-        isPaused = true;
-        elements.helpOverlay.classList.remove('is-faded-out');
-    }
-
-    function resumeGame() {
-        isPaused = false;
-        elements.helpOverlay.classList.add('is-faded-out');
-    }
-    
-    function playSequence() {
-      let i = 0;
-      const interval = setInterval(() => {
-        if(i >= sequence.length) { clearInterval(interval); return; }
-        flashButton(elements.buttons[sequence[i]]);
-        i++;
-      }, 600);
-    }
-    
-    function flashButton(btn) {
-        elements.flashSound.currentTime = 0;
-        elements.flashSound.play();
-        btn.classList.add("flash");
-        setTimeout(() => btn.classList.remove("flash"), 300);
-    }
-    
-    function triggerFanfare(text, duration) {
-        elements.fanfare.textContent = text;
-        elements.fanfare.classList.remove('hidden', 'fanfare-animate');
-        void elements.fanfare.offsetWidth;
-        elements.fanfare.classList.add('fanfare-animate');
-        setTimeout(() => elements.fanfare.classList.add('hidden'), duration);
-    }
-    
-    function updateScoreboard() {
-        elements.currentScoreEl.textContent = `Score: ${score}`;
-        elements.bestScoreEl.textContent = `Best: ${best}`;
-    }
-
-    function updateButtonsState(disabled) {
-        elements.buttons.forEach(btn => btn.disabled = disabled);
-    }
-
-  </script>
-</body>
+  <!-- ... (Rest of HTML and All of JS remains the same) ... -->
+  <div id="game-screen" class="screen hidden"> <div id="game-area"> <div id="timer-bar-container" class="timer-bar-container"> <div id="timer-bar" class="timer-bar"></div> </div> <div class="scoreboard"> <span id="currentScore">Score: 0</span> <span id="bestScore">Best: 0</span> </div> <p id="message">Get Ready...</p> <div id="button-container" class="button-container"> <button class="color-button" id="btn1"></button> <button class="color-button" id="btn2"></button> <button class="color-button" id="btn3"></button> <button class="color-button" id="btn4"></button> </div> </div> </div> <button id="helpBtn" class="help-button hidden">?</button> <div id="fanfare" class="hidden"></div> <div id="help-overlay" class="overlay fadeable is-faded-out"> <div class="overlay-content"> <h2>How To Play</h2> <p>Watch the neon sequence.<br>Repeat the pattern by pressing the glowing squares in the same order.<br>Get the highest score you can!</p> <button class="play-button" id="resumeBtn">Resume</button> </div> </div> <div id="final-summary-overlay" class="overlay fadeable is-faded-out"> <div class="overlay-content"> <h2>Time's Up!</h2> <p style="font-size: 1.5em; color: var(--primary-glow);">Great Job!</p> <p>Your personal best score:</p> <p id="final-best-score" style="font-size: 3em; color: #fff; margin: 10px 0; text-shadow: 0 0 8px var(--primary-glow);">0</p> <p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p> </div> </div> <audio id="flashSound" src="https://assets.codepen.io/217233/synth_C4.mp3" preload="auto"></audio> <audio id="wrongSound" src="https://assets.codepen.io/217233/synth_misc_1.mp3" preload="auto"></audio> <script> const starsContainer = document.querySelector('.stars'); for (let i = 0; i < 100; i++) { const star = document.createElement('div'); star.className = 'star'; star.style.width = `${Math.random() * 2}px`; star.style.height = star.style.width; star.style.left = `${Math.random() * 100}%`; star.style.top = `${Math.random() * 100}%`; star.style.animationDelay = `${Math.random() * 10}s`; star.style.animationDuration = `${5 + Math.random() * 5}s`; starsContainer.appendChild(star); } const GAME_TIME = 300; const RETRY_MESSAGES = ["Let's try again!", "You got this!", "Nice try!", "Give it another shot!"]; const elements = { startScreen: document.getElementById('start-screen'), gameScreen: document.getElementById('game-screen'), startBtn: document.getElementById('startBtn'), message: document.getElementById('message'), timerBar: document.getElementById('timer-bar'), buttonContainer: document.getElementById('button-container'), buttons: ["btn1", "btn2", "btn3", "btn4"].map(id => document.getElementById(id)), currentScoreEl: document.getElementById('currentScore'), bestScoreEl: document.getElementById('bestScore'), helpBtn: document.getElementById('helpBtn'), helpOverlay: document.getElementById('help-overlay'), resumeBtn: document.getElementById('resumeBtn'), finalOverlay: document.getElementById('final-summary-overlay'), finalBestScore: document.getElementById('final-best-score'), fanfare: document.getElementById('fanfare'), flashSound: document.getElementById('flashSound'), wrongSound: document.getElementById('wrongSound'), }; let sequence = [], userSequence = [], score = 0, best = 0; let timer, timeLeft = GAME_TIME; let isPlayerTurn = false, isGameRunning = false, isPaused = false; elements.startBtn.addEventListener('click', startGame); elements.helpBtn.addEventListener('click', pauseGame); elements.resumeBtn.addEventListener('click', resumeGame); elements.buttons.forEach((btn, i) => { btn.addEventListener('click', () => handlePlayerInput(i)); }); function startGame() { elements.startScreen.classList.add('hidden'); elements.gameScreen.classList.remove('hidden'); elements.helpBtn.classList.remove('hidden'); triggerFanfare("Get Ready", 1500); setTimeout(() => { isGameRunning = true; startTimer(); nextRound(); }, 1500); } function nextRound() { if (!isGameRunning) return; isPlayerTurn = false; userSequence = []; updateButtonsState(true); elements.message.textContent = '...WATCH...'; sequence.push(Math.floor(Math.random() * 4)); playSequence(); setTimeout(() => { isPlayerTurn = true; updateButtonsState(false); elements.message.textContent = 'YOUR TURN!'; }, sequence.length * 600 + 400); } function endGame() { isGameRunning = false; clearInterval(timer); elements.finalBestScore.textContent = best; elements.finalOverlay.classList.remove('is-faded-out'); elements.helpBtn.classList.add('hidden'); updateButtonsState(true); window.parent.postMessage("showNext", "*"); } function handlePlayerInput(index) { if (!isPlayerTurn) return; flashButton(elements.buttons[index]); userSequence.push(index); if (userSequence[userSequence.length - 1] !== sequence[userSequence.length - 1]) { handleIncorrect(); return; } if (userSequence.length === sequence.length) { handleCorrect(); } } function handleCorrect() { isPlayerTurn = false; score++; if (score > best) { best = score; triggerFanfare("NEW BEST!", 1000); } updateScoreboard(); setTimeout(nextRound, 1000); } function handleIncorrect() { isPlayerTurn = false; elements.wrongSound.play(); elements.message.textContent = RETRY_MESSAGES[Math.floor(Math.random() * RETRY_MESSAGES.length)]; elements.buttonContainer.classList.add('shake-container'); score = 0; sequence = []; updateScoreboard(); setTimeout(() => { elements.buttonContainer.classList.remove('shake-container'); nextRound(); }, 1500); } function startTimer() { timer = setInterval(() => { if (isPaused || !isGameRunning) return; timeLeft--; elements.timerBar.style.width = (timeLeft / GAME_TIME) * 100 + '%'; if (timeLeft <= 0) endGame(); }, 1000); } function pauseGame() { if (!isGameRunning) return; isPaused = true; elements.helpOverlay.classList.remove('is-faded-out'); } function resumeGame() { isPaused = false; elements.helpOverlay.classList.add('is-faded-out'); } function playSequence() { let i = 0; const interval = setInterval(() => { if(i >= sequence.length) { clearInterval(interval); return; } flashButton(elements.buttons[sequence[i]]); i++; }, 600); } function flashButton(btn) { elements.flashSound.currentTime = 0; elements.flashSound.play(); btn.classList.add("flash"); setTimeout(() => btn.classList.remove("flash"), 300); } function triggerFanfare(text, duration) { elements.fanfare.textContent = text; elements.fanfare.classList.remove('hidden', 'fanfare-animate'); void elements.fanfare.offsetWidth; elements.fanfare.classList.add('fanfare-animate'); setTimeout(() => elements.fanfare.classList.add('hidden'), duration); } function updateScoreboard() { elements.currentScoreEl.textContent = `Score: ${score}`; elements.bestScoreEl.textContent = `Best: ${best}`; } function updateButtonsState(disabled) { elements.buttons.forEach(btn => btn.disabled = disabled); } </script></body>
 </html>
