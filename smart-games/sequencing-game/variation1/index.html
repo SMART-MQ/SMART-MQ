@@ -62,7 +62,6 @@
   <div id="start-screen" class="screen">
     <p class="subtitle">Welcome to the SMART Challenge</p>
     <h1>Sequence Master</h1>
-    <!-- Change: Removed "Try to beat..." sentence -->
     <p>This is a challenge just for you.</p>
     <ul class="start-instructions">
         <li>Watch the neon sequence.</li>
@@ -72,5 +71,247 @@
     <button class="play-button" id="startBtn">Start Game</button>
   </div>
   
-  <div id="game-screen" class="screen hidden"> <div id="game-area"> <div id="timer-bar-container" class="timer-bar-container"> <div id="timer-bar" class="timer-bar"></div> </div> <div class="scoreboard"> <span id="currentScore">Score: 0</span> <span id="bestScore">Best: 0</span> </div> <p id="message">Get Ready...</p> <div id="button-container" class="button-container"> <button class="color-button" id="btn1"></button> <button class="color-button" id="btn2"></button> <button class="color-button" id="btn3"></button> <button class="color-button" id="btn4"></button> </div> </div> </div> <button id="helpBtn" class="help-button hidden">?</button> <div id="fanfare" class="hidden"></div> <div id="help-overlay" class="overlay fadeable is-faded-out"> <div class="overlay-content"> <h2>How To Play</h2> <p>Watch the neon sequence.<br>Repeat the pattern by pressing the glowing squares in the same order.<br>Get the highest score you can!</p> <button class="play-button" id="resumeBtn">Resume</button> </div> </div> <div id="final-summary-overlay" class="overlay fadeable is-faded-out"> <div class="overlay-content"> <h2>Time's Up!</h2> <p style="font-size: 1.5em; color: var(--primary-glow);">Great Job!</p> <p>Your personal best score:</p> <p id="final-best-score" style="font-size: 3em; color: #fff; margin: 10px 0; text-shadow: 0 0 8px var(--primary-glow);">0</p> <p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p> </div> </div> <audio id="flashSound" src="https://assets.codepen.io/217233/synth_C4.mp3" preload="auto"></audio> <audio id="wrongSound" src="https://assets.codepen.io/217233/synth_misc_1.mp3" preload="auto"></audio> <script> const starsContainer = document.querySelector('.stars'); for (let i = 0; i < 100; i++) { const star = document.createElement('div'); star.className = 'star'; star.style.width = `${Math.random() * 2}px`; star.style.height = star.style.width; star.style.left = `${Math.random() * 100}%`; star.style.top = `${Math.random() * 100}%`; star.style.animationDelay = `${Math.random() * 10}s`; star.style.animationDuration = `${5 + Math.random() * 5}s`; starsContainer.appendChild(star); } const GAME_TIME = 300; const RETRY_MESSAGES = ["Let's try again!", "You got this!", "Nice try!", "Give it another shot!"]; const elements = { startScreen: document.getElementById('start-screen'), gameScreen: document.getElementById('game-screen'), startBtn: document.getElementById('startBtn'), message: document.getElementById('message'), timerBar: document.getElementById('timer-bar'), buttonContainer: document.getElementById('button-container'), buttons: ["btn1", "btn2", "btn3", "btn4"].map(id => document.getElementById(id)), currentScoreEl: document.getElementById('currentScore'), bestScoreEl: document.getElementById('bestScore'), helpBtn: document.getElementById('helpBtn'), helpOverlay: document.getElementById('help-overlay'), resumeBtn: document.getElementById('resumeBtn'), finalOverlay: document.getElementById('final-summary-overlay'), finalBestScore: document.getElementById('final-best-score'), fanfare: document.getElementById('fanfare'), flashSound: document.getElementById('flashSound'), wrongSound: document.getElementById('wrongSound'), }; let sequence = [], userSequence = [], score = 0, best = 0; let timer, timeLeft = GAME_TIME; let isPlayerTurn = false, isGameRunning = false, isPaused = false; elements.startBtn.addEventListener('click', startGame); elements.helpBtn.addEventListener('click', pauseGame); elements.resumeBtn.addEventListener('click', resumeGame); elements.buttons.forEach((btn, i) => { btn.addEventListener('click', () => handlePlayerInput(i)); }); function startGame() { elements.startScreen.classList.add('hidden'); elements.gameScreen.classList.remove('hidden'); elements.helpBtn.classList.remove('hidden'); triggerFanfare("Get Ready", 1500); setTimeout(() => { isGameRunning = true; startTimer(); nextRound(); }, 1500); } function nextRound() { if (!isGameRunning) return; isPlayerTurn = false; userSequence = []; updateButtonsState(true); elements.message.textContent = '...WATCH...'; sequence.push(Math.floor(Math.random() * 4)); playSequence(); setTimeout(() => { isPlayerTurn = true; updateButtonsState(false); elements.message.textContent = 'YOUR TURN!'; }, sequence.length * 600 + 400); } function endGame() { isGameRunning = false; clearInterval(timer); elements.finalBestScore.textContent = best; elements.finalOverlay.classList.remove('is-faded-out'); elements.helpBtn.classList.add('hidden'); updateButtonsState(true); window.parent.postMessage("showNext", "*"); } function handlePlayerInput(index) { if (!isPlayerTurn) return; flashButton(elements.buttons[index]); userSequence.push(index); if (userSequence[userSequence.length - 1] !== sequence[userSequence.length - 1]) { handleIncorrect(); return; } if (userSequence.length === sequence.length) { handleCorrect(); } } function handleCorrect() { isPlayerTurn = false; score++; if (score > best) { best = score; triggerFanfare("NEW BEST!", 1000); } updateScoreboard(); setTimeout(nextRound, 1000); } function handleIncorrect() { isPlayerTurn = false; elements.wrongSound.play(); elements.message.textContent = RETRY_MESSAGES[Math.floor(Math.random() * RETRY_MESSAGES.length)]; elements.buttonContainer.classList.add('shake-container'); score = 0; sequence = []; updateScoreboard(); setTimeout(() => { elements.buttonContainer.classList.remove('shake-container'); nextRound(); }, 1500); } function startTimer() { timer = setInterval(() => { if (isPaused || !isGameRunning) return; timeLeft--; elements.timerBar.style.width = (timeLeft / GAME_TIME) * 100 + '%'; if (timeLeft <= 0) endGame(); }, 1000); } function pauseGame() { if (!isGameRunning) return; isPaused = true; elements.helpOverlay.classList.remove('is-faded-out'); } function resumeGame() { isPaused = false; elements.helpOverlay.classList.add('is-faded-out'); } function playSequence() { let i = 0; const interval = setInterval(() => { if(i >= sequence.length) { clearInterval(interval); return; } flashButton(elements.buttons[sequence[i]]); i++; }, 600); } function flashButton(btn) { elements.flashSound.currentTime = 0; elements.flashSound.play(); btn.classList.add("flash"); setTimeout(() => btn.classList.remove("flash"), 300); } function triggerFanfare(text, duration) { elements.fanfare.textContent = text; elements.fanfare.classList.remove('hidden', 'fanfare-animate'); void elements.fanfare.offsetWidth; elements.fanfare.classList.add('fanfare-animate'); setTimeout(() => elements.fanfare.classList.add('hidden'), duration); } function updateScoreboard() { elements.currentScoreEl.textContent = `Score: ${score}`; elements.bestScoreEl.textContent = `Best: ${best}`; } function updateButtonsState(disabled) { elements.buttons.forEach(btn => btn.disabled = disabled); } </script></body>
+  <div id="game-screen" class="screen hidden">
+    <div id="game-area">
+      <div id="timer-bar-container" class="timer-bar-container">
+        <div id="timer-bar" class="timer-bar"></div>
+      </div>
+      <div class="scoreboard">
+        <span id="levelDisplay">Level: 1</span>
+        <span id="currentScore">Score: 0</span>
+        <span id="bestScore">Best: 0</span>
+      </div>
+      <p id="message"></p>
+      <div id="button-container" class="button-container">
+        <button class="color-button" id="btn1"></button>
+        <button class="color-button" id="btn2"></button>
+        <button class="color-button" id="btn3"></button>
+        <button class="color-button" id="btn4"></button>
+      </div>
+    </div>
+  </div>
+
+  <button id="helpBtn" class="help-button hidden">?</button>
+  <div id="fanfare" class="hidden"></div>
+  <div id="help-overlay" class="overlay fadeable is-faded-out"> <div class="overlay-content"> <h2>How To Play</h2> <p>Watch the neon sequence.<br>Repeat the pattern by pressing the glowing squares in the same order.<br>Get the highest score you can!</p> <button class="play-button" id="resumeBtn">Resume</button> </div> </div>
+  <div id="final-summary-overlay" class="overlay fadeable is-faded-out"> <div class="overlay-content"> <h2>Time's Up!</h2> <p style="font-size: 1.5em; color: var(--primary-glow);">Great Job!</p> <p>Your personal best score:</p> <p id="final-best-score" style="font-size: 3em; color: #fff; margin: 10px 0; text-shadow: 0 0 8px var(--primary-glow);">0</p> <p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p> </div> </div>
+  <audio id="flashSound" src="https://assets.codepen.io/217233/synth_C4.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="https://assets.codepen.io/217233/synth_misc_1.mp3" preload="auto"></audio>
+
+  <script>
+    const starsContainer = document.querySelector('.stars');
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.width = `${Math.random() * 2}px`; star.style.height = star.style.width;
+        star.style.left = `${Math.random() * 100}%`; star.style.top = `${Math.random() * 100}%`;
+        star.style.animationDelay = `${Math.random() * 10}s`; star.style.animationDuration = `${5 + Math.random() * 5}s`;
+        starsContainer.appendChild(star);
+    }
+  
+    const GAME_TIME = 300;
+    const RETRY_MESSAGES = ["Let's try again!", "You got this!", "Nice try!", "Give it another shot!"];
+    const SEQUENCE_SPEED = 600; // Change: Speed is now constant
+
+    const elements = {
+        startScreen: document.getElementById('start-screen'),
+        gameScreen: document.getElementById('game-screen'),
+        startBtn: document.getElementById('startBtn'),
+        message: document.getElementById('message'),
+        timerBar: document.getElementById('timer-bar'),
+        buttonContainer: document.getElementById('button-container'),
+        buttons: ["btn1", "btn2", "btn3", "btn4"].map(id => document.getElementById(id)),
+        levelDisplay: document.getElementById('levelDisplay'),
+        currentScoreEl: document.getElementById('currentScore'),
+        bestScoreEl: document.getElementById('bestScore'),
+        helpBtn: document.getElementById('helpBtn'),
+        helpOverlay: document.getElementById('help-overlay'),
+        resumeBtn: document.getElementById('resumeBtn'),
+        finalOverlay: document.getElementById('final-summary-overlay'),
+        finalBestScore: document.getElementById('final-best-score'),
+        fanfare: document.getElementById('fanfare'),
+        flashSound: document.getElementById('flashSound'),
+        wrongSound: document.getElementById('wrongSound'),
+    };
+
+    let sequence = [], userSequence = [], score = 0, best = 0;
+    let level = 1, correctStreak = 0;
+    let timer, timeLeft = GAME_TIME;
+    let isPlayerTurn = false, isGameRunning = false, isPaused = false;
+
+    elements.startBtn.addEventListener('click', startGame);
+    elements.helpBtn.addEventListener('click', pauseGame);
+    elements.resumeBtn.addEventListener('click', resumeGame);
+    elements.buttons.forEach((btn, i) => {
+      btn.addEventListener('click', () => handlePlayerInput(i));
+    });
+
+    function startGame() {
+      level = 1;
+      correctStreak = 0;
+      score = 0;
+      sequence = [];
+      updateScoreboard();
+
+      elements.startScreen.classList.add('hidden');
+      elements.gameScreen.classList.remove('hidden');
+      elements.helpBtn.classList.remove('hidden');
+      
+      setTimeout(() => {
+        isGameRunning = true;
+        startTimer();
+        nextRound();
+      }, 500);
+    }
+    
+    function nextRound() {
+      if (!isGameRunning) return;
+      isPlayerTurn = false;
+      userSequence = [];
+      elements.message.textContent = "";
+      updateButtonsState(true);
+      
+      triggerFanfare("Watch This!", 1000);
+
+      setTimeout(() => {
+        // Change: Difficulty now adds more items based on level
+        let itemsToAdd = 1;
+        if (level >= 4 && level <=6) {
+            itemsToAdd = 2;
+        } else if (level >= 7) {
+            itemsToAdd = 3;
+        }
+        for(let i = 0; i < itemsToAdd; i++) {
+            sequence.push(Math.floor(Math.random() * 4));
+        }
+        
+        playSequence();
+      
+        const sequenceDuration = sequence.length * SEQUENCE_SPEED + 400;
+        setTimeout(() => {
+            triggerFanfare("Your Turn!", 1000);
+            isPlayerTurn = true;
+            updateButtonsState(false);
+        }, sequenceDuration);
+      }, 1000);
+    }
+    
+    function endGame() {
+        isGameRunning = false;
+        clearInterval(timer);
+        elements.finalBestScore.textContent = best;
+        elements.finalOverlay.classList.remove('is-faded-out');
+        elements.helpBtn.classList.add('hidden');
+        updateButtonsState(true);
+        window.parent.postMessage("showNext", "*");
+    }
+
+    function handlePlayerInput(index) {
+        if (!isPlayerTurn) return;
+        flashButton(elements.buttons[index]);
+        userSequence.push(index);
+        if (userSequence[userSequence.length - 1] !== sequence[userSequence.length - 1]) {
+            handleIncorrect();
+            return;
+        }
+        if (userSequence.length === sequence.length) {
+            handleCorrect();
+        }
+    }
+    
+    function handleCorrect() {
+        isPlayerTurn = false;
+        score++;
+        correctStreak++;
+        
+        if (score > best) { best = score; }
+        
+        if (correctStreak >= 3) {
+            level++;
+            correctStreak = 0;
+            triggerFanfare("Level Up!", 1500);
+        }
+
+        updateScoreboard();
+        // Reset sequence for next round, it will be populated based on the new level
+        sequence = [];
+        setTimeout(nextRound, 1200);
+    }
+    
+    function handleIncorrect() {
+        isPlayerTurn = false;
+        correctStreak = 0;
+        
+        // Change: Leveling down is now silent and without a harsh message
+        if (level > 1) { level--; }
+
+        elements.wrongSound.play();
+        elements.message.textContent = RETRY_MESSAGES[Math.floor(Math.random() * RETRY_MESSAGES.length)];
+        elements.buttonContainer.classList.add('shake-container');
+        score = 0;
+        sequence = [];
+        updateScoreboard();
+        setTimeout(() => {
+            elements.buttonContainer.classList.remove('shake-container');
+            nextRound();
+        }, 1500);
+    }
+    
+    function startTimer() {
+        timer = setInterval(() => {
+            if (isPaused || !isGameRunning) return;
+            timeLeft--;
+            elements.timerBar.style.width = (timeLeft / GAME_TIME) * 100 + '%';
+            if (timeLeft <= 0) endGame();
+        }, 1000);
+    }
+
+    function pauseGame() {
+        if (!isGameRunning) return;
+        isPaused = true;
+        elements.helpOverlay.classList.remove('is-faded-out');
+    }
+
+    function resumeGame() {
+        isPaused = false;
+        elements.helpOverlay.classList.add('is-faded-out');
+    }
+    
+    function playSequence() {
+      let i = 0;
+      const interval = setInterval(() => {
+        if(i >= sequence.length) { clearInterval(interval); return; }
+        flashButton(elements.buttons[sequence[i]]);
+        i++;
+      }, SEQUENCE_SPEED);
+    }
+    
+    function flashButton(btn) {
+        elements.flashSound.currentTime = 0;
+        elements.flashSound.play();
+        btn.classList.add("flash");
+        setTimeout(() => btn.classList.remove("flash"), 300);
+    }
+    
+    function triggerFanfare(text, duration) {
+        elements.fanfare.textContent = text;
+        elements.fanfare.classList.remove('hidden', 'fanfare-animate');
+        void elements.fanfare.offsetWidth;
+        elements.fanfare.classList.add('fanfare-animate');
+        setTimeout(() => {
+            elements.fanfare.classList.add('hidden');
+        }, duration);
+    }
+    
+    function updateScoreboard() {
+        elements.levelDisplay.textContent = `Level: ${level}`;
+        elements.currentScoreEl.textContent = `Score: ${score}`;
+        elements.bestScoreEl.textContent = `Best: ${best}`;
+    }
+
+    function updateButtonsState(disabled) {
+        elements.buttons.forEach(btn => btn.disabled = disabled);
+    }
+  </script>
+</body>
 </html>
