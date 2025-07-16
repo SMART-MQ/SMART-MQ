@@ -17,16 +17,15 @@
   .screen { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 15px; background: radial-gradient(circle, #ffffff99 20%, #e0f7fa00 100%); }
   .active { display: flex; animation: zoomIn 0.4s ease-out; }
   .hidden { display: none !important; }
-  .start-content { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .start-content { display: flex; flex-direction: column; align-items: center; gap: 8px; }
   h1 { font-size: clamp(2em, 9vw, 3em); color: var(--primary-color); margin: 0; }
-  h2 { font-size: 2.5em; color: var(--primary-color); margin: 0; }
-  h3 { font-size: 1.5em; margin-bottom: 10px; color: var(--primary-color); }
+  h2 { font-size: 2.2em; color: var(--primary-color); margin: 0; }
   .welcome-subtitle { font-size: 1.3em; color: var(--text-color); margin-bottom: 0; }
   .main-instructions { font-size: 1.1em; max-width: 450px; line-height: 1.4; margin: 5px 0 0 0; }
   .goal-card { background: rgba(255, 255, 255, 0.75); border-radius: 15px; padding: 15px 20px; margin-top: 5px; max-width: 450px; width: 95%; border: 2px solid rgba(255,255,255,0.9); text-align: left;}
   .goal-card p { font-size: 1em; line-height: 1.4; margin: 0; }
   .goal-card p + p { margin-top: 10px; }
-  .difficulty-selector { display: flex; flex-wrap: nowrap; justify-content: center; gap: 10px; width: 100%; }
+  .difficulty-selector { display: flex; flex-wrap: nowrap; justify-content: center; gap: 10px; width: 100%; margin-top: 10px; }
   .difficulty-button { background-color: var(--accent-color); border: none; color: var(--text-color); padding: 12px 10px; font-size: 1em; font-family: 'Fredoka One', cursive; border-radius: 50px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 0 var(--accent-dark-color); text-transform: uppercase; font-weight: 600; flex-grow: 1; max-width: 130px; }
   .difficulty-button:hover:not(:disabled) { background-color: #ffd54f; transform: translateY(-2px); box-shadow: 0 6px 0 var(--accent-dark-color); }
   .difficulty-button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 3px 0 var(--accent-dark-color); }
@@ -46,14 +45,17 @@
   @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
   .countdown { font-size: 8rem; color: var(--primary-color); opacity: 0; transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; transform: scale(0.5); }
   .fade-in { opacity: 1 !important; transform: scale(1); }
-  .final-summary { font-size: 1.2em; background: var(--white); border: 3px solid var(--primary-color); border-radius: 15px; padding: 20px; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
-  .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 20px; text-align: left; font-size: 0.9em; }
+  .final-summary { font-size: 1.1em; background: var(--white); border: 3px solid var(--primary-color); border-radius: 15px; padding: 20px; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+  .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 15px; text-align: left; font-size: 0.9em; }
   .help-button { position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px; border-radius: 50%; font-size: 1.8em; font-family: 'Fredoka One', cursive; background-color: var(--primary-color); color: var(--white); border: 3px solid var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; display: flex; justify-content: center; align-items: center; line-height: 1; }
   .in-game-hint { position: fixed; bottom: 75px; left: 15px; background-color: var(--primary-color); color: var(--white); padding: 8px 12px; border-radius: 8px; font-size: 0.9em; z-index: 1001; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none; }
   .in-game-hint.visible { opacity: 1; transform: translateY(0); }
   .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 15px; }
   .overlay-content { background-color: var(--card-back-color); padding: 20px 30px; border-radius: 20px; border: 3px solid var(--primary-color); width: 100%; max-width: 500px; text-align: center; }
   .overlay-content h2 { margin-top: 0; }
+  .overlay-content h3 { font-size: 1.2em; color: var(--primary-color); margin-top: 15px; margin-bottom: 5px; text-align: left; }
+  #helpView p { text-align: left; margin: 0; font-size: 1em; max-width: 100%; line-height: 1.4; }
+  #difficultyChangeView p { text-align: center; }
   .overlay-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 20px; flex-wrap: wrap; }
   .play-button { background-color: var(--accent-color); border: none; color: var(--text-color); padding: 15px 40px; font-size: 1.5em; font-family: 'Fredoka One', cursive; border-radius: 50px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 var(--accent-dark-color); text-transform: uppercase; font-weight: 600; }
   .secondary-button { background-color: var(--secondary-gray); color: var(--white); box-shadow: 0 5px 0 var(--secondary-gray-dark); }
@@ -75,7 +77,6 @@
         <p><strong>Your Goal:</strong> You have 5 minutes to complete as many rounds as you can. We'll time each round and show you your <strong>Personal Best</strong> at the end!</p>
         <p>💡 <strong>Hint:</strong> Press the <strong>?</strong> button to pause or change difficulty.</p>
       </div>
-      <p>Choose your challenge:</p>
       <div class="difficulty-selector" id="startDifficultySelector">
         <button class="difficulty-button" data-difficulty="easy">Easy</button>
         <button class="difficulty-button" data-difficulty="medium">Medium</button>
@@ -92,17 +93,20 @@
     <div class="final-summary">
         <h2>Good Job!</h2>
         <div id="finalResults"></div>
-        <p style="margin-top: 20px;">Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>
+        <p style="margin-top: 20px; text-align: center;">Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>
     </div>
   </div>
 
   <button id="helpButton" class="help-button hidden">?</button>
-  <div id="inGameHint" class="in-game-hint hidden">Psst! Press me to pause or change difficulty!</div>
+  <div id="inGameHint" class="in-game-hint hidden">Psst! Press the <strong>?</strong> button to pause or change difficulty!</div>
   <div id="helpOverlay" class="overlay hidden">
     <div class="overlay-content">
       <div id="helpView">
-        <h2>How to Play</h2>
-        <p>Your timer is paused. <strong>How to Play:</strong> Flip a card, memorise it, and find its match. <strong>Your Goal:</strong> Try to complete each round as quickly as possible to get your best time!</p>
+        <h2>Game Paused</h2>
+        <h3>How to Play</h3>
+        <p>Flip a card, memorise it, and find its match!</p>
+        <h3>Your Goal</h3>
+        <p>Complete rounds as quickly as possible to get your Personal Best time!</p>
         <div class="overlay-buttons">
           <button class="play-button secondary-button" id="changeDifficultyBtn">Change Difficulty</button>
           <button class="play-button" id="closeHelpButton">Close</button>
@@ -156,6 +160,7 @@
     
     function endGame() {
       helpButton.classList.add('hidden');
+      inGameHint.classList.add('hidden');
       if (sessionScores.length === 0) {
         finalResults.innerHTML = `<p style="text-align: center;">Time's up! Try to complete a round next time to see your score.</p>`;
       } else {
