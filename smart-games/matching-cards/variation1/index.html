@@ -46,7 +46,8 @@
   .countdown { font-size: 8rem; color: var(--primary-color); opacity: 0; transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; transform: scale(0.5); }
   .fade-in { opacity: 1 !important; transform: scale(1); }
   .final-summary { font-size: 1.1em; background: var(--white); border: 3px solid var(--primary-color); border-radius: 15px; padding: 20px; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
-  .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 15px; text-align: left; font-size: 0.9em; }
+  .final-summary h3 { font-size: 1.4em; color: var(--primary-color); margin-top: 0; margin-bottom: 10px; }
+  .final-summary p { font-size: 1.2em; text-align: center; margin: 5px 0; }
   .help-button { position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px; border-radius: 50%; font-size: 1.8em; font-family: 'Fredoka One', cursive; background-color: var(--primary-color); color: var(--white); border: 3px solid var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; display: flex; justify-content: center; align-items: center; line-height: 1; }
   .in-game-hint { position: fixed; bottom: 75px; left: 15px; background-color: var(--primary-color); color: var(--white); padding: 8px 12px; border-radius: 8px; font-size: 0.9em; z-index: 1001; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none; }
   .in-game-hint.visible { opacity: 1; transform: translateY(0); }
@@ -165,9 +166,8 @@
         finalResults.innerHTML = `<p style="text-align: center;">Time's up! Try to complete a round next time to see your score.</p>`;
       } else {
         const bestTime = Math.min(...sessionScores.map(score => score.time));
-        let resultsHtml = '<h3>Your Times:</h3><div class="results-grid">';
-        sessionScores.forEach(score => { const isBest = score.time === bestTime; resultsHtml += `<p>Round ${score.round}: <strong>${score.time.toFixed(1)}s</strong> ${isBest ? '⭐' : ''}</p>`; });
-        resultsHtml += '</div>'
+        const roundsCompleted = sessionScores.length;
+        let resultsHtml = `<h3>Your Results:</h3><p>Rounds Completed: <strong>${roundsCompleted}</strong></p><p>Personal Best: <strong>${bestTime.toFixed(1)}s</strong> ⭐</p>`;
         finalResults.innerHTML = resultsHtml;
       }
       switchScreen(screens.game, screens.final);
