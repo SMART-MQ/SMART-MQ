@@ -7,13 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
- 
+
 <style>
     :root {
-        --bg-color: #e0f7fa; /* Light Sky Blue */
-        --text-color: #004d40; /* Deep Teal */
-        --accent-color: #ffc107; /* Sunny Yellow */
-        --accent-shadow: #ff8f00; /* Darker Yellow for 3D effect */
+        --bg-color: #e0f7fa;
+        --text-color: #004d40;
+        --accent-color: #ffc107;
+        --accent-shadow: #ff8f00;
         --white: #ffffff;
         --correct-color: #2a9d8f;
         --incorrect-color: #e76f51;
@@ -44,11 +44,12 @@
         gap: 20px; justify-items: center; margin-top: 20px;
         padding: 10px; width: 100%; max-width: 800px;
     }
+    /* MODIFIED: Reduced horizontal padding and font-size to fit long words */
     .word-card {
         background-color: var(--white); border: 3px solid var(--text-color);
-        border-radius: 12px; box-shadow: 0 5px 0 var(--text-color); padding: 20px;
+        border-radius: 12px; box-shadow: 0 5px 0 var(--text-color); padding: 15px 10px;
         width: 100%; min-height: 60px; display: flex; align-items: center; justify-content: center;
-        text-align: center; font-weight: 400; font-size: 22px; font-family: inherit;
+        text-align: center; font-weight: 400; font-size: 20px; font-family: inherit;
         text-transform: capitalize; transition: transform 0.1s ease, box-shadow 0.1s ease; user-select: none;
     }
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
@@ -108,7 +109,6 @@
     }
     .overlay-container .info-page-container { margin: auto; }
 
-    /* NEW: Specific styles to make the final summary fit on screen */
     #result.final-summary { padding: 15px 25px; }
     #result.final-summary p { font-size: 1.2em; margin: 10px 0; }
     #result.final-summary hr { margin: 10px 0; }
@@ -156,6 +156,7 @@
         </div>
     </div>
 </div>
+<!-- MODIFIED: Added timer info to help screen -->
 <div id="help-overlay" class="overlay-container hidden">
     <div class="info-page-container">
         <h2>How to Play</h2>
@@ -163,14 +164,16 @@
             <li>🧠 First, memorise the list of words.</li>
             <li>👍 Press <strong>"Yes"</strong> if you saw the word.</li>
             <li>👎 Press <strong>"No"</strong> if it's a new word.</li>
+            <li>🏆 You have 5 minutes to play!</li>
         </ul>
         <button class="btn main-action-button" onclick="toggleHelp(false)">Got it!</button>
     </div>
 </div>
+<!-- MODIFIED: Reordered elements to fix overlap -->
 <div id="game-container" class="view hidden">
     <h2 id="game-heading">Memorise these words!</h2>
-    <div id="words-list"></div>
     <p id="timer">Time left: <span id="time-left">20</span> seconds</p>
+    <div id="words-list"></div>
 </div>
 <div id="recall-container" class="view hidden">
     <h2>Recall the words!</h2>
@@ -327,7 +330,7 @@
             switchView('result-container');
             document.body.classList.add('no-scroll');
             const resultEl = document.getElementById('result');
-            resultEl.classList.add('final-summary'); // Add class for specific styling
+            resultEl.classList.add('final-summary');
             resultEl.innerHTML = `
                 <p>Time's Up!</p><hr>
                 <ul id="score-list">${finalScoreHTML}</ul><hr>
