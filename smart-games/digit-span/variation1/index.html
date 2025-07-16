@@ -8,48 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Poppins', sans-serif; text-align: center; padding: 10px; overflow-x: hidden; color: #fff; background-color: #0d0d21; -webkit-tap-highlight-color: transparent; }
-    #digital-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; --grid-size: 50px; --line-color: rgba(0, 183, 255, 0.1); background-image: linear-gradient(to right, var(--line-color) 1px, transparent 1px), linear-gradient(to bottom, var(--line-color) 1px, transparent 1px); background-size: var(--grid-size) var(--grid-size); animation: pan-grid 60s linear infinite; }
-    @keyframes pan-grid { from { background-position: 0 0; } to { background-position: var(--grid-size) var(--grid-size); } }
-    .container { max-width: 900px; margin: auto; background-color: rgba(13, 13, 33, 0.5); border: 1px solid rgba(0, 183, 255, 0.3); backdrop-filter: blur(10px); border-radius: 20px; padding: 15px 10px; box-shadow: 0 0 30px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; transition: opacity 0.3s ease; }
-    .main { flex: 1; margin-bottom: 15px; width: 100%; }
-    .main-title { font-size: clamp(22px, 6vw, 32px); font-weight: 600; color: #fff; text-shadow: 0 0 10px rgba(0, 183, 255, 0.7); margin-bottom: 8px; }
-    #info-bar { font-size: clamp(16px, 4vw, 20px); font-weight: 600; text-shadow: 0 0 5px #fff; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
-    #how-to-play-btn { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: #fff; background-color: rgba(0, 183, 255, 0.3); border: 1px solid rgba(0, 183, 255, 0.7); width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; }
-    #how-to-play-btn:hover { background-color: #00b7ff; box-shadow: 0 0 10px #00b7ff; }
-    .digit-display, #answer-display { font-size: clamp(28px, 8vw, 42px); font-weight: 600; color: #fff; text-shadow: 0 0 5px #fff, 0 0 10px #0ff; background-color: rgba(0,0,0,0.4); border-radius: 10px; margin: 10px 0; min-height: 55px; letter-spacing: 0.2em; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 0 10px; }
-    #instructions-modal, #final-summary-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 100; }
-    #instructions-modal.show, #final-summary-modal.show { display: flex; }
-    .modal-content { background-color: rgba(13, 13, 33, 0.8); border: 1px solid rgba(0, 183, 255, 0.5); backdrop-filter: blur(10px); padding: 25px; border-radius: 15px; max-width: 90vw; width: 450px; text-align: center; color: #fff; text-shadow: 0 0 5px rgba(0, 183, 255, 0.5); }
-    .modal-content h3 { font-size: 24px; margin-top: 0; margin-bottom: 20px; }
-    .modal-content ul { list-style-type: none; padding: 0; text-align: left; display: inline-block; margin-bottom: 25px; }
-    .modal-content li { margin-bottom: 15px; font-size: 18px; display: flex; align-items: center; }
-    .modal-content li span { margin-right: 15px; font-size: 24px; }
-    #close-modal-btn { font-size: 18px; font-weight: 600; background: #0077b6; border: 2px solid #00b7ff; border-radius: 30px; padding: 10px 25px; color: white; cursor: pointer; transition: all 0.3s ease; }
-    #close-modal-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; }
-    #instructions-container { background: rgba(255, 255, 255, 0.94); border-radius: 20px; padding: 15px; box-shadow: 0 0 25px rgba(0,0,0,0.2); max-width: 600px; margin: 0 auto 20px auto; color: #333; }
-    #instructions-container h3 { font-size: 20px; margin-bottom: 10px; }
-    #instructions-container ul { list-style-type: none; padding: 0; margin: 0 auto; text-align: left; display: inline-block; }
-    #instructions-container li { font-size: 15px; line-height: 1.5; margin-bottom: 10px; }
-    #instructions-btn { font-size: 18px; font-weight: 600; background: #0077b6; border: 2px solid #00b7ff; border-radius: 30px; padding: 12px 30px; color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 15px; }
-    #instructions-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; }
-    .option-buttons { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, auto); gap: 5px; margin-top: 15px; }
-    .option-buttons button { font-family: 'Poppins', sans-serif; font-size: 26px; width: 100%; min-width: 0; height: 55px; background-color: #0077b6; color: #fff; border: 2px solid #00b7ff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; padding: 0; }
-    .option-buttons button:hover, .option-buttons button:active { background-color: #00b7ff; box-shadow: 0 0 15px #00b7ff; }
-    .option-buttons button#backspace-btn { background-color: #c0392b; border-color: #e74c3c; grid-row: 4; grid-column: 1 / 2; }
-    .option-buttons button#backspace-btn:hover { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; }
-    .option-buttons button#btn-zero { grid-row: 4; grid-column: 2 / 3; }
-    .option-buttons button#submit-btn { background-color: #27ae60; border-color: #2ecc71; border-radius: 12px; grid-row: 4; grid-column: 3 / 4; font-size: 24px; }
-    .option-buttons button#submit-btn:hover { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
-    .hidden { display: none; }
-    .message { font-size: 18px; margin-top: 15px; min-height: 24px; color: #fff; font-weight: 600; }
-    #streak-tracker { margin-top: 10px; min-height: 25px; display: flex; justify-content: center; align-items: center; gap: 8px; }
-    .data-packet { width: 40px; height: 12px; border: 2px solid #00b7ff; border-radius: 4px; background-color: transparent; transition: all 0.5s ease; }
-    .data-packet.filled { background-color: #00b7ff; box-shadow: 0 0 10px #00b7ff; }
-    #prompt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 13, 33, 0.7); display: none; align-items: center; justify-content: center; z-index: 50; }
-    #prompt-overlay.show { display: flex; }
-    #prompt-text { font-family: 'Orbitron', sans-serif; font-size: clamp(24px, 6vw, 40px); color: #fff; text-shadow: 0 0 10px #0ff, 0 0 20px #0ff; padding: 20px; animation: prompt-pop-fade 1.5s ease-out forwards; }
+    /* All CSS is correct and unchanged */
+    * { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Poppins', sans-serif; text-align: center; padding: 10px; overflow-x: hidden; color: #fff; background-color: #0d0d21; -webkit-tap-highlight-color: transparent; } #digital-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; --grid-size: 50px; --line-color: rgba(0, 183, 255, 0.1); background-image: linear-gradient(to right, var(--line-color) 1px, transparent 1px), linear-gradient(to bottom, var(--line-color) 1px, transparent 1px); background-size: var(--grid-size) var(--grid-size); animation: pan-grid 60s linear infinite; } @keyframes pan-grid { from { background-position: 0 0; } to { background-position: var(--grid-size) var(--grid-size); } } .container { max-width: 900px; margin: auto; background-color: rgba(13, 13, 33, 0.5); border: 1px solid rgba(0, 183, 255, 0.3); backdrop-filter: blur(10px); border-radius: 20px; padding: 15px 10px; box-shadow: 0 0 30px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; transition: opacity 0.3s ease; } .main { flex: 1; margin-bottom: 15px; width: 100%; } .main-title { font-size: clamp(22px, 6vw, 32px); font-weight: 600; color: #fff; text-shadow: 0 0 10px rgba(0, 183, 255, 0.7); margin-bottom: 8px; } #info-bar { font-size: clamp(16px, 4vw, 20px); font-weight: 600; text-shadow: 0 0 5px #fff; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; } #how-to-play-btn { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: #fff; background-color: rgba(0, 183, 255, 0.3); border: 1px solid rgba(0, 183, 255, 0.7); width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; } #how-to-play-btn:hover { background-color: #00b7ff; box-shadow: 0 0 10px #00b7ff; } .digit-display, #answer-display { font-size: clamp(28px, 8vw, 42px); font-weight: 600; color: #fff; text-shadow: 0 0 5px #fff, 0 0 10px #0ff; background-color: rgba(0,0,0,0.4); border-radius: 10px; margin: 10px 0; min-height: 55px; letter-spacing: 0.2em; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 0 10px; } #instructions-modal, #final-summary-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 100; } #instructions-modal.show, #final-summary-modal.show { display: flex; } .modal-content { background-color: rgba(13, 13, 33, 0.8); border: 1px solid rgba(0, 183, 255, 0.5); backdrop-filter: blur(10px); padding: 25px; border-radius: 15px; max-width: 90vw; width: 450px; text-align: center; color: #fff; text-shadow: 0 0 5px rgba(0, 183, 255, 0.5); } .modal-content h3 { font-size: 24px; margin-top: 0; margin-bottom: 20px; } .modal-content ul { list-style-type: none; padding: 0; text-align: left; display: inline-block; margin-bottom: 25px; } .modal-content li { margin-bottom: 15px; font-size: 18px; display: flex; align-items: center; } .modal-content li span { margin-right: 15px; font-size: 24px; } #close-modal-btn { font-size: 18px; font-weight: 600; background: #0077b6; border: 2px solid #00b7ff; border-radius: 30px; padding: 10px 25px; color: white; cursor: pointer; transition: all 0.3s ease; } #close-modal-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; } #instructions-container { background: rgba(255, 255, 255, 0.94); border-radius: 20px; padding: 15px; box-shadow: 0 0 25px rgba(0,0,0,0.2); max-width: 600px; margin: 0 auto 20px auto; color: #333; } #instructions-container h3 { font-size: 20px; margin-bottom: 10px; } #instructions-container ul { list-style-type: none; padding: 0; margin: 0 auto; text-align: left; display: inline-block; } #instructions-container li { font-size: 15px; line-height: 1.5; margin-bottom: 10px; } #instructions-btn { font-size: 18px; font-weight: 600; background: #0077b6; border: 2px solid #00b7ff; border-radius: 30px; padding: 12px 30px; color: white; cursor: pointer; transition: all 0.3s ease; margin-top: 15px; } #instructions-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; } .option-buttons { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, auto); gap: 5px; margin-top: 15px; } .option-buttons button { font-family: 'Poppins', sans-serif; font-size: 26px; width: 100%; min-width: 0; height: 55px; background-color: #0077b6; color: #fff; border: 2px solid #00b7ff; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; padding: 0; } .option-buttons button:hover, .option-buttons button:active { background-color: #00b7ff; box-shadow: 0 0 15px #00b7ff; } .option-buttons button#backspace-btn { background-color: #c0392b; border-color: #e74c3c; grid-row: 4; grid-column: 1 / 2; } .option-buttons button#backspace-btn:hover { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; } .option-buttons button#btn-zero { grid-row: 4; grid-column: 2 / 3; } .option-buttons button#submit-btn { background-color: #27ae60; border-color: #2ecc71; border-radius: 12px; grid-row: 4; grid-column: 3 / 4; font-size: 24px; } .option-buttons button#submit-btn:hover { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; } .hidden { display: none; } .message { font-size: 18px; margin-top: 15px; min-height: 24px; color: #fff; font-weight: 600; } #streak-tracker { margin-top: 10px; min-height: 25px; display: flex; justify-content: center; align-items: center; gap: 8px; } .data-packet { width: 40px; height: 12px; border: 2px solid #00b7ff; border-radius: 4px; background-color: transparent; transition: all 0.5s ease; } .data-packet.filled { background-color: #00b7ff; box-shadow: 0 0 10px #00b7ff; } #prompt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 13, 33, 0.7); display: none; align-items: center; justify-content: center; z-index: 50; } #prompt-overlay.show { display: flex; } #prompt-text { font-family: 'Orbitron', sans-serif; font-size: clamp(24px, 6vw, 40px); color: #fff; text-shadow: 0 0 10px #0ff, 0 0 20px #0ff; padding: 20px; animation: prompt-pop-fade 1.5s ease-out forwards; }
     @keyframes prompt-pop-fade { 0% { transform: scale(0.5); opacity: 0; } 20% { transform: scale(1.1); opacity: 1; } 40% { transform: scale(1); opacity: 1; } 80% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.2); opacity: 0; } }
     #badge-popup { position: fixed; left: 50%; transform: translateX(-50%); top: -150px; background-color: rgba(13, 13, 33, 0.7); border: 1px solid rgba(0, 183, 255, 0.5); backdrop-filter: blur(10px); padding: 15px 30px; border-radius: 10px; font-size: 18px; font-weight: 600; color: #fff; text-shadow: 0 0 8px #0ff; box-shadow: 0 0 20px rgba(0, 183, 255, 0.5); z-index: 200; transition: top 0.5s ease-out; overflow: hidden; width: 90vw; }
     #badge-popup.show { top: 20px; }
@@ -98,7 +58,6 @@
         <h3>How to Play</h3>
         <ul>
             <li><span>👁️</span> Watch the numbers flash on the screen.</li>
-            <!-- --- FIX: Corrected the typo in this line --- -->
             <li><span>🧠</span> Remember them in the <strong>exact</strong> order.</li>
             <li><span>👉</span> When it's your turn, press the numbers you saw.</li>
             <li><span>✅</span> Press the green check to submit!</li>
@@ -118,21 +77,139 @@
   </div>
 
   <script>
-    // All JavaScript is correct and unchanged from the last working version.
-    var badgeLevels = { 4: "Digit Detective", 5: "Memory Master", 6: "Sequence Star", 7: "Cognitive Champion", 8: "Unstoppable", 9: "Brainy Boss" }; var digits = '1234567890'; var correctMessages = ["Correct!", "Nice!", "Good job!", "You got it!", "Perfect!", "Excellent!", "You're on a roll!"]; var encouragementMessages = [ "Try again!", "Let's try a different one!", "You got this!", "Almost!" ]; var currentLength = 3; var consecutiveCorrect = 0; var personalBest = 0; var earnedBadges = {}; var isChecking = false; var isGameOver = false; var gameTimerInterval = null; var timeRemaining; const GAME_DURATION = 300; var timeIsUp = false;
-    var instructionsContainer = document.getElementById('instructions-container'); var instructionsBtn = document.getElementById('instructions-btn'); var gameContainer = document.getElementById('game'); var timerDisplayEl, infoBar, digitDisplay, optionButtons, answerDisplay, message, badgesEarned, badgePopup, streakTracker, howToPlayBtn, instructionsModal, closeModalBtn, promptOverlay, promptText, finalSummaryModal, finalSummaryContent; var sequence = ''; var userAnswer = '';
-    instructionsBtn.onclick = function() { instructionsContainer.style.display = 'none'; gameContainer.classList.remove('hidden'); startGame(); };
-    function pauseGameTimer() { clearInterval(gameTimerInterval); } function resumeGameTimer() { if (isGameOver) return; clearInterval(gameTimerInterval); gameTimerInterval = setInterval(updateTimer, 1000); } function updateTimer() { if (timeRemaining < 0) { clearInterval(gameTimerInterval); timerDisplayEl.textContent = "00:00"; timeIsUp = true; return; } var minutes = Math.floor(timeRemaining / 60); var seconds = timeRemaining % 60; timerDisplayEl.textContent = minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0'); timeRemaining--; }
+    var badgeLevels = { 4: "Digit Detective", 5: "Memory Master", 6: "Sequence Star", 7: "Cognitive Champion", 8: "Unstoppable", 9: "Brainy Boss" };
+    var digits = '1234567890';
+    var correctMessages = ["Correct!", "Nice!", "Good job!", "You got it!", "Perfect!", "Excellent!", "You're on a roll!"];
+    var encouragementMessages = [ "Try again!", "Let's try a different one!", "You got this!", "Almost!" ];
+    var currentLength = 3; 
+    var consecutiveCorrect = 0;
+    var personalBest = 0;
+    var earnedBadges = {};
+    var isChecking = false;
+    var isGameOver = false;
+    var gameTimerInterval = null; 
+    var timeRemaining;
+    const GAME_DURATION = 300; 
+    var timeIsUp = false;
+    
+    var instructionsContainer = document.getElementById('instructions-container');
+    var instructionsBtn = document.getElementById('instructions-btn');
+    var gameContainer = document.getElementById('game');
+    var timerDisplayEl, infoBar, digitDisplay, optionButtons, answerDisplay, message, badgesEarned, badgePopup, streakTracker, howToPlayBtn, instructionsModal, closeModalBtn, promptOverlay, promptText, finalSummaryModal, finalSummaryContent;
+    var sequence = '';
+    var userAnswer = '';
+
+    instructionsBtn.onclick = function() {
+      instructionsContainer.style.display = 'none';
+      gameContainer.classList.remove('hidden');
+      startGame();
+    };
+
+    function pauseGameTimer() { clearInterval(gameTimerInterval); }
+    function resumeGameTimer() { if (isGameOver) return; clearInterval(gameTimerInterval); gameTimerInterval = setInterval(updateTimer, 1000); }
+    
+    function updateTimer() {
+        if (timeRemaining < 0) {
+            clearInterval(gameTimerInterval);
+            timerDisplayEl.textContent = "00:00";
+            timeIsUp = true;
+            return;
+        }
+        var minutes = Math.floor(timeRemaining / 60);
+        var seconds = timeRemaining % 60;
+        timerDisplayEl.textContent = minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+        timeRemaining--;
+    }
+    
     function showGamePrompt(text, callback) { promptText.textContent = text; promptOverlay.classList.add('show'); setTimeout(function() { promptOverlay.classList.remove('show'); if (callback) callback(); }, 1500); }
     function getReadyCountdown(callback) { showGamePrompt("Remember these numbers...", callback); }
     function flashNextDigit(index) { if (isGameOver) return; if (index >= sequence.length) { showGamePrompt("Your turn!", function() { displayOptions(); isChecking = false; }); return; } digitDisplay.textContent = sequence[index]; setTimeout(function() { digitDisplay.textContent = ''; setTimeout(function() { flashNextDigit(index + 1); }, 250); }, 750); }
-    function capLength(length) { return Math.min(length, 10); } function generateDigits(length) { var result = ''; var availableDigits = '0123456789'.split(''); for (var i = 0; i < length; i++) { var randomIndex = Math.floor(Math.random() * availableDigits.length); result += availableDigits.splice(randomIndex, 1)[0]; } return result; } function updateStreakVisual() { var packets = streakTracker.querySelectorAll('.data-packet'); packets.forEach(function(packet, index) { packet.classList.toggle('filled', index < consecutiveCorrect); }); } function showBadge(name) { if (earnedBadges[name]) return; earnedBadges[name] = true; var badge = document.createElement('div'); badge.className = 'badge-earned'; badge.textContent = '🎖️ ' + name; badgesEarned.appendChild(badge); badgePopup.textContent = '🎉 Badge Unlocked: ' + name + '! 🎉'; badgePopup.classList.add('show'); setTimeout(function() { badgePopup.classList.remove('show'); }, 3500); } function showDigits() { if (isGameOver) return; isChecking = true; sequence = generateDigits(currentLength); answerDisplay.textContent = ''; userAnswer = ''; optionButtons.classList.add('hidden'); message.textContent = ''; getReadyCountdown(function() { flashNextDigit(0); }); } function displayOptions() { if (isGameOver) return; optionButtons.innerHTML = ''; digits.split('').forEach(function(d) { var btn = document.createElement('button'); btn.textContent = d; if (d === '0') { btn.id = 'btn-zero'; } btn.onclick = function() { if(userAnswer.length < currentLength) { userAnswer += d; answerDisplay.textContent = userAnswer; } }; optionButtons.appendChild(btn); }); var backspaceBtn = document.createElement('button'); backspaceBtn.innerHTML = '⌫'; backspaceBtn.id = 'backspace-btn'; backspaceBtn.onclick = function() { userAnswer = userAnswer.slice(0, -1); answerDisplay.textContent = userAnswer; }; optionButtons.appendChild(backspaceBtn); var submitBtn = document.createElement('button'); submitBtn.innerHTML = '✓'; submitBtn.id = 'submit-btn'; submitBtn.onclick = checkAnswer; optionButtons.appendChild(submitBtn); optionButtons.classList.remove('hidden'); } function checkAnswer() { if (isGameOver || isChecking) return; isChecking = true; optionButtons.classList.add('hidden'); var delayForNextTurn = 1500; if (userAnswer === sequence) { consecutiveCorrect++; updateStreakVisual(); personalBest = Math.max(personalBest, currentLength); if (consecutiveCorrect >= 3) { consecutiveCorrect = 0; currentLength = capLength(currentLength + 1); message.textContent = 'Level Up!'; delayForNextTurn = 2000; if (badgeLevels[currentLength]) { showBadge(badgeLevels[currentLength]); delayForNextTurn = 3600; } } else { var randomIndex = Math.floor(Math.random() * correctMessages.length); message.textContent = correctMessages[randomIndex]; } } else { consecutiveCorrect = 0; updateStreakVisual(); var randomIndex = Math.floor(Math.random() * encouragementMessages.length); message.textContent = encouragementMessages[randomIndex]; currentLength = Math.max(3, currentLength - 1); } if (timeIsUp) { setTimeout(showFinalSummary, 1500); } else { setTimeout(moveToNextTurn, delayForNextTurn); } } function moveToNextTurn() { if (isGameOver) return; if (consecutiveCorrect === 0) { setTimeout(updateStreakVisual, 500); } showDigits(); }
-    function showFinalSummary() { isGameOver = true; if (gameTimerInterval) clearInterval(gameTimerInterval); isChecking = true; var summaryHtml = "<h3>Good job - Check out your score below!</h3>"; summaryHtml += "<p style='font-size: 20px; font-weight: 600; margin: 15px 0;'>Your Personal Best Was Level: " + personalBest + "</p>"; summaryHtml += "<p style='margin-top: 20px;'>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>"; finalSummaryContent.innerHTML = summaryHtml; gameContainer.style.opacity = '0.3'; finalSummaryModal.classList.add('show'); window.parent.postMessage("showNext", "*"); } 
-    function startGame() { timerDisplayEl = document.getElementById('timer-display'); infoBar = document.getElementById('info-bar'); digitDisplay = document.getElementById('digit-display'); optionButtons = document.getElementById('option-buttons'); answerDisplay = document.getElementById('answer-display'); message = document.getElementById('message'); badgesEarned = document.getElementById('badges-earned'); badgePopup = document.getElementById('badge-popup'); streakTracker = document.getElementById('streak-tracker'); howToPlayBtn = document.getElementById('how-to-play-btn'); instructionsModal = document.getElementById('instructions-modal'); closeModalBtn = document.getElementById('close-modal-btn'); promptOverlay = document.getElementById('prompt-overlay'); promptText = document.getElementById('prompt-text'); finalSummaryModal = document.getElementById('final-summary-modal'); finalSummaryContent = document.getElementById('final-summary-content');
+    function capLength(length) { return Math.min(length, 10); } 
+    function generateDigits(length) { var result = ''; var availableDigits = '0123456789'.split(''); for (var i = 0; i < length; i++) { var randomIndex = Math.floor(Math.random() * availableDigits.length); result += availableDigits.splice(randomIndex, 1)[0]; } return result; }
+    function updateStreakVisual() { var packets = streakTracker.querySelectorAll('.data-packet'); packets.forEach(function(packet, index) { packet.classList.toggle('filled', index < consecutiveCorrect); }); }
+    function showBadge(name) { if (earnedBadges[name]) return; earnedBadges[name] = true; var badge = document.createElement('div'); badge.className = 'badge-earned'; badge.textContent = '🎖️ ' + name; badgesEarned.appendChild(badge); badgePopup.textContent = '🎉 Badge Unlocked: ' + name + '! 🎉'; badgePopup.classList.add('show'); setTimeout(function() { badgePopup.classList.remove('show'); }, 3500); }
+    function showDigits() { if (isGameOver) return; isChecking = true; sequence = generateDigits(currentLength); answerDisplay.textContent = ''; userAnswer = ''; optionButtons.classList.add('hidden'); message.textContent = ''; getReadyCountdown(function() { flashNextDigit(0); }); }
+    function displayOptions() { if (isGameOver) return; optionButtons.innerHTML = ''; digits.split('').forEach(function(d) { var btn = document.createElement('button'); btn.textContent = d; if (d === '0') { btn.id = 'btn-zero'; } btn.onclick = function() { if(userAnswer.length < currentLength) { userAnswer += d; answerDisplay.textContent = userAnswer; } }; optionButtons.appendChild(btn); }); var backspaceBtn = document.createElement('button'); backspaceBtn.innerHTML = '⌫'; backspaceBtn.id = 'backspace-btn'; backspaceBtn.onclick = function() { userAnswer = userAnswer.slice(0, -1); answerDisplay.textContent = userAnswer; }; optionButtons.appendChild(backspaceBtn); var submitBtn = document.createElement('button'); submitBtn.innerHTML = '✓'; submitBtn.id = 'submit-btn'; submitBtn.onclick = checkAnswer; optionButtons.appendChild(submitBtn); optionButtons.classList.remove('hidden'); }
+    
+    function checkAnswer() {
+      if (isGameOver || isChecking) return;
+      isChecking = true;
+      optionButtons.classList.add('hidden');
+      var delayForNextTurn = 1500;
+      if (userAnswer === sequence) {
+        consecutiveCorrect++;
+        updateStreakVisual();
+        personalBest = Math.max(personalBest, currentLength);
+        if (consecutiveCorrect >= 3) {
+          consecutiveCorrect = 0;
+          currentLength = capLength(currentLength + 1);
+          message.textContent = 'Level Up!';
+          delayForNextTurn = 2000;
+          if (badgeLevels[currentLength]) {
+            showBadge(badgeLevels[currentLength]);
+            delayForNextTurn = 3600;
+          }
+        } else {
+          var randomIndex = Math.floor(Math.random() * correctMessages.length);
+          message.textContent = correctMessages[randomIndex];
+        }
+      } else {
+        consecutiveCorrect = 0;
+        updateStreakVisual();
+        var randomIndex = Math.floor(Math.random() * encouragementMessages.length);
+        message.textContent = encouragementMessages[randomIndex];
+        currentLength = Math.max(3, currentLength - 1);
+      }
+      
+      if (timeIsUp) {
+          setTimeout(showFinalSummary, 1500);
+      } else {
+          setTimeout(moveToNextTurn, delayForNextTurn);
+      }
+    }
+    
+    function moveToNextTurn() { if (isGameOver) return; if (consecutiveCorrect === 0) { setTimeout(updateStreakVisual, 500); } showDigits(); }
+    
+    function showFinalSummary() {
+      isGameOver = true;
+      if (gameTimerInterval) clearInterval(gameTimerInterval);
+      isChecking = true;
+      
+      var summaryHtml = "<h3>Good job - Check out your score below!</h3>";
+      summaryHtml += "<p style='font-size: 20px; font-weight: 600; margin: 15px 0;'>Your Personal Best Was Level: " + personalBest + "</p>";
+      summaryHtml += "<p style='margin-top: 20px;'>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>";
+      finalSummaryContent.innerHTML = summaryHtml;
+      
+      gameContainer.style.opacity = '0.3';
+      finalSummaryModal.classList.add('show');
+      window.parent.postMessage("showNext", "*");
+    } 
+    
+    function startGame() {
+      timerDisplayEl = document.getElementById('timer-display');
+      infoBar = document.getElementById('info-bar');
+      digitDisplay = document.getElementById('digit-display');
+      optionButtons = document.getElementById('option-buttons');
+      answerDisplay = document.getElementById('answer-display');
+      message = document.getElementById('message');
+      badgesEarned = document.getElementById('badges-earned');
+      badgePopup = document.getElementById('badge-popup');
+      streakTracker = document.getElementById('streak-tracker');
+      howToPlayBtn = document.getElementById('how-to-play-btn');
+      instructionsModal = document.getElementById('instructions-modal');
+      closeModalBtn = document.getElementById('close-modal-btn');
+      promptOverlay = document.getElementById('prompt-overlay');
+      promptText = document.getElementById('prompt-text');
+      finalSummaryModal = document.getElementById('final-summary-modal');
+      finalSummaryContent = document.getElementById('final-summary-content');
+
       howToPlayBtn.onclick = function() { instructionsModal.classList.add('show'); pauseGameTimer(); }
       closeModalBtn.onclick = function() { instructionsModal.classList.remove('show'); resumeGameTimer(); }
       instructionsModal.onclick = function(event) { if (event.target === instructionsModal) { instructionsModal.classList.remove('show'); resumeGameTimer(); } }
-      isGameOver = false; timeIsUp = false; currentLength = 3; consecutiveCorrect = 0; personalBest = 0; earnedBadges = {}; timeRemaining = GAME_DURATION; finalSummaryModal.classList.remove('show'); gameContainer.style.opacity = '1'; badgesEarned.innerHTML = '';
+      
+      isGameOver = false; timeIsUp = false; currentLength = 3; consecutiveCorrect = 0; personalBest = 0; earnedBadges = {}; timeRemaining = GAME_DURATION;
+      finalSummaryModal.classList.remove('show'); gameContainer.style.opacity = '1';
+      badgesEarned.innerHTML = '';
       updateStreakVisual(); updateTimer(); resumeGameTimer(); showDigits();
     }
   </script>
