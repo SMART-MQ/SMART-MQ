@@ -30,11 +30,14 @@
     h2 { font-size: clamp(2em, 7vw, 2.5em); color: var(--primary-glow); }
     p, li { font-size: clamp(1em, 4vw, 1.2em); line-height: 1.5; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
     .subtitle { font-size: clamp(1.2em, 5vw, 1.5em); color: var(--text-color); margin-bottom: 20px; }
-    .emphasis { color: var(--primary-glow); font-size: 1.3em; }
     .start-instructions { list-style-type: none; padding: 0; text-align: left; max-width: 400px; margin: 20px auto; }
     .start-instructions li::before { content: '▶'; color: var(--primary-glow); margin-right: 15px; }
     #game-area { width: 100%; max-width: 600px; }
-    .scoreboard { display: flex; justify-content: space-around; font-size: 1.2em; margin-bottom: 15px; }
+    .scoreboard { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 15px; }
+    .level-info { display: flex; justify-content: space-around; width: 100%; font-size: 1.2em; }
+    #progress-tracker { display: flex; gap: 10px; }
+    .progress-pip { width: 30px; height: 10px; border: 2px solid var(--primary-glow); border-radius: 5px; background-color: transparent; transition: background-color 0.3s; }
+    .progress-pip.filled { background-color: var(--primary-glow); }
     #message { font-size: 1.5em; color: #fff; min-height: 1.5em; margin: 20px 0; text-shadow: 0 0 5px var(--primary-glow); }
     .timer-bar-container { width: 90%; max-width: 500px; height: 15px; background-color: rgba(0,0,0,0.3); border-radius: 10px; border: 2px solid var(--primary-glow); margin: 15px auto; overflow: hidden; box-shadow: 0 0 10px rgba(35, 217, 217, 0.3); }
     .timer-bar { height: 100%; width: 100%; background-color: var(--primary-glow); border-radius: 6px; transition: width 1s linear; }
@@ -77,9 +80,15 @@
         <div id="timer-bar" class="timer-bar"></div>
       </div>
       <div class="scoreboard">
-        <span id="levelDisplay">Level: 1</span>
-        <span id="scoreDisplay">Length: 0</span>
-        <span id="bestScore">Best: 0</span>
+        <div class="level-info">
+          <span id="levelDisplay">Level: 1</span>
+          <span id="bestLevelDisplay">Best Level: 1</span>
+        </div>
+        <div id="progress-tracker">
+            <div class="progress-pip"></div>
+            <div class="progress-pip"></div>
+            <div class="progress-pip"></div>
+        </div>
       </div>
       <p id="message"></p>
       <div id="button-container" class="button-container">
@@ -94,7 +103,7 @@
   <button id="helpBtn" class="help-button hidden">?</button>
   <div id="fanfare" class="hidden"></div>
   <div id="help-overlay" class="overlay fadeable is-faded-out"> <div class="overlay-content"> <h2>How To Play</h2> <p>Watch the neon sequence.<br>Repeat the pattern by pressing the glowing squares in the same order.<br>Get the highest score you can!</p> <button class="play-button" id="resumeBtn">Resume</button> </div> </div>
-  <div id="final-summary-overlay" class="overlay fadeable is-faded-out"> <div class="overlay-content"> <h2>Time's Up!</h2> <p style="font-size: 1.5em; color: var(--primary-glow);">Great Job!</p> <p>Your personal best score:</p> <p id="final-best-score" style="font-size: 3em; color: #fff; margin: 10px 0; text-shadow: 0 0 8px var(--primary-glow);">0</p> <p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p> </div> </div>
+  <div id="final-summary-overlay" class="overlay fadeable is-faded-out"> <div class="overlay-content"> <h2>Time's Up!</h2> <p style="font-size: 1.5em; color: var(--primary-glow);">Great Job!</p> <p>Your best level was:</p> <p id="final-best-score" style="font-size: 3em; color: #fff; margin: 10px 0; text-shadow: 0 0 8px var(--primary-glow);">1</p> <p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p> </div> </div>
   <audio id="flashSound" src="https://assets.codepen.io/217233/synth_C4.mp3" preload="auto"></audio>
   <audio id="wrongSound" src="https://assets.codepen.io/217233/synth_misc_1.mp3" preload="auto"></audio>
 
@@ -110,7 +119,7 @@
     }
   
     const GAME_TIME = 300;
-    const RETRY_MESSAGES = ["Let's try again!", "You got this!", "Nice try!", "Give it another shot!"];
+    const RETRY_MESSAGES = ["Let's try that level again!", "You got this!", "Nice try, give it another shot!"];
     const SEQUENCE_SPEED = 600;
 
     const elements = {
@@ -122,8 +131,8 @@
         buttonContainer: document.getElementById('button-container'),
         buttons: ["btn1", "btn2", "btn3", "btn4"].map(id => document.getElementById(id)),
         levelDisplay: document.getElementById('levelDisplay'),
-        scoreDisplay: document.getElementById('scoreDisplay'), // Changed from currentScoreEl
-        bestScoreEl: document.getElementById('bestScore'),
+        bestLevelDisplay: document.getElementById('bestLevelDisplay'),
+        progressPips: document.querySelectorAll('.progress-pip'),
         helpBtn: document.getElementById('helpBtn'),
         helpOverlay: document.getElementById('help-overlay'),
         resumeBtn: document.getElementById('resumeBtn'),
@@ -134,8 +143,8 @@
         wrongSound: document.getElementById('wrongSound'),
     };
 
-    let sequence = [], userSequence = [], best = 0;
-    let level = 1, correctStreak = 0;
+    let sequence = [], userSequence = [], bestLevel = 1;
+    let level = 1, correctStreakInLevel = 0;
     let timer, timeLeft = GAME_TIME;
     let isPlayerTurn = false, isGameRunning = false, isPaused = false;
 
@@ -148,26 +157,31 @@
 
     function startGame() {
       level = 1;
-      correctStreak = 0;
-      sequence = [];
-      best = 0;
-
-      // Change: Create the initial sequence of 3 here
-      for(let i=0; i<3; i++) {
-          sequence.push(Math.floor(Math.random() * 4));
-      }
-      updateScoreboard();
-
+      bestLevel = 1;
+      correctStreakInLevel = 0;
+      
       elements.startScreen.classList.add('hidden');
       elements.gameScreen.classList.remove('hidden');
       elements.helpBtn.classList.remove('hidden');
       
       startTimer();
-      setTimeout(nextRound, 500); // Start the first round
+      prepareNewRound();
     }
     
-    function nextRound() {
-      if (!isGameRunning) return;
+    function prepareNewRound() {
+        if (!isGameRunning) return;
+        
+        const sequenceLength = level + 1; // Level 1 = 2 items, Level 2 = 3 items, etc.
+        sequence = [];
+        for (let i = 0; i < sequenceLength; i++) {
+            sequence.push(Math.floor(Math.random() * 4));
+        }
+        
+        updateScoreboard();
+        playRound();
+    }
+    
+    function playRound() {
       isPlayerTurn = false;
       userSequence = [];
       elements.message.textContent = "";
@@ -190,7 +204,7 @@
     function endGame() {
         isGameRunning = false;
         clearInterval(timer);
-        elements.finalBestScore.textContent = best;
+        elements.finalBestScore.textContent = bestLevel;
         elements.finalOverlay.classList.remove('is-faded-out');
         elements.helpBtn.classList.add('hidden');
         updateButtonsState(true);
@@ -201,10 +215,13 @@
         if (!isPlayerTurn) return;
         flashButton(elements.buttons[index]);
         userSequence.push(index);
+        
+        // Check if current press is wrong
         if (userSequence[userSequence.length - 1] !== sequence[userSequence.length - 1]) {
             handleIncorrect();
             return;
         }
+        // Check if the whole sequence is complete
         if (userSequence.length === sequence.length) {
             handleCorrect();
         }
@@ -212,49 +229,39 @@
     
     function handleCorrect() {
         isPlayerTurn = false;
-        correctStreak++;
+        correctStreakInLevel++;
+        updateStreakVisual();
         
         let delay = 1200;
-        if (correctStreak >= 3) {
+        if (correctStreakInLevel >= 3) {
             level++;
-            correctStreak = 0;
+            correctStreakInLevel = 0;
+            if(level > bestLevel) bestLevel = level;
+            
             triggerFanfare("Level Up!", 1500);
             delay = 2000;
         }
         
-        // Change: Add one new item to the sequence
-        sequence.push(Math.floor(Math.random() * 4));
-        updateScoreboard();
-        setTimeout(nextRound, delay);
+        setTimeout(prepareNewRound, delay);
     }
     
     function handleIncorrect() {
         isPlayerTurn = false;
-        correctStreak = 0;
-        
-        if (level > 1) { level--; }
+        correctStreakInLevel = 0;
+        updateStreakVisual();
 
         elements.wrongSound.play();
         elements.message.textContent = RETRY_MESSAGES[Math.floor(Math.random() * RETRY_MESSAGES.length)];
         elements.buttonContainer.classList.add('shake-container');
         
-        // Change: Reset sequence to a new, shorter length
-        sequence = [];
-        const newLength = Math.max(3, 2 + level); // Min length of 3
-        for(let i = 0; i < newLength; i++) {
-            sequence.push(Math.floor(Math.random() * 4));
-        }
-        updateScoreboard();
-        
         setTimeout(() => {
             elements.buttonContainer.classList.remove('shake-container');
-            nextRound();
+            prepareNewRound(); // Prepare a new sequence for the same level
         }, 1500);
     }
     
     function startTimer() {
         isGameRunning = true;
-        // Ensure previous timer is cleared before starting a new one
         if(timer) clearInterval(timer);
         timeLeft = GAME_TIME;
         timer = setInterval(() => {
@@ -303,13 +310,15 @@
     }
     
     function updateScoreboard() {
-        const currentLength = sequence.length || 0;
-        if (currentLength > best) {
-            best = currentLength;
-        }
         elements.levelDisplay.textContent = `Level: ${level}`;
-        elements.scoreDisplay.textContent = `Length: ${currentLength}`;
-        elements.bestScoreEl.textContent = `Best: ${best}`;
+        elements.bestLevelDisplay.textContent = `Best Level: ${bestLevel}`;
+        updateStreakVisual();
+    }
+    
+    function updateStreakVisual() {
+        elements.progressPips.forEach((pip, index) => {
+            pip.classList.toggle('filled', index < correctStreakInLevel);
+        });
     }
 
     function updateButtonsState(disabled) {
