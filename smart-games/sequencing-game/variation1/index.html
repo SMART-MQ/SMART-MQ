@@ -111,7 +111,7 @@
   
     const GAME_TIME = 300;
     const RETRY_MESSAGES = ["Let's try again!", "You got this!", "Nice try!", "Give it another shot!"];
-    const SEQUENCE_SPEED = 600; // Change: Speed is now constant
+    const SEQUENCE_SPEED = 600;
 
     const elements = {
         startScreen: document.getElementById('start-screen'),
@@ -157,15 +157,29 @@
       elements.gameScreen.classList.remove('hidden');
       elements.helpBtn.classList.remove('hidden');
       
-      setTimeout(() => {
-        isGameRunning = true;
-        startTimer();
+      // Change: Start with prepareNextRound to generate the initial sequence
+      setTimeout(prepareNextRound, 500);
+    }
+    
+    // Change: New function to prepare the sequence before the round starts
+    function prepareNextRound(isFirstRound = false) {
+        if (!isGameRunning && !isFirstRound) return;
+
+        // Change: Difficulty is now based on sequence length, determined by level.
+        const itemsToAdd = (isFirstRound) ? 3 : 1; // Start with 3, add 1 each round
+        for(let i = 0; i < itemsToAdd; i++) {
+            sequence.push(Math.floor(Math.random() * 4));
+        }
+        
+        // Update score to reflect the length to be remembered
+        score = sequence.length;
+        if(score > best) best = score;
+        updateScoreboard();
+        
         nextRound();
-      }, 500);
     }
     
     function nextRound() {
-      if (!isGameRunning) return;
       isPlayerTurn = false;
       userSequence = [];
       elements.message.textContent = "";
@@ -174,17 +188,6 @@
       triggerFanfare("Watch This!", 1000);
 
       setTimeout(() => {
-        // Change: Difficulty now adds more items based on level
-        let itemsToAdd = 1;
-        if (level >= 4 && level <=6) {
-            itemsToAdd = 2;
-        } else if (level >= 7) {
-            itemsToAdd = 3;
-        }
-        for(let i = 0; i < itemsToAdd; i++) {
-            sequence.push(Math.floor(Math.random() * 4));
-        }
-        
         playSequence();
       
         const sequenceDuration = sequence.length * SEQUENCE_SPEED + 400;
@@ -221,43 +224,49 @@
     
     function handleCorrect() {
         isPlayerTurn = false;
-        score++;
         correctStreak++;
         
-        if (score > best) { best = score; }
-        
+        let delay = 1200;
         if (correctStreak >= 3) {
             level++;
             correctStreak = 0;
             triggerFanfare("Level Up!", 1500);
+            delay = 2000; // Longer pause after leveling up
         }
 
         updateScoreboard();
-        // Reset sequence for next round, it will be populated based on the new level
-        sequence = [];
-        setTimeout(nextRound, 1200);
+        // Change: Call prepareNextRound after a delay
+        setTimeout(prepareNextRound, delay);
     }
     
     function handleIncorrect() {
         isPlayerTurn = false;
         correctStreak = 0;
         
-        // Change: Leveling down is now silent and without a harsh message
         if (level > 1) { level--; }
 
         elements.wrongSound.play();
         elements.message.textContent = RETRY_MESSAGES[Math.floor(Math.random() * RETRY_MESSAGES.length)];
         elements.buttonContainer.classList.add('shake-container');
-        score = 0;
+        
+        // Reset sequence to the new, easier level length
         sequence = [];
+        const startingLength = Math.max(3, 2 + level);
+        for(let i=0; i<startingLength; i++) {
+            sequence.push(Math.floor(Math.random() * 4));
+        }
+
+        score = sequence.length;
         updateScoreboard();
+        
         setTimeout(() => {
             elements.buttonContainer.classList.remove('shake-container');
-            nextRound();
+            nextRound(); // Play the new, shorter sequence
         }, 1500);
     }
     
     function startTimer() {
+        isGameRunning = true;
         timer = setInterval(() => {
             if (isPaused || !isGameRunning) return;
             timeLeft--;
@@ -305,13 +314,25 @@
     
     function updateScoreboard() {
         elements.levelDisplay.textContent = `Level: ${level}`;
-        elements.currentScoreEl.textContent = `Score: ${score}`;
-        elements.bestScoreEl.textContent = `Best: ${best}`;
+        // Score now reflects the length of the current sequence
+        elements.currentScoreEl.textContent = `Length: ${sequence.length || 0}`;
+        elements.bestScoreEl.textContent = `Best: ${best || 0}`;
     }
 
     function updateButtonsState(disabled) {
         elements.buttons.forEach(btn => btn.disabled = disabled);
     }
+    
+    // Change: Initial call to set up the game before starting
+    function init() {
+        // Start the game by calling startGame which will then call prepareNextRound
+        elements.startBtn.addEventListener('click', () => startGame(true));
+    }
+
+    // Replace old start event listener with init
+    elements.startBtn.removeEventListener('click', startGame);
+    init();
+
   </script>
 </body>
 </html>
