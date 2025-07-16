@@ -20,6 +20,7 @@
   .start-content { display: flex; flex-direction: column; align-items: center; gap: 10px; }
   h1 { font-size: clamp(2em, 9vw, 3em); color: var(--primary-color); margin: 0; }
   h2 { font-size: 2.5em; color: var(--primary-color); margin: 0; }
+  h3 { font-size: 1.5em; margin-bottom: 10px; color: var(--primary-color);}
   .welcome-subtitle { font-size: 1.3em; color: var(--text-color); margin-bottom: 0; }
   .instructions-card { background: rgba(255, 255, 255, 0.75); border-radius: 15px; padding: 15px 20px; margin-top: 5px; max-width: 450px; width: 95%; border: 2px solid rgba(255,255,255,0.9); }
   .instruction-item { display: flex; align-items: center; text-align: left; font-size: 1em; line-height: 1.4; }
@@ -32,7 +33,7 @@
   p { font-size: 1.2em; max-width: 550px; line-height: 1.5; margin-top: 10px; margin-bottom: 5px; }
   .game-container { width: 100%; max-width: 500px; }
   .timer-bar-container { width: 100%; height: 20px; background-color: #b0bec5; border-radius: 20px; border: 3px solid var(--white); margin: 0 auto 20px auto; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-  .timer-bar { height: 100%; width: 100%; background-color: var(--success-green); border-radius: 20px; transition: width 1s linear; }
+  .timer-bar { height: 100%; width: 100%; background-color: var(--success-green); border-radius: 20px; transition: width 1s linear, background-color 0.5s ease; }
   .game-board { display: grid; gap: 10px; perspective: 1000px; }
   .card { background-color: transparent; width: 100%; aspect-ratio: 1 / 1; border: none; cursor: pointer; }
   .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
@@ -45,8 +46,8 @@
   @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
   .countdown { font-size: 8rem; color: var(--primary-color); opacity: 0; transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; transform: scale(0.5); }
   .fade-in { opacity: 1 !important; transform: scale(1); }
-  .final-summary { font-size: 1.2em; background: var(--white); border: 3px solid var(--primary-color); border-radius: 15px; padding: 20px 30px; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-  .final-score { font-size: 1.8em; color: var(--accent-color); font-weight: 600; }
+  .final-summary { font-size: 1.2em; background: var(--white); border: 3px solid var(--primary-color); border-radius: 15px; padding: 20px 30px; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: left; }
+  .final-summary p { margin: 8px 0; }
   .help-button { position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px; border-radius: 50%; font-size: 1.8em; font-family: 'Fredoka One', cursive; background-color: var(--primary-color); color: var(--white); border: 3px solid var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; display: flex; justify-content: center; align-items: center; line-height: 1; }
   .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 15px; }
   .overlay-content { background-color: var(--card-back-color); padding: 20px 30px; border-radius: 20px; border: 3px solid var(--primary-color); width: 100%; max-width: 500px; text-align: center; }
@@ -62,7 +63,6 @@
 </head>
 <body>
 
-  <!-- START SCREEN -->
   <div class="screen active" id="startScreen">
     <div class="start-content">
       <h2 class="welcome-subtitle">Welcome to the SMART Challenge!</h2>
@@ -81,39 +81,175 @@
     </div>
   </div>
 
-  <!-- COUNTDOWN --> <div class="screen" id="countdownScreen"> <div class="countdown" id="countdownText">3</div> </div>
-  <!-- GAME --> <div class="screen" id="gameScreen"> <div class="game-container"> <div class="timer-bar-container"> <div class="timer-bar" id="timerBar"></div> </div> <div class="game-board" id="gameBoard"></div> </div> </div>
-  <!-- ROUND COMPLETE --> <div class="screen" id="roundEndScreen"> <h2>Great Job! 🎉</h2> <p id="roundResultText"></p> <button class="play-button" id="nextRoundBtn">Next Round</button> </div>
-  <!-- FINAL SCREEN --> <div class="screen" id="finalScreen"> <div class="final-summary"> <h2>Good Job!</h2> <p id="finalResults"></p> <p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p> </div> </div>
-  <!-- HELP BUTTON AND OVERLAY --> <button id="helpButton" class="help-button hidden">?</button> <div id="helpOverlay" class="overlay hidden"> <div class="overlay-content"> <div id="helpView"> <h2>How to Play</h2> <p>The timer is paused. Match all the face emoji pairs to clear the board!</p> <div class="overlay-buttons"> <button class="play-button secondary-button" id="changeDifficultyBtn">Change Difficulty</button> <button class="play-button" id="closeHelpButton">Close</button> </div> </div> <div id="difficultyChangeView" class="hidden"> <h2>Select New Difficulty</h2> <p>Your current round will be replaced.</p> <div class="difficulty-selector overlay-buttons" id="overlayDifficultySelector"> <button class="difficulty-button" data-difficulty="easy">Easy</button> <button class="difficulty-button" data-difficulty="medium">Medium</button> <button class="difficulty-button" data-difficulty="hard">Hard</button> </div> <button class="play-button secondary-button" id="cancelChangeBtn" style="margin-top: 15px;">Cancel</button> </div> </div> </div>
+  <div class="screen" id="countdownScreen"> <div class="countdown" id="countdownText">3</div> </div>
+  <div class="screen" id="gameScreen"> <div class="game-container"> <div class="timer-bar-container"> <div class="timer-bar" id="timerBar"></div> </div> <div class="game-board" id="gameBoard"></div> </div> </div>
+  <div class="screen" id="roundEndScreen"> <h2>Great Job! 🎉</h2> <p id="roundResultText"></p> <button class="play-button" id="nextRoundBtn">Next Round</button> </div>
+  
+  <div class="screen" id="finalScreen">
+    <div class="final-summary">
+        <h2 style="text-align: center;">Good Job!</h2>
+        <div id="finalResults"></div> <!-- Results will be injected here -->
+        <p style="text-align: center; margin-top: 20px;">Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>
+    </div>
+  </div>
+
+  <button id="helpButton" class="help-button hidden">?</button>
+  <div id="helpOverlay" class="overlay hidden">
+    <div class="overlay-content">
+      <div id="helpView">
+        <h2>How to Play</h2>
+        <p>You get 5 minutes to complete as many rounds as you can. Try and see how quickly you complete a round, we will tell you your personal best at the end</p>
+        <div class="overlay-buttons">
+          <button class="play-button secondary-button" id="changeDifficultyBtn">Change Difficulty</button>
+          <button class="play-button" id="closeHelpButton">Close</button>
+        </div>
+      </div>
+      <div id="difficultyChangeView" class="hidden">
+        <h2>Select New Difficulty</h2>
+        <p>Your current round will be replaced.</p>
+        <div class="difficulty-selector overlay-buttons" id="overlayDifficultySelector">
+          <button class="difficulty-button" data-difficulty="easy">Easy</button>
+          <button class="difficulty-button" data-difficulty="medium">Medium</button>
+          <button class="difficulty-button" data-difficulty="hard">Hard</button>
+        </div>
+        <button class="play-button secondary-button" id="cancelChangeBtn" style="margin-top: 15px;">Cancel</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const allEmojis = ['😀', '😇', '😍', '😎', '🥳', '🥸', '😐', '😢', '🤔', '🤯'];
     const totalGameTime = 300;
     const difficultySettings = { easy: { pairs: 6, columns: 4, rows: 3 }, medium: { pairs: 8, columns: 4, rows: 4 }, hard: { pairs: 10, columns: 5, rows: 4 } };
-    let currentDifficulty = 'medium', totalPairs, cards = [], firstCard = null, timer = null, lockBoard = false, matches = 0, roundNumber = 1, timeRemaining = totalGameTime, roundsCompleted = 0;
+    
+    let currentDifficulty = 'medium';
+    let totalPairs, cards = [], firstCard = null, timer = null;
+    let lockBoard = false, matches = 0, roundNumber = 1, timeRemaining = totalGameTime;
+    let roundStartTime, sessionScores = [], isGracePeriod = false;
+
     const screens = { start: document.getElementById('startScreen'), countdown: document.getElementById('countdownScreen'), game: document.getElementById('gameScreen'), roundEnd: document.getElementById('roundEndScreen'), final: document.getElementById('finalScreen') };
     const board = document.getElementById('gameBoard'), countdownText = document.getElementById('countdownText'), roundResultText = document.getElementById('roundResultText'), finalResults = document.getElementById('finalResults'), timerBar = document.getElementById('timerBar'), helpButton = document.getElementById('helpButton'), helpOverlay = document.getElementById('helpOverlay'), closeHelpButton = document.getElementById('closeHelpButton'), nextRoundBtn = document.getElementById('nextRoundBtn'), startDifficultySelector = document.getElementById('startDifficultySelector'), helpView = document.getElementById('helpView'), difficultyChangeView = document.getElementById('difficultyChangeView'), changeDifficultyBtn = document.getElementById('changeDifficultyBtn'), overlayDifficultySelector = document.getElementById('overlayDifficultySelector'), cancelChangeBtn = document.getElementById('cancelChangeBtn');
+
     startDifficultySelector.addEventListener('click', (e) => { if (e.target.classList.contains('difficulty-button')) { currentDifficulty = e.target.dataset.difficulty; startCountdown(); } });
     overlayDifficultySelector.addEventListener('click', (e) => { if (e.target.classList.contains('difficulty-button')) { selectNewDifficulty(e.target.dataset.difficulty); } });
     changeDifficultyBtn.addEventListener('click', () => { helpView.classList.add('hidden'); difficultyChangeView.classList.remove('hidden'); });
     cancelChangeBtn.addEventListener('click', () => { difficultyChangeView.classList.add('hidden'); helpView.classList.remove('hidden'); });
-    nextRoundBtn.addEventListener('click', startNextRound); helpButton.addEventListener('click', pauseGame); closeHelpButton.addEventListener('click', resumeGame);
+    nextRoundBtn.addEventListener('click', startNextRound);
+    helpButton.addEventListener('click', pauseGame);
+    closeHelpButton.addEventListener('click', resumeGame);
+
     function switchScreen(from, to) { from.classList.remove('active'); to.classList.add('active'); }
     function shuffle(array) { let newArray = [...array]; for (let i = newArray.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [newArray[i], newArray[j]] = [newArray[j], newArray[i]]; } return newArray; }
-    function startCountdown() { switchScreen(screens.start, screens.countdown); timeRemaining = totalGameTime; roundsCompleted = 0; roundNumber = 1; let count = 3; countdownText.textContent = count; countdownText.classList.add('fade-in'); const interval = setInterval(() => { countdownText.classList.remove('fade-in'); setTimeout(() => { count--; if (count <= 0) { countdownText.textContent = "GO!"; countdownText.classList.add('fade-in'); clearInterval(interval); setTimeout(() => { switchScreen(screens.countdown, screens.game); helpButton.classList.remove('hidden'); startGameTimer(); initGame(); }, 1000); } else { countdownText.textContent = count; countdownText.classList.add('fade-in'); } }, 500); }, 1000); }
-    function startGameTimer() { if (timer) clearInterval(timer); updateTimerDisplay(); timer = setInterval(() => { timeRemaining--; updateTimerDisplay(); if (timeRemaining <= 0) { clearInterval(timer); endGame(); } }, 1000); }
+
+    function startCountdown() {
+      switchScreen(screens.start, screens.countdown);
+      timeRemaining = totalGameTime;
+      sessionScores = [];
+      isGracePeriod = false;
+      roundNumber = 1;
+      let count = 3;
+      countdownText.textContent = count;
+      countdownText.classList.add('fade-in');
+      const interval = setInterval(() => {
+        countdownText.classList.remove('fade-in');
+        setTimeout(() => {
+          count--;
+          if (count <= 0) {
+            countdownText.textContent = "GO!";
+            countdownText.classList.add('fade-in');
+            clearInterval(interval);
+            setTimeout(() => {
+              switchScreen(screens.countdown, screens.game);
+              helpButton.classList.remove('hidden');
+              startGameTimer();
+              initGame();
+            }, 1000);
+          } else {
+            countdownText.textContent = count;
+            countdownText.classList.add('fade-in');
+          }
+        }, 500);
+      }, 1000);
+    }
+
+    function startGameTimer() {
+        if (timer) clearInterval(timer);
+        timerBar.style.backgroundColor = 'var(--success-green)';
+        updateTimerDisplay();
+        timer = setInterval(() => {
+            timeRemaining--;
+            updateTimerDisplay();
+            if (timeRemaining <= 0) {
+                clearInterval(timer);
+                isGracePeriod = true;
+                timerBar.style.backgroundColor = 'var(--primary-color)'; // Visual cue for grace period
+            }
+        }, 1000);
+    }
+
     function pauseGame() { clearInterval(timer); helpView.classList.remove('hidden'); difficultyChangeView.classList.add('hidden'); helpOverlay.classList.remove('hidden'); }
-    function resumeGame() { helpOverlay.classList.add('hidden'); startGameTimer(); }
-    function selectNewDifficulty(newDiff) { currentDifficulty = newDiff; helpOverlay.classList.add('hidden'); startNextRound(); startGameTimer(); }
-    function updateTimerDisplay() { const percentage = (timeRemaining / totalGameTime) * 100; timerBar.style.width = `${percentage}%`; }
-    function initGame() { const settings = difficultySettings[currentDifficulty]; totalPairs = settings.pairs; board.style.gridTemplateColumns = `repeat(${settings.columns}, 1fr)`; board.style.gridTemplateRows = `repeat(${settings.rows}, 1fr)`; const emojisForRound = shuffle(allEmojis).slice(0, totalPairs); let cardEmojis = shuffle([...emojisForRound, ...emojisForRound]); board.innerHTML = ''; matches = 0; firstCard = null; lockBoard = false; cardEmojis.forEach(emoji => { const cardElement = document.createElement('div'); cardElement.classList.add('card'); cardElement.dataset.emoji = emoji; cardElement.innerHTML = `<div class="card-inner"><div class="card-front"></div><div class="card-back">${emoji}</div></div>`; cardElement.addEventListener('click', flipCard); board.appendChild(cardElement); }); }
+    function resumeGame() { helpOverlay.classList.add('hidden'); if (!isGracePeriod) startGameTimer(); }
+    function selectNewDifficulty(newDiff) { currentDifficulty = newDiff; helpOverlay.classList.add('hidden'); startNextRound(); if (!isGracePeriod) startGameTimer(); }
+    function updateTimerDisplay() { const percentage = (timeRemaining / totalGameTime) * 100; timerBar.style.width = `${percentage > 0 ? percentage : 0}%`; }
+
+    function initGame() {
+      roundStartTime = Date.now();
+      const settings = difficultySettings[currentDifficulty];
+      totalPairs = settings.pairs;
+      board.style.gridTemplateColumns = `repeat(${settings.columns}, 1fr)`;
+      board.style.gridTemplateRows = `repeat(${settings.rows}, 1fr)`;
+      const emojisForRound = shuffle(allEmojis).slice(0, totalPairs);
+      let cardEmojis = shuffle([...emojisForRound, ...emojisForRound]);
+      board.innerHTML = '';
+      matches = 0;
+      firstCard = null;
+      lockBoard = false;
+      cardEmojis.forEach(emoji => { const cardElement = document.createElement('div'); cardElement.classList.add('card'); cardElement.dataset.emoji = emoji; cardElement.innerHTML = `<div class="card-inner"><div class="card-front"></div><div class="card-back">${emoji}</div></div>`; cardElement.addEventListener('click', flipCard); board.appendChild(cardElement); });
+    }
+
     function flipCard() { if (lockBoard || this.classList.contains('flipped') || this === firstCard) return; this.classList.add('flipped'); if (!firstCard) { firstCard = this; return; } const secondCard = this; lockBoard = true; checkForMatch(firstCard, secondCard); }
     function checkForMatch(card1, card2) { const isMatch = card1.dataset.emoji === card2.dataset.emoji; isMatch ? handleMatch(card1, card2) : handleMismatch(card1, card2); }
-    function handleMatch(card1, card2) { card1.removeEventListener('click', flipCard); card2.removeEventListener('click', flipCard); matches++; setTimeout(() => { firstCard = null; lockBoard = false; if (matches === totalPairs) { roundsCompleted++; setTimeout(() => { roundResultText.textContent = `You finished round ${roundNumber}!`; switchScreen(screens.game, screens.roundEnd); }, 500); } }, 400); }
+    
+    function handleMatch(card1, card2) {
+        card1.removeEventListener('click', flipCard);
+        card2.removeEventListener('click', flipCard);
+        matches++;
+        setTimeout(() => {
+            firstCard = null;
+            lockBoard = false;
+            if (matches === totalPairs) {
+                const timeTaken = (Date.now() - roundStartTime) / 1000;
+                sessionScores.push({ round: roundNumber, time: parseFloat(timeTaken.toFixed(1)) });
+                roundResultText.textContent = `You finished round ${roundNumber} in ${timeTaken.toFixed(1)} seconds!`;
+                
+                if (isGracePeriod) {
+                    setTimeout(endGame, 500);
+                } else {
+                    setTimeout(() => { switchScreen(screens.game, screens.roundEnd); }, 500);
+                }
+            }
+        }, 400);
+    }
+    
     function handleMismatch(card1, card2) { card1.classList.add('shake'); card2.classList.add('shake'); setTimeout(() => { card1.classList.remove('flipped', 'shake'); card2.classList.remove('flipped', 'shake'); firstCard = null; lockBoard = false; }, 1000); }
     function startNextRound() { roundNumber++; switchScreen(screens.roundEnd, screens.game); initGame(); }
-    function endGame() { helpButton.classList.add('hidden'); finalResults.innerHTML = `<span class="final-score">${roundsCompleted} Rounds Completed!</span>`; switchScreen(screens.game, screens.final); window.parent.postMessage("showNext", "*"); }
+    
+    function endGame() {
+      helpButton.classList.add('hidden');
+      if (sessionScores.length === 0) {
+        finalResults.innerHTML = `<p style="text-align: center;">Time's up! Try to complete a round next time to see your score.</p>`;
+      } else {
+        const bestTime = Math.min(...sessionScores.map(score => score.time));
+        let resultsHtml = '<h3>Your Times:</h3>';
+        sessionScores.forEach(score => {
+          const isBest = score.time === bestTime;
+          resultsHtml += `<p>Round ${score.round}: ${score.time.toFixed(1)}s ${isBest ? '⭐' : ''}</p>`;
+        });
+        finalResults.innerHTML = resultsHtml;
+      }
+      switchScreen(screens.game, screens.final);
+      window.parent.postMessage("showNext", "*");
+    }
   </script>
 </body>
 </html>
