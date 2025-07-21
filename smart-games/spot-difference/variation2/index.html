@@ -95,6 +95,7 @@
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(62, 39, 35, 0.7); z-index: 1000; display: flex;
+            flex-direction: column;
             justify-content: center; align-items: center; padding: 15px;
             transition: opacity 0.3s ease;
         }
@@ -106,12 +107,18 @@
             font-size: 8rem; font-weight: bold; color: #33691E;
             background-color: rgba(241, 248, 233, 0.95);
         }
+        #countdownOverlay span {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 20px;
+        }
         #round-fanfare {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background-color: rgba(51, 105, 30, 0.9); color: white; padding: 20px 40px;
             border-radius: 20px; font-size: 3em; z-index: 9999;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3); pointer-events: none; opacity: 0;
         }
+        #round-fanfare.long-text { font-size: 2.2em; }
         .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
         @keyframes fanfare-anim {
             0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
@@ -124,7 +131,6 @@
         #star-summary { font-size: 1.8em; color: #BF360C; margin: 20px 0; font-weight: bold; }
         #final-prompt { color: #33691E; font-weight: bold; }
         
-        /* FIX: Media query for small screens to prevent scrolling on instruction page */
         @media (max-height: 700px) and (max-width: 400px) {
             h1 { font-size: 2.2rem; margin-top: 5px; margin-bottom: 5px; }
             .welcome-title { font-size: 1.1em; margin-bottom: 10px; }
@@ -216,7 +222,6 @@
     let totalStars = 0;
     let isPaused = false;
     let isMemorizing = false;
-
     let fanfareTimeout, introTimeout, memorizationTimeout;
 
     const cover = document.getElementById('cover');
@@ -247,16 +252,34 @@
         countdownOverlay.classList.remove('hidden');
         const steps = ["3", "2", "1", "GO!"];
         let i = 0;
-        countdownText.textContent = steps[i];
+        countdownText.innerHTML = steps[i];
         const interval = setInterval(() => {
             i++;
-            if (i < steps.length) { countdownText.textContent = steps[i]; } 
+            if (i < steps.length) { countdownText.innerHTML = steps[i]; } 
             else { clearInterval(interval); countdownOverlay.classList.add('hidden'); callback(); }
         }, 800);
     }
     
-    function triggerFanfare(text, callback) {
+    function showMemorizeCountdown(callback) {
+      countdownOverlay.classList.remove('hidden');
+      const steps = ["<span>Get ready to memorise...</span>", "3", "2", "1", "GO!"];
+      let i = 0;
+      countdownText.innerHTML = steps[i];
+      const interval = setInterval(() => {
+        i++;
+        if (i < steps.length) {
+          countdownText.innerHTML = steps[i];
+        } else {
+          clearInterval(interval);
+          countdownOverlay.classList.add('hidden');
+          callback();
+        }
+      }, i === 0 ? 1500 : 800);
+    }
+
+    function triggerFanfare(text, callback, isLong = false) {
         roundFanfare.textContent = text;
+        roundFanfare.classList.toggle('long-text', isLong);
         roundFanfare.classList.remove('fanfare-animate');
         void roundFanfare.offsetWidth;
         roundFanfare.classList.add('fanfare-animate');
@@ -265,7 +288,6 @@
 
     function startRound() {
         if (isPaused) return;
-        const round = rounds[currentRound];
         foundDifferences.clear();
         incorrectPressesThisRound = 0;
         gridElement.classList.add('hidden');
@@ -276,17 +298,14 @@
             if (isPaused) return;
             gameInfoElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`; 
             
-            const diffText = round.differences === 1 ? 'There is 1 new animal.' : `There are ${round.differences} new animals.`;
-            messageElement.innerHTML = `Get ready to memorise...<br>${diffText}`;
-            
-            introTimeout = setTimeout(() => {
+            showMemorizeCountdown(() => {
                 if (isPaused) return;
-                if (emojiIndex + round.gridSize > animalEmojis.length) { emojiIndex = 0; }
-                originalGrid = animalEmojis.slice(emojiIndex, emojiIndex + round.gridSize);
-                emojiIndex += round.gridSize;
-                renderGrid(originalGrid, round.columns, round.cellSize, false);
-                startMemorizationPhase(round);
-            }, 2500);
+                if (emojiIndex + rounds[currentRound].gridSize > animalEmojis.length) { emojiIndex = 0; }
+                originalGrid = animalEmojis.slice(emojiIndex, emojiIndex + rounds[currentRound].gridSize);
+                emojiIndex += rounds[currentRound].gridSize;
+                renderGrid(originalGrid, rounds[currentRound].columns, rounds[currentRound].cellSize, false);
+                startMemorizationPhase(rounds[currentRound]);
+            });
         });
     }
 
@@ -311,17 +330,19 @@
     function startGuessingPhase() {
         isMemorizing = false;
         timerBarContainer.classList.add('hidden');
-        const result = modifyGrid(originalGrid, rounds[currentRound].differences);
-        modifiedGrid = result.newGrid;
-        changedIndices = result.changedIndices;
-        gridElement.style.opacity = '0';
-        messageElement.textContent = 'Now, find the new animals!';
-        setTimeout(() => {
+        gridElement.classList.add('hidden');
+
+        triggerFanfare("Now find the new animals!", () => {
             if (isPaused) return;
+            const result = modifyGrid(originalGrid, rounds[currentRound].differences);
+            modifiedGrid = result.newGrid;
+            changedIndices = result.changedIndices;
+            messageElement.textContent = 'Now, find the new animals!';
             renderGrid(modifiedGrid, rounds[currentRound].columns, rounds[currentRound].cellSize, true);
-            gridElement.style.transition = 'opacity 0.5s ease-in-out';
-            gridElement.style.opacity = '1';
-        }, 500);
+            gridElement.style.opacity = '0';
+            gridElement.classList.remove('hidden');
+            setTimeout(() => { gridElement.style.opacity = '1'; }, 100);
+        }, true);
     }
 
     function renderGrid(gridData, columns, cellSize, clickable) {
@@ -339,23 +360,24 @@
             gridElement.appendChild(cell);
         });
     }
-
+    
     function modifyGrid(grid, count) {
         const newGrid = [...grid];
-        const indices = [];
-        let attempts = 0;
-        while (indices.length < count && attempts < 1000) {
-            const i = Math.floor(Math.random() * grid.length);
-            if (!indices.includes(i)) {
-                let newEmoji;
-                do { newEmoji = animalEmojis[Math.floor(Math.random() * animalEmojis.length)]; } 
-                while (grid.includes(newEmoji));
-                newGrid[i] = newEmoji;
-                indices.push(i);
-            }
-            attempts++;
+        const gridEmojiSet = new Set(grid);
+        const availableForSwap = animalEmojis.filter(emoji => !gridEmojiSet.has(emoji));
+        shuffleArray(availableForSwap);
+        const indicesToChange = [];
+        const allPossibleIndices = Array.from(Array(grid.length).keys());
+        shuffleArray(allPossibleIndices);
+        for(let i = 0; i < count; i++) {
+            indicesToChange.push(allPossibleIndices[i]);
         }
-        return { newGrid, changedIndices: indices.sort((a,b) => a-b) };
+        for(let i = 0; i < count; i++) {
+            const gridIndex = indicesToChange[i];
+            const newEmoji = availableForSwap.pop();
+            newGrid[gridIndex] = newEmoji;
+        }
+        return { newGrid, changedIndices: indicesToChange.sort((a,b) => a-b) };
     }
 
     function handlePress(index, cell) {
@@ -416,7 +438,6 @@
         window.parent.postMessage("showNext", "*");
     }
     
-    // FIX: Updated pause/resume logic
     function toggleHelp(show) {
         isPaused = show;
         helpOverlay.classList.toggle('hidden', !show);
