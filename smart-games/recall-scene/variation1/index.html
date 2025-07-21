@@ -9,56 +9,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-    body {
-      background-color: #f3e8ff;
-      font-family: 'Fredoka One', cursive;
-      color: #3d3d3d;
-      text-align: center;
-      margin: 0;
-      padding: 10px 5px;
-    }
+    body { background-color: #f3e8ff; font-family: 'Fredoka One', cursive; color: #3d3d3d; text-align: center; margin: 0; padding: 10px 5px; }
     .hidden { display: none !important; }
     .fadeable { transition: opacity 0.4s ease-in-out; }
     .is-faded-out { opacity: 0; pointer-events: none; }
     #instructions-container { padding: 20px; max-width: 550px; margin: 20px auto; }
     h1 { margin-top: 15px; font-size: 3em; color: #4b0082; text-shadow: 3px 3px 0px #ff7f50; }
-    h2.welcome-title {
-        display: inline-block;
-        font-size: 1.3em;
-        font-weight: 700;
-        color: #4b0082;
-        background-color: #e6e6fa;
-        padding: 8px 20px;
-        border-radius: 30px;
-        border: 2px solid #d8bfd8;
-        margin-bottom: 0;
-    }
+    h2.welcome-title { display: inline-block; font-size: 1.3em; font-weight: 700; color: #4b0082; background-color: #e6e6fa; padding: 8px 20px; border-radius: 30px; border: 2px solid #d8bfd8; margin-bottom: 0; }
     ul.instructions-list { list-style-type: none; padding: 0; margin: 20px auto; display: inline-block; text-align: left; }
     ul.instructions-list li { font-size: 1.2em; margin-bottom: 10px; }
     .game-area { margin: 10px auto; width: 95%; max-width: 500px; position: relative; }
     .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #4b0082; margin: 10px auto 15px auto; overflow: hidden; }
     .timer-bar { height: 100%; width: 100%; background-color: #32cd32; border-radius: 8px 0 0 8px; transition: width 1s linear; }
-    .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; min-height: 25px; } /* Add min-height to prevent layout shifts */
-    .scene {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
-      gap: 5px;
-      align-items: center;
-    }
-    .item {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 12px;
-      background-color: white;
-      border: 2px solid #d8bfd8;
-      box-shadow: 0 4px 0 #b39db3;
-      font-size: clamp(20px, 8vw, 32px);
-      cursor: pointer;
-      transition: all 0.1s ease-out;
-    }
+    .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; min-height: 25px; }
+    .scene { display: grid; grid-template-columns: repeat(auto-fit, minmax(65px, 1fr)); gap: 5px; align-items: center; }
+    .item { width: 100%; aspect-ratio: 1 / 1; display: flex; justify-content: center; align-items: center; border-radius: 12px; background-color: white; border: 2px solid #d8bfd8; box-shadow: 0 4px 0 #b39db3; font-size: clamp(20px, 8vw, 32px); cursor: pointer; transition: all 0.1s ease-out; }
     .item:hover { transform: scale(1.05); }
     .item:active { transform: translateY(2px); box-shadow: 0 2px 0 #b39db3; }
     .item.correct { border-color: #32cd32; background-color: #d4edda; pointer-events: none; transform: translateY(2px); box-shadow: 0 2px 0 #28a745; }
@@ -104,21 +69,19 @@
       </div>
       <div id="roundCounter">Round 1</div>
       <div class="game-area">
-        <div id="viewing-phase" class="fadeable is-faded-out">
-            <!-- --- FINAL FIX: Message content is now removed --- -->
+        <div id="viewing-phase" class="hidden">
             <div class="message" id="viewing-phase-message"></div>
             <div id="scene" class="scene"></div>
             <button id="readyBtn">I've Memorised It!</button>
         </div>
-        <div id="answering-phase" class="fadeable is-faded-out">
-            <!-- --- FINAL FIX: Message content is now removed --- -->
+        <div id="answering-phase" class="hidden">
             <div class="message" id="answering-phase-message"></div>
             <div id="choices" class="scene"></div>
         </div>
       </div>
   </div>
   
-  <div id="results-overlay" class="overlay fadeable is-faded-out">
+  <div id="results-overlay" class="overlay hidden">
     <div id="result" class="overlay-content">
         <div id="result-content"></div>
         <button id="nextBtn" class="hidden" disabled>Next Round in 3</button>
@@ -129,7 +92,7 @@
   <div id="finalSummary" class="hidden"></div>
   <button id="helpBtn" class="help-button hidden">?</button>
 
-  <div id="help-overlay" class="overlay fadeable is-faded-out">
+  <div id="help-overlay" class="overlay hidden">
       <div class="overlay-content">
           <h2 class="welcome-title">How to Play</h2>
           <ul class="instructions-list">
@@ -142,7 +105,7 @@
       </div>
   </div>
   
-  <div id="pre-round-overlay" class="overlay fadeable is-faded-out">
+  <div id="pre-round-overlay" class="overlay hidden">
     <h2 id="pre-round-text"></h2>
   </div>
 
@@ -168,7 +131,6 @@
         startBtn: document.getElementById('startBtn'), nextBtn: document.getElementById('nextBtn'),
         scene: document.getElementById('scene'), choices: document.getElementById('choices'),
         result: document.getElementById('result'), resultContent: document.getElementById('result-content'),
-        // viewingCountdown is now created dynamically
         viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
         roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
         resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn'),
@@ -177,7 +139,6 @@
         closeHelpBtn: document.getElementById('closeHelpBtn'),
         preRoundOverlay: document.getElementById('pre-round-overlay'),
         preRoundText: document.getElementById('pre-round-text'),
-        // --- FINAL FIX: Added message containers ---
         viewingPhaseMessage: document.getElementById('viewing-phase-message'),
         answeringPhaseMessage: document.getElementById('answering-phase-message'),
     };
@@ -198,15 +159,13 @@
         if (isGameOver) return;
         isPaused = true;
         clearInterval(mainGameTimer);
-        allElements.helpOverlay.classList.remove('is-faded-out');
-        allElements.helpBtn.disabled = true;
+        allElements.helpOverlay.classList.remove('hidden');
     }
 
     function resumeGame() {
         if (isGameOver || !isPaused) return;
         isPaused = false;
-        allElements.helpOverlay.classList.add('is-faded-out');
-        allElements.helpBtn.disabled = false;
+        allElements.helpOverlay.classList.add('hidden');
         
         mainGameTimer = setInterval(() => {
             if (isPaused) return; 
@@ -236,8 +195,8 @@
     
     function triggerFanfare() {
         allElements.roundFanfare.textContent = `Round ${round}!`;
-        allElements.roundFanfare.classList.remove('hidden', 'fanfare-animate');
-        setTimeout(() => allElements.roundFanfare.classList.add('fanfare-animate'), 10);
+        allElements.roundFanfare.classList.remove('hidden');
+        allElements.roundFanfare.classList.add('fanfare-animate');
         setTimeout(() => allElements.roundFanfare.classList.add('hidden'), 1500);
     }
 
@@ -247,11 +206,11 @@
         const updateText = (text) => {
             textEl.textContent = text;
             textEl.style.animation = 'none';
-            textEl.offsetHeight;
+            textEl.offsetHeight; // Trigger reflow
             textEl.style.animation = '';
         };
 
-        allElements.preRoundOverlay.classList.remove('is-faded-out');
+        allElements.preRoundOverlay.classList.remove('hidden');
         
         let delay = 100;
         setTimeout(() => updateText("Get Ready..."), delay);
@@ -267,21 +226,18 @@
         delay += 1000;
         
         setTimeout(() => {
-            allElements.preRoundOverlay.classList.add('is-faded-out');
+            allElements.preRoundOverlay.classList.add('hidden');
         }, delay);
         
         setTimeout(() => {
             if (isGameOver) return;
             buildScene();
             
-            // --- FINAL FIX: Dynamically create the message right before showing it ---
+            // Re-create the instruction message
             allElements.viewingPhaseMessage.innerHTML = `Memorise these items! (<span id="viewingCountdown">${VIEWING_TIME}</span>s)`;
             const viewingCountdownSpan = document.getElementById('viewingCountdown');
             
             allElements.viewingPhase.classList.remove('hidden');
-            setTimeout(() => {
-                allElements.viewingPhase.classList.remove('is-faded-out');
-            }, 20);
 
             allElements.readyBtn.disabled = true;
             setTimeout(() => { allElements.readyBtn.disabled = false; }, 10000);
@@ -293,7 +249,7 @@
                 viewingCountdownSpan.textContent = timeLeft;
                 if (timeLeft <= 0) { showAnsweringPhase(); }
             }, 1000);
-        }, delay + 400);
+        }, delay + 100);
     }
 
 
@@ -302,11 +258,18 @@
       round++;
       allElements.roundCounter.textContent = `Round ${round}`;
       
+      // --- FINAL FIX: Clean up everything from the previous round instantly. ---
+      allElements.preRoundText.innerHTML = ''; 
+      allElements.viewingPhaseMessage.innerHTML = '';
+      allElements.answeringPhaseMessage.innerHTML = '';
+      allElements.scene.innerHTML = '';
+      allElements.choices.innerHTML = '';
+
       clearInterval(viewTimer);
-      allElements.resultsOverlay.classList.add('is-faded-out');
+      allElements.resultsOverlay.classList.add('hidden');
       allElements.nextBtn.classList.add('hidden');
-      allElements.answeringPhase.classList.add('hidden', 'is-faded-out');
-      allElements.viewingPhase.classList.add('hidden', 'is-faded-out');
+      allElements.answeringPhase.classList.add('hidden');
+      allElements.viewingPhase.classList.add('hidden');
       
       triggerFanfare();
       
@@ -321,7 +284,6 @@
       const shuffled = [...allItems].sort(() => 0.5 - Math.random());
       recallObjects = shuffled.slice(0, itemsToMemorise);
       
-      allElements.scene.innerHTML = '';
       recallObjects.forEach(item => {
         const div = document.createElement('div');
         div.className = 'item';
@@ -333,12 +295,10 @@
     function showAnsweringPhase() {
         if (isGameOver) return;
         clearInterval(viewTimer);
-        allElements.viewingPhase.classList.add('is-faded-out');
+        allElements.viewingPhase.classList.add('hidden');
         
-        // --- FINAL FIX: Dynamically create the answering message ---
+        // Re-create the instruction message
         allElements.answeringPhaseMessage.innerHTML = 'Which one was in the scene?';
-        
-        allElements.answeringPhase.classList.add('is-faded-out');
         allElements.answeringPhase.classList.remove('hidden');
 
         correctChoice = recallObjects[Math.floor(Math.random() * recallObjects.length)];
@@ -357,17 +317,11 @@
             div.addEventListener('click', () => handleChoice(div, item === correctChoice));
             allElements.choices.appendChild(div);
         });
-
-        setTimeout(() => {
-            allElements.answeringPhase.classList.remove('is-faded-out');
-        }, 20);
     }
     
     function handleChoice(element, isCorrect) {
         if (isGameOver) return;
-        
         element.classList.add(isCorrect ? 'correct' : 'incorrect');
-        
         const choiceElements = allElements.choices.children;
         for(const el of choiceElements) {
             if (el.classList.contains('item')) {
@@ -377,7 +331,6 @@
                 }
             }
         }
-        
         endRound(isCorrect);
     }
 
@@ -399,20 +352,16 @@
             }
         } else {
             correctStreak = 0;
-            if (currentLevel > 1) {
-                currentLevel--;
-            }
+            if (currentLevel > 1) { currentLevel--; }
             feedbackHTML = `<h2>Almost! Let's try another one.</h2>`;
         }
         
         allElements.resultContent.innerHTML = feedbackHTML;
         allElements.result.classList.remove('celebrate');
-        if (wasCorrect) {
-            setTimeout(() => allElements.result.classList.add('celebrate'), 10);
-        }
+        if (wasCorrect) { setTimeout(() => allElements.result.classList.add('celebrate'), 10); }
         
-        allElements.answeringPhase.classList.add('is-faded-out');
-        allElements.resultsOverlay.classList.remove('is-faded-out');
+        allElements.answeringPhase.classList.add('hidden');
+        allElements.resultsOverlay.classList.remove('hidden');
         allElements.nextBtn.classList.remove('hidden');
         
         let countdown = 3;
@@ -437,7 +386,7 @@
       resetAllTimers();
       
       allElements.game.classList.add('hidden');
-      allElements.resultsOverlay.classList.add('is-faded-out');
+      allElements.resultsOverlay.classList.add('hidden');
       allElements.finalSummary.classList.remove('hidden');
       allElements.helpBtn.classList.add('hidden');
       
