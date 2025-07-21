@@ -49,7 +49,6 @@
   </style>
 </head>
 <body>
-
   <div id="instructions-container">
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
     <h1>Memory Mix-Up</h1>
@@ -61,7 +60,6 @@
     </ul>
     <button id="startBtn">Let's Play!</button>
   </div>
-
   <div id="game-container" class="hidden">
       <div id="main-timer-bar-container" class="timer-bar-container">
           <div id="main-timer-bar" class="timer-bar"></div>
@@ -80,14 +78,12 @@
         </div>
       </div>
   </div>
-  
   <div id="results-overlay" class="overlay hidden">
     <div id="result" class="overlay-content">
         <div id="result-content"></div>
         <button id="nextBtn" class="hidden" disabled>Next Round in 3</button>
     </div>
   </div>
-  
   <div id="round-fanfare" class="hidden"></div>
   <div id="finalSummary" class="hidden"></div>
   <button id="helpBtn" class="help-button hidden">?</button>
@@ -106,7 +102,6 @@
   <div id="pre-round-overlay" class="overlay hidden">
     <h2 id="pre-round-text"></h2>
   </div>
-
   <script>
     const allItems = ['🍎','🐶','🧸','🎈','📚','🚲','🎮','🧃','🎩','🖍️','🧼','🎵', '⭐', '🚗', '🏠', '🌳'];
     let recallObjects = [], roundScores = [];
@@ -119,7 +114,6 @@
     const VIEWING_TIME = 30;
     const ANSWERING_TIME = 60;
     const TOTAL_GAME_TIME = 300;
-
     const allElements = {
         instructions: document.getElementById('instructions-container'), game: document.getElementById('game-container'),
         roundCounter: document.getElementById('roundCounter'), finalSummary: document.getElementById('finalSummary'),
@@ -135,13 +129,11 @@
         preRoundOverlay: document.getElementById('pre-round-overlay'), preRoundText: document.getElementById('pre-round-text'),
         viewingPhaseMessage: document.getElementById('viewing-phase-message'), answeringPhaseMessage: document.getElementById('answering-phase-message'),
     };
-
     allElements.startBtn.addEventListener('click', startGame);
     allElements.nextBtn.addEventListener('click', nextRound);
     allElements.readyBtn.addEventListener('click', showAnsweringPhase);
     allElements.helpBtn.addEventListener('click', pauseGame);
     allElements.closeHelpBtn.addEventListener('click', resumeGame);
-
     function resetAllTimers() {
       clearInterval(viewTimer); clearInterval(answerTimer); clearInterval(mainGameTimer); clearInterval(nextBtnTimer);
     }
@@ -183,7 +175,6 @@
         allElements.roundFanfare.classList.add('fanfare-animate');
         setTimeout(() => allElements.roundFanfare.classList.add('hidden'), 1500);
     }
-    
     function startPreRoundSequence() {
         const textEl = allElements.preRoundText;
         const updateText = (text) => {
@@ -201,7 +192,6 @@
         setTimeout(() => updateText("1"), delay);
         delay += 1000;
         setTimeout(() => { allElements.preRoundOverlay.classList.add('hidden'); }, delay);
-        
         setTimeout(() => {
             if (isGameOver) return;
             buildScene();
@@ -219,7 +209,6 @@
             }, 1000);
         }, delay + 100);
     }
-    
     function nextRound() {
       if (isGameOver) return;
       round++;
@@ -230,7 +219,10 @@
       allElements.tallyCounter.innerHTML = '';
       allElements.scene.innerHTML = '';
       allElements.choices.innerHTML = '';
-      resetAllTimers();
+      // --- BUG FIX: Only clear round-specific timers. Do NOT clear mainGameTimer. ---
+      clearInterval(viewTimer);
+      clearInterval(answerTimer);
+      clearInterval(nextBtnTimer);
       allElements.resultsOverlay.classList.add('hidden');
       allElements.nextBtn.classList.add('hidden');
       allElements.answeringPhase.classList.add('hidden');
@@ -241,7 +233,6 @@
         startPreRoundSequence();
       }, 1500);
     }
-    
     function buildScene() {
       const shuffled = [...allItems].sort(() => 0.5 - Math.random());
       recallObjects = shuffled.slice(0, 4);
@@ -253,7 +244,6 @@
         allElements.scene.appendChild(div);
       });
     }
-
     function showAnsweringPhase() {
         if (isGameOver) return;
         clearInterval(viewTimer);
@@ -265,11 +255,9 @@
         correctFound = 0;
         totalClicks = 0;
         allElements.tallyCounter.textContent = `Found: 0 / 4`;
-
         const distractors = allItems.filter(item => !recallObjects.includes(item));
         const shuffledDistractors = [...distractors].sort(() => 0.5 - Math.random()).slice(0, 4);
         const choices = [...recallObjects, ...shuffledDistractors].sort(() => 0.5 - Math.random());
-        
         allElements.choices.innerHTML = '';
         choices.forEach(item => {
             const div = document.createElement('div');
@@ -278,7 +266,6 @@
             div.addEventListener('click', () => handleChoice(div, item));
             allElements.choices.appendChild(div);
         });
-
         let timeLeft = ANSWERING_TIME;
         answerTimer = setInterval(() => {
             if(isGameOver || isPaused) { return; }
@@ -287,7 +274,6 @@
             if (timeLeft <= 0) { endRound(); }
         }, 1000);
     }
-    
     function handleChoice(element, item) {
         if (isPaused || element.classList.contains('correct')) return;
         totalClicks++;
@@ -301,7 +287,6 @@
         }
         if (correctFound === 4) { endRound(); }
     }
-
     function endRound() {
         if (isGameOver) return;
         clearInterval(answerTimer);
@@ -342,7 +327,6 @@
             }
         }, 1000);
     }
-    
     function showFinalSummary() {
       if (isGameOver) return;
       isGameOver = true;
