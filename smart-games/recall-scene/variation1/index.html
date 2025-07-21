@@ -123,7 +123,6 @@
     @keyframes fanfare-anim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
 
-    /* --- CHANGE: CSS for new pre-round overlay --- */
     #pre-round-text {
         color: white;
         font-size: 4em;
@@ -136,7 +135,6 @@
         from { transform: scale(0.7); opacity: 0; }
         to { transform: scale(1); opacity: 1; }
     }
-
   </style>
 </head>
 <body>
@@ -195,7 +193,6 @@
       </div>
   </div>
   
-  <!-- --- CHANGE: New pre-round overlay --- -->
   <div id="pre-round-overlay" class="overlay fadeable is-faded-out">
     <h2 id="pre-round-text"></h2>
   </div>
@@ -229,7 +226,6 @@
         helpBtn: document.getElementById('helpBtn'),
         helpOverlay: document.getElementById('help-overlay'),
         closeHelpBtn: document.getElementById('closeHelpBtn'),
-        // --- CHANGE: Added pre-round elements ---
         preRoundOverlay: document.getElementById('pre-round-overlay'),
         preRoundText: document.getElementById('pre-round-text'),
     };
@@ -293,7 +289,6 @@
         setTimeout(() => allElements.roundFanfare.classList.add('hidden'), 1500);
     }
 
-    // --- CHANGE: New function for the pre-round sequence ---
     function startPreRoundSequence() {
         const textEl = allElements.preRoundText;
 
@@ -322,12 +317,10 @@
         setTimeout(() => updateText("Memorise these items!"), delay);
         delay += 1500;
 
-        // Hide the pre-round overlay
         setTimeout(() => {
             allElements.preRoundOverlay.classList.add('is-faded-out');
         }, delay);
         
-        // Show the game content after the overlay has faded
         setTimeout(() => {
             if (isGameOver) return;
             buildScene();
@@ -344,7 +337,7 @@
                 allElements.viewingCountdown.textContent = timeLeft;
                 if (timeLeft <= 0) { showAnsweringPhase(); }
             }, 1000);
-        }, delay + 400); // Start after overlay fades out
+        }, delay + 400);
     }
 
 
@@ -357,10 +350,11 @@
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.nextBtn.classList.add('hidden');
       allElements.answeringPhase.classList.add('is-faded-out');
+      // --- CHANGE: The simple fix to prevent the flash ---
+      allElements.viewingPhase.classList.add('is-faded-out'); 
       
-      triggerFanfare(); // Takes 1.5s
+      triggerFanfare();
       
-      // --- CHANGE: Call the new pre-round sequence instead of showing items directly
       setTimeout(() => {
         if(isGameOver) return;
         startPreRoundSequence();
