@@ -78,6 +78,7 @@
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(78, 52, 46, 0.7); z-index: 1000; display: flex;
+            flex-direction: column; /* Allow text stacking */
             justify-content: center; align-items: center; padding: 15px;
             transition: opacity 0.3s ease;
         }
@@ -89,12 +90,18 @@
             font-size: 8rem; font-weight: bold; color: #D84315;
             background-color: rgba(255, 243, 224, 0.95);
         }
+        #countdownOverlay span { /* For smaller text */
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 20px;
+        }
         #round-fanfare {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background-color: rgba(216, 67, 21, 0.9); color: white; padding: 20px 40px;
             border-radius: 20px; font-size: 3em; z-index: 9999;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3); pointer-events: none; opacity: 0;
         }
+        #round-fanfare.long-text { font-size: 2.2em; }
         .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
         @keyframes fanfare-anim { 0%, 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
         #finalSummary { text-align: center; }
@@ -217,21 +224,41 @@
             startRound();
         });
     }
-
+    
+    // This is the initial countdown for the whole game
     function showStartCountdown(callback) {
         countdownOverlay.classList.remove('hidden');
         const steps = ["3", "2", "1", "GO!"];
         let i = 0;
-        countdownText.textContent = steps[i];
+        countdownText.innerHTML = steps[i];
         const interval = setInterval(() => {
             i++;
-            if (i < steps.length) { countdownText.textContent = steps[i]; } 
+            if (i < steps.length) { countdownText.innerHTML = steps[i]; } 
             else { clearInterval(interval); countdownOverlay.classList.add('hidden'); callback(); }
         }, 800);
     }
     
-    function triggerFanfare(text, callback) {
+    // NEW: Countdown for the memorization phase
+    function showMemorizeCountdown(callback) {
+      countdownOverlay.classList.remove('hidden');
+      const steps = ["<span>Get ready to memorise...</span>", "3", "2", "1", "GO!"];
+      let i = 0;
+      countdownText.innerHTML = steps[i];
+      const interval = setInterval(() => {
+        i++;
+        if (i < steps.length) {
+          countdownText.innerHTML = steps[i];
+        } else {
+          clearInterval(interval);
+          countdownOverlay.classList.add('hidden');
+          callback();
+        }
+      }, i === 0 ? 1500 : 800); // Give more time for the initial message
+    }
+
+    function triggerFanfare(text, callback, isLong = false) {
         roundFanfare.textContent = text;
+        roundFanfare.classList.toggle('long-text', isLong);
         roundFanfare.classList.remove('fanfare-animate');
         void roundFanfare.offsetWidth;
         roundFanfare.classList.add('fanfare-animate');
@@ -240,7 +267,6 @@
 
     function startRound() {
         if (isPaused) return;
-        const round = rounds[currentRound];
         foundDifferences.clear();
         incorrectPressesThisRound = 0;
         gridElement.classList.add('hidden');
@@ -251,17 +277,15 @@
             if (isPaused) return;
             gameInfoElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`; 
             
-            const diffText = round.differences === 1 ? 'There is 1 difference.' : `There are ${round.differences} differences.`;
-            messageElement.innerHTML = `Get ready to memorise...<br>${diffText}`;
-            
-            introTimeout = setTimeout(() => {
+            // CHANGE: Replaced the old intro message with the new countdown popup
+            showMemorizeCountdown(() => {
                 if (isPaused) return;
-                if (emojiIndex + round.gridSize > foodEmojis.length) { emojiIndex = 0; }
-                originalGrid = foodEmojis.slice(emojiIndex, emojiIndex + round.gridSize);
-                emojiIndex += round.gridSize;
-                renderGrid(originalGrid, round.columns, round.cellSize, false);
-                startMemorizationPhase(round);
-            }, 2500);
+                if (emojiIndex + rounds[currentRound].gridSize > foodEmojis.length) { emojiIndex = 0; }
+                originalGrid = foodEmojis.slice(emojiIndex, emojiIndex + rounds[currentRound].gridSize);
+                emojiIndex += rounds[currentRound].gridSize;
+                renderGrid(originalGrid, rounds[currentRound].columns, rounds[currentRound].cellSize, false);
+                startMemorizationPhase(rounds[currentRound]);
+            });
         });
     }
 
@@ -286,17 +310,20 @@
     function startGuessingPhase() {
         isMemorizing = false;
         timerBarContainer.classList.add('hidden');
-        const result = modifyGrid(originalGrid, rounds[currentRound].differences);
-        modifiedGrid = result.newGrid;
-        changedIndices = result.changedIndices;
-        gridElement.style.opacity = '0';
-        messageElement.textContent = 'Now, find the differences!';
-        setTimeout(() => {
+        gridElement.classList.add('hidden'); // Hide the grid before the popup
+
+        // CHANGE: Added the new transition pop-up
+        triggerFanfare("Ready? Find the Mix-up!", () => {
             if (isPaused) return;
+            const result = modifyGrid(originalGrid, rounds[currentRound].differences);
+            modifiedGrid = result.newGrid;
+            changedIndices = result.changedIndices;
+            messageElement.textContent = 'Now, find the differences!';
             renderGrid(modifiedGrid, rounds[currentRound].columns, rounds[currentRound].cellSize, true);
-            gridElement.style.transition = 'opacity 0.5s ease-in-out';
-            gridElement.style.opacity = '1';
-        }, 500);
+            gridElement.style.opacity = '0';
+            gridElement.classList.remove('hidden');
+            setTimeout(() => { gridElement.style.opacity = '1'; }, 100);
+        }, true);
     }
 
     function renderGrid(gridData, columns, cellSize, clickable) {
@@ -314,34 +341,25 @@
             gridElement.appendChild(cell);
         });
     }
-
-    // FIX: Rewritten function to be 100% reliable
+    
     function modifyGrid(grid, count) {
         const newGrid = [...grid];
         const gridEmojiSet = new Set(grid);
-
-        // 1. Create a pool of emojis that are not in the current grid
         const availableForSwap = foodEmojis.filter(emoji => !gridEmojiSet.has(emoji));
         shuffleArray(availableForSwap);
-
-        // 2. Pick unique indices to change
         const indicesToChange = [];
         const allPossibleIndices = Array.from(Array(grid.length).keys());
         shuffleArray(allPossibleIndices);
         for(let i = 0; i < count; i++) {
             indicesToChange.push(allPossibleIndices[i]);
         }
-
-        // 3. Swap the emojis
         for(let i = 0; i < count; i++) {
             const gridIndex = indicesToChange[i];
-            const newEmoji = availableForSwap.pop(); // Pop from the clean, shuffled pool
+            const newEmoji = availableForSwap.pop();
             newGrid[gridIndex] = newEmoji;
         }
-        
         return { newGrid, changedIndices: indicesToChange.sort((a,b) => a-b) };
     }
-
 
     function handlePress(index, cell) {
         if (isPaused || cell.classList.contains('correct') || cell.classList.contains('incorrect-temp')) return;
