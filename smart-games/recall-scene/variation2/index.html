@@ -49,7 +49,6 @@
   </style>
 </head>
 <body>
-
   <div id="instructions-container">
     <h2 class="welcome-title">Welcome to the SMART Challenge</h2>
     <h1>Spot The New Item</h1>
@@ -61,7 +60,6 @@
     </ul>
     <button id="startBtn">Let's Play!</button>
   </div>
-
   <div id="game-container" class="hidden">
       <div id="main-timer-bar-container" class="timer-bar-container">
           <div id="main-timer-bar" class="timer-bar"></div>
@@ -79,14 +77,12 @@
         </div>
       </div>
   </div>
-  
   <div id="results-overlay" class="overlay hidden">
     <div id="result" class="overlay-content">
         <div id="result-content"></div>
         <button id="nextBtn" class="hidden" disabled>Next Round in 3</button>
     </div>
   </div>
-  
   <div id="round-fanfare" class="hidden"></div>
   <div id="finalSummary" class="hidden"></div>
   <button id="helpBtn" class="help-button hidden">?</button>
@@ -105,7 +101,6 @@
   <div id="pre-round-overlay" class="overlay hidden">
     <h2 id="pre-round-text"></h2>
   </div>
-
   <script>
     const allItems = ['🍎','🐶','🧸','🎈','📚','🚲','🎮','🧃','🎩','🖍️','🧼','🎵', '⭐', '🚗', '🏠', '🌳', '🧩', '🚀', '🤖', '👑'];
     let recallObjects = [], roundScores = [];
@@ -120,7 +115,6 @@
     const VIEWING_TIME = 30;
     const ANSWERING_TIME = 60;
     const TOTAL_GAME_TIME = 300;
-
     const allElements = {
         instructions: document.getElementById('instructions-container'), game: document.getElementById('game-container'),
         roundCounter: document.getElementById('roundCounter'), finalSummary: document.getElementById('finalSummary'),
@@ -135,13 +129,11 @@
         preRoundOverlay: document.getElementById('pre-round-overlay'), preRoundText: document.getElementById('pre-round-text'),
         viewingPhaseMessage: document.getElementById('viewing-phase-message'), answeringPhaseMessage: document.getElementById('answering-phase-message'),
     };
-
     allElements.startBtn.addEventListener('click', startGame);
     allElements.nextBtn.addEventListener('click', nextRound);
     allElements.readyBtn.addEventListener('click', showAnsweringPhase);
     allElements.helpBtn.addEventListener('click', pauseGame);
     allElements.closeHelpBtn.addEventListener('click', resumeGame);
-
     function resetAllTimers() {
       clearInterval(viewTimer); clearInterval(answerTimer); clearInterval(mainGameTimer); clearInterval(nextBtnTimer);
     }
@@ -184,7 +176,6 @@
         allElements.roundFanfare.classList.add('fanfare-animate');
         setTimeout(() => allElements.roundFanfare.classList.add('hidden'), 1500);
     }
-
     function startPreRoundSequence() {
         const textEl = allElements.preRoundText;
         const updateText = (text) => {
@@ -193,3 +184,161 @@
         };
         allElements.preRoundOverlay.classList.remove('hidden');
         let delay = 100;
+        setTimeout(() => updateText("Get Ready..."), delay);
+        delay += 1500;
+        setTimeout(() => updateText("3"), delay);
+        delay += 1000;
+        setTimeout(() => updateText("2"), delay);
+        delay += 1000;
+        setTimeout(() => updateText("1"), delay);
+        delay += 1000;
+        setTimeout(() => { allElements.preRoundOverlay.classList.add('hidden'); }, delay);
+        setTimeout(() => {
+            if (isGameOver) return;
+            buildScene();
+            allElements.viewingPhaseMessage.innerHTML = `Memorise these items! (<span id="viewingCountdown">${VIEWING_TIME}</span>s)`;
+            const viewingCountdownSpan = document.getElementById('viewingCountdown');
+            allElements.viewingPhase.classList.remove('hidden');
+            allElements.readyBtn.disabled = true;
+            setTimeout(() => { allElements.readyBtn.disabled = false; }, 10000);
+            let timeLeft = VIEWING_TIME;
+            viewTimer = setInterval(() => {
+                if(isGameOver || isPaused) { return; }
+                timeLeft--;
+                viewingCountdownSpan.textContent = timeLeft;
+                if (timeLeft <= 0) { showAnsweringPhase(); }
+            }, 1000);
+        }, delay + 100);
+    }
+    function nextRound() {
+      if (isGameOver) return;
+      round++;
+      allElements.roundCounter.textContent = `Round ${round}`;
+      allElements.preRoundText.innerHTML = ''; 
+      allElements.viewingPhaseMessage.innerHTML = '';
+      allElements.answeringPhaseMessage.innerHTML = '';
+      allElements.scene.innerHTML = '';
+      allElements.choices.innerHTML = '';
+      // --- BUG FIX: Only clear round-specific timers. Do NOT clear mainGameTimer. ---
+      clearInterval(viewTimer);
+      clearInterval(answerTimer);
+      clearInterval(nextBtnTimer);
+      allElements.resultsOverlay.classList.add('hidden');
+      allElements.nextBtn.classList.add('hidden');
+      allElements.answeringPhase.classList.add('hidden');
+      allElements.viewingPhase.classList.add('hidden');
+      triggerFanfare();
+      setTimeout(() => {
+        if(isGameOver) return;
+        startPreRoundSequence();
+      }, 1500);
+    }
+    function buildScene() {
+      const itemsToMemorise = 2 + currentLevel;
+      const shuffled = [...allItems].sort(() => 0.5 - Math.random());
+      recallObjects = shuffled.slice(0, itemsToMemorise);
+      recallObjects.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.textContent = item;
+        allElements.scene.appendChild(div);
+      });
+    }
+    function showAnsweringPhase() {
+        if (isGameOver) return;
+        clearInterval(viewTimer);
+        allElements.viewingPhase.classList.add('hidden');
+        allElements.answeringPhaseMessage.innerHTML = `<strong>Press</strong> the <strong>one new item</strong>! (<span id="answerCountdown">${ANSWERING_TIME}</span>s)`;
+        const answerCountdownSpan = document.getElementById('answerCountdown');
+        allElements.answeringPhase.classList.remove('hidden');
+        const distractors = allItems.filter(item => !recallObjects.includes(item));
+        newItem = distractors.sort(() => 0.5 - Math.random())[0];
+        const choices = [...recallObjects, newItem].sort(() => 0.5 - Math.random());
+        allElements.choices.innerHTML = '';
+        choices.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.textContent = item;
+            div.addEventListener('click', () => handleChoice(div, item));
+            allElements.choices.appendChild(div);
+        });
+        let timeLeft = ANSWERING_TIME;
+        answerTimer = setInterval(() => {
+            if(isGameOver || isPaused) { return; }
+            timeLeft--;
+            answerCountdownSpan.textContent = timeLeft;
+            if (timeLeft <= 0) { endRound(false); }
+        }, 1000);
+    }
+    function handleChoice(element, item) {
+        if (isGameOver) return;
+        clearInterval(answerTimer);
+        const isCorrect = (item === newItem);
+        element.classList.add(isCorrect ? 'correct' : 'incorrect');
+        const choiceElements = allElements.choices.children;
+        for(const el of choiceElements) { el.style.pointerEvents = 'none'; }
+        endRound(isCorrect);
+    }
+    function endRound(wasCorrect) {
+        if (isGameOver) return;
+        clearInterval(answerTimer);
+        const roundScore = wasCorrect ? 1 : 0;
+        score += roundScore;
+        roundScores.push({ round, score: roundScore, level: currentLevel, items: 2 + currentLevel });
+        let feedbackHTML = '';
+        if (wasCorrect) {
+            correctStreak++;
+            feedbackHTML = `<h2>Correct! Great job! 🎉</h2>`;
+            if (correctStreak >= 2 && currentLevel < MAX_LEVEL) {
+                currentLevel++; correctStreak = 0;
+                feedbackHTML += `<p style="color: #28a745; font-weight: bold;">LEVEL UP!</p>`;
+            }
+        } else {
+            correctStreak = 0;
+            feedbackHTML = `<h2>Almost! The new item was ${newItem}.</h2>`;
+            if (currentLevel > 1) { currentLevel--; }
+        }
+        allElements.resultContent.innerHTML = feedbackHTML;
+        if (wasCorrect) { setTimeout(() => allElements.result.classList.add('celebrate'), 10); }
+        allElements.answeringPhase.classList.add('hidden');
+        allElements.resultsOverlay.classList.remove('hidden');
+        allElements.nextBtn.classList.remove('hidden');
+        let countdown = 3;
+        allElements.nextBtn.textContent = `Next Round in ${countdown}`;
+        allElements.nextBtn.disabled = true;
+        clearInterval(nextBtnTimer);
+        nextBtnTimer = setInterval(() => {
+            if (isPaused) return;
+            countdown--;
+            allElements.nextBtn.textContent = `Next Round in ${countdown}`;
+            if (countdown <= 0) {
+                clearInterval(nextBtnTimer);
+                allElements.nextBtn.textContent = 'Next Round';
+                allElements.nextBtn.disabled = false;
+            }
+        }, 1000);
+    }
+    function showFinalSummary() {
+      if (isGameOver) return;
+      isGameOver = true;
+      resetAllTimers();
+      allElements.game.classList.add('hidden');
+      allElements.resultsOverlay.classList.add('hidden');
+      allElements.finalSummary.classList.remove('hidden');
+      allElements.helpBtn.classList.add('hidden');
+      let maxItemsMemorized = 0;
+      const correctRounds = roundScores.filter(r => r.score === 1);
+      if (correctRounds.length > 0) {
+        maxItemsMemorized = Math.max(...correctRounds.map(r => r.items));
+      }
+      allElements.finalSummary.innerHTML = `
+        <h2>Good Job!</h2>
+        <p id="best-score">Your best score:<br><strong>${maxItemsMemorized} items!</strong> ⭐</p>
+        <p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>
+        <button onclick="location.reload()">Play Again</button>
+      `;
+      window.parent.postMessage("showNext", "*");
+    }
+  </script>
+</body>
+</html>
