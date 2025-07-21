@@ -17,16 +17,11 @@
       margin: 0;
       padding: 10px 5px;
     }
-
     .hidden { display: none !important; }
-    
     .fadeable { transition: opacity 0.4s ease-in-out; }
     .is-faded-out { opacity: 0; pointer-events: none; }
-
     #instructions-container { padding: 20px; max-width: 550px; margin: 20px auto; }
-
     h1 { margin-top: 15px; font-size: 3em; color: #4b0082; text-shadow: 3px 3px 0px #ff7f50; }
-    
     h2.welcome-title {
         display: inline-block;
         font-size: 1.3em;
@@ -38,24 +33,18 @@
         border: 2px solid #d8bfd8;
         margin-bottom: 0;
     }
-    
     ul.instructions-list { list-style-type: none; padding: 0; margin: 20px auto; display: inline-block; text-align: left; }
     ul.instructions-list li { font-size: 1.2em; margin-bottom: 10px; }
-
     .game-area { margin: 10px auto; width: 95%; max-width: 500px; position: relative; }
-
     .timer-bar-container { width: 100%; height: 25px; background-color: #e9ecef; border-radius: 10px; border: 2px solid #4b0082; margin: 10px auto 15px auto; overflow: hidden; }
     .timer-bar { height: 100%; width: 100%; background-color: #32cd32; border-radius: 8px 0 0 8px; transition: width 1s linear; }
-
-    #viewing-phase .message, #answering-phase .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; }
-    
+    .message { font-size: 1.1em; font-weight: 700; color: #4b0082; margin-bottom: 15px; min-height: 25px; } /* Add min-height to prevent layout shifts */
     .scene {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
       gap: 5px;
       align-items: center;
     }
-    
     .item {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -72,69 +61,27 @@
     }
     .item:hover { transform: scale(1.05); }
     .item:active { transform: translateY(2px); box-shadow: 0 2px 0 #b39db3; }
-
     .item.correct { border-color: #32cd32; background-color: #d4edda; pointer-events: none; transform: translateY(2px); box-shadow: 0 2px 0 #28a745; }
     .item.incorrect { border-color: #dc3545; animation: shake 0.5s; pointer-events: none; }
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
-    
-    .overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: rgba(0,0,0,0.6); z-index: 1000; display: flex;
-        justify-content: center; align-items: center; padding: 15px;
-    }
-    .overlay-content {
-        background-color: #e6e6fa; padding: 20px; border-radius: 15px; 
-        border: 3px solid #4b0082; width: 100%; max-width: 500px;
-        max-height: 90vh; overflow-y: auto;
-    }
-    
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 15px; }
+    .overlay-content { background-color: #e6e6fa; padding: 20px; border-radius: 15px; border: 3px solid #4b0082; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
     button { background-color: #ff7f50; border: none; color: white; padding: 12px 25px; margin: 10px; font-size: 1.2em; font-family: 'Fredoka One', cursive; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 0 #e06c3a; text-transform: uppercase; }
     button:hover:not(:disabled) { background-color: #ff9066; transform: translateY(-2px); box-shadow: 0 7px 0 #e06c3a; }
     button:disabled { background-color: #cccccc; color: #888888; box-shadow: 0 5px 0 #aaaaaa; cursor: not-allowed; }
-    
-    .help-button {
-      position: fixed;
-      bottom: 15px;
-      left: 15px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      font-size: 1.8em;
-      z-index: 2000;
-      padding: 0;
-      line-height: 1;
-    }
-
+    .help-button { position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px; border-radius: 50%; font-size: 1.8em; z-index: 2000; padding: 0; line-height: 1; }
     #roundCounter { font-size: 1.5em; font-weight: 700; color: #555; margin-bottom: 10px;}
     #finalSummary { font-size: 1.2em; background: #ffffff; border: 3px solid #4b0082; border-radius: 15px; padding: 30px; }
     #finalSummary p { margin: 12px 0; }
-    #best-score {
-        font-size: 1.8em;
-        color: #4b0082;
-        margin: 20px 0;
-    }
-    
+    #best-score { font-size: 1.8em; color: #4b0082; margin: 20px 0; }
     #result h2, #result p { margin: 8px 0; }
-    
     @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .celebrate { animation: celebrate 0.5s ease-in-out; }
-    
     #round-fanfare { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(75, 0, 130, 0.9); color: white; padding: 20px 40px; border-radius: 20px; font-size: 3em; font-weight: 700; z-index: 9999; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
     @keyframes fanfare-anim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
-
-    #pre-round-text {
-        color: white;
-        font-size: 4em;
-        font-weight: 700;
-        text-align: center;
-        text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
-        animation: text-pop 0.5s ease-out forwards;
-    }
-    @keyframes text-pop {
-        from { transform: scale(0.7); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
-    }
+    #pre-round-text { color: white; font-size: 4em; font-weight: 700; text-align: center; text-shadow: 3px 3px 6px rgba(0,0,0,0.4); animation: text-pop 0.5s ease-out forwards; }
+    @keyframes text-pop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   </style>
 </head>
 <body>
@@ -158,12 +105,14 @@
       <div id="roundCounter">Round 1</div>
       <div class="game-area">
         <div id="viewing-phase" class="fadeable is-faded-out">
-            <div class="message">Memorise these items! (<span id="viewingCountdown">30</span>s)</div>
+            <!-- --- FINAL FIX: Message content is now removed --- -->
+            <div class="message" id="viewing-phase-message"></div>
             <div id="scene" class="scene"></div>
             <button id="readyBtn">I've Memorised It!</button>
         </div>
         <div id="answering-phase" class="fadeable is-faded-out">
-            <div class="message">Which one was in the scene?</div>
+            <!-- --- FINAL FIX: Message content is now removed --- -->
+            <div class="message" id="answering-phase-message"></div>
             <div id="choices" class="scene"></div>
         </div>
       </div>
@@ -219,7 +168,7 @@
         startBtn: document.getElementById('startBtn'), nextBtn: document.getElementById('nextBtn'),
         scene: document.getElementById('scene'), choices: document.getElementById('choices'),
         result: document.getElementById('result'), resultContent: document.getElementById('result-content'),
-        viewingCountdown: document.getElementById('viewingCountdown'),
+        // viewingCountdown is now created dynamically
         viewingPhase: document.getElementById('viewing-phase'), answeringPhase: document.getElementById('answering-phase'),
         roundFanfare: document.getElementById('round-fanfare'), mainTimerBar: document.getElementById('main-timer-bar'),
         resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn'),
@@ -228,6 +177,9 @@
         closeHelpBtn: document.getElementById('closeHelpBtn'),
         preRoundOverlay: document.getElementById('pre-round-overlay'),
         preRoundText: document.getElementById('pre-round-text'),
+        // --- FINAL FIX: Added message containers ---
+        viewingPhaseMessage: document.getElementById('viewing-phase-message'),
+        answeringPhaseMessage: document.getElementById('answering-phase-message'),
     };
 
     allElements.startBtn.addEventListener('click', startGame);
@@ -295,7 +247,7 @@
         const updateText = (text) => {
             textEl.textContent = text;
             textEl.style.animation = 'none';
-            textEl.offsetHeight; // Trigger a reflow to restart animation
+            textEl.offsetHeight;
             textEl.style.animation = '';
         };
 
@@ -314,9 +266,6 @@
         setTimeout(() => updateText("1"), delay);
         delay += 1000;
         
-        setTimeout(() => updateText("Memorise these items!"), delay);
-        delay += 1500;
-
         setTimeout(() => {
             allElements.preRoundOverlay.classList.add('is-faded-out');
         }, delay);
@@ -324,6 +273,10 @@
         setTimeout(() => {
             if (isGameOver) return;
             buildScene();
+            
+            // --- FINAL FIX: Dynamically create the message right before showing it ---
+            allElements.viewingPhaseMessage.innerHTML = `Memorise these items! (<span id="viewingCountdown">${VIEWING_TIME}</span>s)`;
+            const viewingCountdownSpan = document.getElementById('viewingCountdown');
             
             allElements.viewingPhase.classList.remove('hidden');
             setTimeout(() => {
@@ -334,11 +287,10 @@
             setTimeout(() => { allElements.readyBtn.disabled = false; }, 10000);
 
             let timeLeft = VIEWING_TIME;
-            allElements.viewingCountdown.textContent = timeLeft;
             viewTimer = setInterval(() => {
                 if(isGameOver || isPaused) { return; }
                 timeLeft--;
-                allElements.viewingCountdown.textContent = timeLeft;
+                viewingCountdownSpan.textContent = timeLeft;
                 if (timeLeft <= 0) { showAnsweringPhase(); }
             }, 1000);
         }, delay + 400);
@@ -349,10 +301,6 @@
       if (isGameOver) return;
       round++;
       allElements.roundCounter.textContent = `Round ${round}`;
-      
-      // --- FINAL FIX: Erase the previous round's content instantly. ---
-      allElements.scene.innerHTML = '';
-      allElements.choices.innerHTML = '';
       
       clearInterval(viewTimer);
       allElements.resultsOverlay.classList.add('is-faded-out');
@@ -374,7 +322,6 @@
       recallObjects = shuffled.slice(0, itemsToMemorise);
       
       allElements.scene.innerHTML = '';
-
       recallObjects.forEach(item => {
         const div = document.createElement('div');
         div.className = 'item';
@@ -388,7 +335,9 @@
         clearInterval(viewTimer);
         allElements.viewingPhase.classList.add('is-faded-out');
         
-        // Make sure answering phase is ready to be shown
+        // --- FINAL FIX: Dynamically create the answering message ---
+        allElements.answeringPhaseMessage.innerHTML = 'Which one was in the scene?';
+        
         allElements.answeringPhase.classList.add('is-faded-out');
         allElements.answeringPhase.classList.remove('hidden');
 
@@ -409,7 +358,6 @@
             allElements.choices.appendChild(div);
         });
 
-        // Now fade it in
         setTimeout(() => {
             allElements.answeringPhase.classList.remove('is-faded-out');
         }, 20);
