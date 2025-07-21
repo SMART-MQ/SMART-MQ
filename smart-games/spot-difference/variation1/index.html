@@ -224,8 +224,7 @@
             startRound();
         });
     }
-    
-    // This is the initial countdown for the whole game
+
     function showStartCountdown(callback) {
         countdownOverlay.classList.remove('hidden');
         const steps = ["3", "2", "1", "GO!"];
@@ -238,7 +237,6 @@
         }, 800);
     }
     
-    // NEW: Countdown for the memorization phase
     function showMemorizeCountdown(callback) {
       countdownOverlay.classList.remove('hidden');
       const steps = ["<span>Get ready to memorise...</span>", "3", "2", "1", "GO!"];
@@ -253,7 +251,7 @@
           countdownOverlay.classList.add('hidden');
           callback();
         }
-      }, i === 0 ? 1500 : 800); // Give more time for the initial message
+      }, i === 0 ? 1500 : 800);
     }
 
     function triggerFanfare(text, callback, isLong = false) {
@@ -277,7 +275,6 @@
             if (isPaused) return;
             gameInfoElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`; 
             
-            // CHANGE: Replaced the old intro message with the new countdown popup
             showMemorizeCountdown(() => {
                 if (isPaused) return;
                 if (emojiIndex + rounds[currentRound].gridSize > foodEmojis.length) { emojiIndex = 0; }
@@ -310,10 +307,10 @@
     function startGuessingPhase() {
         isMemorizing = false;
         timerBarContainer.classList.add('hidden');
-        gridElement.classList.add('hidden'); // Hide the grid before the popup
+        gridElement.classList.add('hidden');
 
-        // CHANGE: Added the new transition pop-up
-        triggerFanfare("Ready? Find the Mix-up!", () => {
+        // CHANGE: Text updated for consistency
+        triggerFanfare("Now find the difference", () => {
             if (isPaused) return;
             const result = modifyGrid(originalGrid, rounds[currentRound].differences);
             modifiedGrid = result.newGrid;
