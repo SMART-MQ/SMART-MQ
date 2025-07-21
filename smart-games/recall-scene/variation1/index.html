@@ -325,11 +325,10 @@
             if (isGameOver) return;
             buildScene();
             
-            // --- CHANGE: The more robust way to reveal the items ---
-            allElements.viewingPhase.classList.remove('hidden'); // Put it back in the document flow, but still transparent
+            allElements.viewingPhase.classList.remove('hidden');
             setTimeout(() => {
-                allElements.viewingPhase.classList.remove('is-faded-out'); // Now, fade it in
-            }, 20); // A tiny delay ensures the browser renders the display change first
+                allElements.viewingPhase.classList.remove('is-faded-out');
+            }, 20);
 
             allElements.readyBtn.disabled = true;
             setTimeout(() => { allElements.readyBtn.disabled = false; }, 10000);
@@ -351,13 +350,15 @@
       round++;
       allElements.roundCounter.textContent = `Round ${round}`;
       
+      // --- FINAL FIX: Erase the previous round's content instantly. ---
+      allElements.scene.innerHTML = '';
+      allElements.choices.innerHTML = '';
+      
       clearInterval(viewTimer);
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.nextBtn.classList.add('hidden');
-      allElements.answeringPhase.classList.add('is-faded-out');
-      
-      // --- CHANGE: Use the powerful .hidden class to guarantee it's not visible ---
-      allElements.viewingPhase.classList.add('hidden', 'is-faded-out'); 
+      allElements.answeringPhase.classList.add('hidden', 'is-faded-out');
+      allElements.viewingPhase.classList.add('hidden', 'is-faded-out');
       
       triggerFanfare();
       
@@ -386,8 +387,11 @@
         if (isGameOver) return;
         clearInterval(viewTimer);
         allElements.viewingPhase.classList.add('is-faded-out');
-        allElements.answeringPhase.classList.remove('is-faded-out');
         
+        // Make sure answering phase is ready to be shown
+        allElements.answeringPhase.classList.add('is-faded-out');
+        allElements.answeringPhase.classList.remove('hidden');
+
         correctChoice = recallObjects[Math.floor(Math.random() * recallObjects.length)];
         const distractors = allItems.filter(item => !recallObjects.includes(item));
         const incorrectChoice = distractors[Math.floor(Math.random() * distractors.length)];
@@ -404,6 +408,11 @@
             div.addEventListener('click', () => handleChoice(div, item === correctChoice));
             allElements.choices.appendChild(div);
         });
+
+        // Now fade it in
+        setTimeout(() => {
+            allElements.answeringPhase.classList.remove('is-faded-out');
+        }, 20);
     }
     
     function handleChoice(element, isCorrect) {
