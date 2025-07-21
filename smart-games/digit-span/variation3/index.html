@@ -6,29 +6,30 @@
   <title>The Flash Challenge</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Poppins', sans-serif; text-align: center; padding: 10px; overflow-x: hidden; color: #fff; background-color: #0d0d21; -webkit-tap-highlight-color: transparent; }
     #digital-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; --grid-size: 50px; --line-color: rgba(0, 183, 255, 0.1); background-image: linear-gradient(to right, var(--line-color) 1px, transparent 1px), linear-gradient(to bottom, var(--line-color) 1px, transparent 1px); background-size: var(--grid-size) var(--grid-size); animation: pan-grid 60s linear infinite; }
     @keyframes pan-grid { from { background-position: 0 0; } to { background-position: var(--grid-size) var(--grid-size); } }
-    .container { max-width: 900px; margin: auto; background-color: rgba(13, 13, 33, 0.5); border: 1px solid rgba(0, 183, 255, 0.3); backdrop-filter: blur(10px); border-radius: 20px; padding: 15px 10px; box-shadow: 0 0 30px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+    .container { max-width: 900px; margin: auto; background-color: rgba(13, 13, 33, 0.5); border: 1px solid rgba(0, 183, 255, 0.3); backdrop-filter: blur(10px); border-radius: 20px; padding: 15px 10px; box-shadow: 0 0 30px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; transition: opacity 0.3s ease; }
     .main { flex: 1; margin-bottom: 15px; width: 100%; }
     .main-title { font-size: clamp(22px, 6vw, 32px); font-weight: 600; color: #fff; text-shadow: 0 0 10px rgba(0, 183, 255, 0.7); margin-bottom: 8px; }
     #info-bar { font-size: clamp(16px, 4vw, 20px); font-weight: 600; text-shadow: 0 0 5px #fff; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
     #how-to-play-btn { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: #fff; background-color: rgba(0, 183, 255, 0.3); border: 1px solid rgba(0, 183, 255, 0.7); width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; }
     #how-to-play-btn:hover { background-color: #00b7ff; box-shadow: 0 0 10px #00b7ff; }
     .digit-display, #answer-display { font-size: clamp(28px, 8vw, 42px); font-weight: 600; color: #fff; text-shadow: 0 0 5px #fff, 0 0 10px #0ff; background-color: rgba(0,0,0,0.4); border-radius: 10px; margin: 10px 0; min-height: 55px; letter-spacing: 0.2em; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 0 10px; }
-    .digit-display-instruction { font-family: 'Orbitron', sans-serif; font-size: clamp(18px, 5vw, 22px); font-weight: 600; letter-spacing: normal; text-shadow: none; color: rgba(255, 255, 255, 0.9); }
-    #instructions-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 100; }
-    #instructions-modal.show { display: flex; }
-    .modal-content { background-color: #f9f9f9; color: #333; padding: 20px; border-radius: 15px; max-width: 90vw; width: 400px; text-align: center; }
-    .modal-content h3 { font-size: 22px; margin-top: 0; margin-bottom: 15px; }
-    .modal-content ul { list-style-type: none; padding: 0; text-align: left; display: inline-block; margin-bottom: 20px; }
-    .modal-content li { margin-bottom: 10px; font-size: 16px; }
+    
+    #instructions-modal, #final-summary-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 100; }
+    #instructions-modal.show, #final-summary-modal.show { display: flex; }
+    .modal-content { background-color: rgba(13, 13, 33, 0.8); border: 1px solid rgba(0, 183, 255, 0.5); backdrop-filter: blur(10px); padding: 25px; border-radius: 15px; max-width: 90vw; width: 450px; text-align: center; color: #fff; text-shadow: 0 0 5px rgba(0, 183, 255, 0.5); }
+    .modal-content h3 { font-size: 24px; margin-top: 0; margin-bottom: 20px; }
+    .modal-content ul { list-style-type: none; padding: 0; text-align: left; margin-bottom: 25px; }
+    .modal-content li { margin-bottom: 15px; font-size: 18px; display: flex; align-items: center; }
+    .modal-content li span { margin-right: 15px; font-size: 24px; }
     #close-modal-btn { font-size: 18px; font-weight: 600; background: #0077b6; border: 2px solid #00b7ff; border-radius: 30px; padding: 10px 25px; color: white; cursor: pointer; transition: all 0.3s ease; }
     #close-modal-btn:hover { background-color: #00b7ff; box-shadow: 0 0 20px #00b7ff; }
+    
     #instructions-container { background: rgba(255, 255, 255, 0.94); border-radius: 20px; padding: 15px; box-shadow: 0 0 25px rgba(0,0,0,0.2); max-width: 600px; margin: 0 auto 20px auto; color: #333; }
     #instructions-container h3 { font-size: 20px; margin-bottom: 10px; }
     #instructions-container ul { list-style-type: none; padding: 0; margin: 0 auto; text-align: left; display: inline-block; }
@@ -57,9 +58,10 @@
     @keyframes glitch-anim-2 { 0% { clip-path: inset(85% 0 5% 0); } 100% { clip-path: inset(55% 0 30% 0); } }
     #badge-popup { position: fixed; left: 50%; transform: translateX(-50%); top: -150px; background-color: rgba(13, 13, 33, 0.7); border: 1px solid rgba(0, 183, 255, 0.5); backdrop-filter: blur(10px); padding: 15px 30px; border-radius: 10px; font-size: 18px; font-weight: 600; color: #fff; text-shadow: 0 0 8px #0ff; box-shadow: 0 0 20px rgba(0, 183, 255, 0.5); z-index: 200; transition: top 0.5s ease-out; overflow: hidden; width: 90vw; }
     #badge-popup.show { top: 20px; }
-    #badge-popup::after { content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 100%; background: linear-gradient(0deg, transparent, rgba(0, 183, 255, 0.3), transparent); animation: scanline 3s linear infinite; }
-    @keyframes scanline { from { top: -100%; } to { top: 100%; } }
-    #final-summary { background: rgba(255, 255, 255, 0.88); border-radius: 20px; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.15); margin: 15px auto; font-size: 16px; color: #333; max-width: 90vw; }
+    #prompt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 13, 33, 0.7); display: none; align-items: center; justify-content: center; z-index: 50; }
+    #prompt-overlay.show { display: flex; }
+    #prompt-text { font-family: 'Orbitron', sans-serif; font-size: clamp(24px, 6vw, 40px); color: #fff; text-shadow: 0 0 10px #0ff, 0 0 20px #0ff; padding: 20px; animation: prompt-pop-fade 1.5s ease-out forwards; }
+    @keyframes prompt-pop-fade { 0% { transform: scale(0.5); opacity: 0; } 20% { transform: scale(1.1); opacity: 1; } 40% { transform: scale(1); opacity: 1; } 80% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.2); opacity: 0; } }
   </style>
 </head>
 <body>
@@ -91,7 +93,6 @@
         <div class="data-packet"></div>
         <div class="data-packet"></div>
       </div>
-      <div id="final-summary" class="hidden"></div>
     </div>
     <div class="badge-tracker">
       <h3>🏆 Badges</h3>
@@ -105,13 +106,21 @@
     <div class="modal-content">
         <h3>How to Play: The Flash!</h3>
         <ul>
-            <li>1. The numbers will appear all at once in a <strong>quick flash!</strong></li>
-            <li>2. Remember them in the correct order.</li>
-            <li>3. When it's your turn, press the numbers you saw.</li>
-            <li>4. Press the green check (✓) to submit!</li>
+            <li><span>⚡</span><div>The numbers will appear all at once in a quick flash!</div></li>
+            <li><span>🧠</span><div>Remember them in the correct order.</div></li>
+            <li><span>⌨️</span><div>When it's your turn, type the numbers you saw.</div></li>
+            <li><span>✅</span><div>Press the green check to submit!</div></li>
         </ul>
         <button id="close-modal-btn">Got it!</button>
     </div>
+  </div>
+
+  <div id="prompt-overlay">
+    <div id="prompt-text"></div>
+  </div>
+  
+  <div id="final-summary-modal">
+      <div class="modal-content" id="final-summary-content"></div>
   </div>
 
   <script>
@@ -129,13 +138,14 @@
     var timeRemaining;
     const GAME_DURATION = 300; 
     
-    var instructionsContainer = document.getElementById('instructions-container');
-    var instructionsBtn = document.getElementById('instructions-btn');
-    var gameContainer = document.getElementById('game');
-    var timerDisplayEl, infoBar, digitDisplay, optionButtons, answerDisplay, message, badgesEarned, badgePopup, finalSummary, streakTracker, howToPlayBtn, instructionsModal, closeModalBtn;
+    var instructionsContainer, instructionsBtn, gameContainer, timerDisplayEl, infoBar, digitDisplay, optionButtons, answerDisplay, message, badgesEarned, badgePopup, streakTracker, howToPlayBtn, instructionsModal, closeModalBtn, promptOverlay, promptText, finalSummaryModal, finalSummaryContent;
     var sequence = '';
     var userAnswer = '';
 
+    instructionsBtn = document.getElementById('instructions-btn');
+    instructionsContainer = document.getElementById('instructions-container');
+    gameContainer = document.getElementById('game');
+    
     instructionsBtn.onclick = function() {
       instructionsContainer.style.display = 'none';
       gameContainer.classList.remove('hidden');
@@ -146,15 +156,7 @@
     function resumeGameTimer() { if (isGameOver) return; clearInterval(gameTimerInterval); gameTimerInterval = setInterval(updateTimer, 1000); }
     function updateTimer() { if (timeRemaining < 0) { clearInterval(gameTimerInterval); showFinalSummary(); return; } var minutes = Math.floor(timeRemaining / 60); var seconds = timeRemaining % 60; timerDisplayEl.textContent = minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0'); timeRemaining--; }
     
-    function getReadyCountdown(callback) {
-      digitDisplay.classList.add('digit-display-instruction');
-      digitDisplay.textContent = 'Remember these numbers...';
-      setTimeout(function() {
-        digitDisplay.textContent = '';
-        digitDisplay.classList.remove('digit-display-instruction');
-        callback(); 
-      }, 1500); 
-    }
+    function showGamePrompt(text, callback) { promptText.textContent = text; promptOverlay.classList.add('show'); setTimeout(function() { promptOverlay.classList.remove('show'); if (callback) callback(); }, 1500); }
     
     function showDigits() {
       if (isGameOver) return;
@@ -163,7 +165,9 @@
       answerDisplay.textContent = ''; userAnswer = '';
       optionButtons.classList.add('hidden');
       message.textContent = '';
-      getReadyCountdown(function() {
+      digitDisplay.textContent = '';
+      
+      showGamePrompt("Remember these numbers...", function() {
         digitDisplay.textContent = sequence;
         var baseDuration = 500; 
         var incrementPerDigit = 250;
@@ -171,20 +175,17 @@
 
         setTimeout(function() {
             if (isGameOver) return;
-            digitDisplay.classList.add('digit-display-instruction');
-            digitDisplay.textContent = 'Your turn!';
-            setTimeout(function() {
+            digitDisplay.textContent = '';
+            showGamePrompt("Your turn!", function() {
                 displayOptions();
                 isChecking = false;
-            }, 1000);
+            });
         }, flashDuration);
       });
     }
 
     function displayOptions() {
       if (isGameOver) return;
-      digitDisplay.classList.remove('digit-display-instruction');
-      digitDisplay.textContent = '';
       optionButtons.innerHTML = '';
       digits.split('').forEach(function(d) {
         var btn = document.createElement('button');
@@ -260,17 +261,14 @@
       isGameOver = true;
       if (gameTimerInterval) clearInterval(gameTimerInterval);
       isChecking = true;
-      infoBar.classList.add('hidden');
-      digitDisplay.textContent = '';
-      answerDisplay.textContent = '';
-      message.textContent = '';
-      optionButtons.classList.add('hidden');
-      streakTracker.classList.add('hidden');
-      finalSummary.classList.remove('hidden');
-      var summaryHtml = "<h2>Good job - Check out your score below!</h2>";
-      summaryHtml += "<p><strong>Your Personal Best Was Level: " + personalBest + "</strong></p>";
-      summaryHtml += "<p>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>";
-      finalSummary.innerHTML = summaryHtml;
+      
+      var summaryHtml = "<h3>Good job - Check out your score below!</h3>";
+      summaryHtml += "<p style='font-size: 20px; font-weight: 600; margin: 15px 0;'>Your Personal Best Was Level: " + personalBest + "</p>";
+      summaryHtml += "<p style='margin-top: 20px;'>Now press the red arrow on the bottom right of the screen to finish, and you will have earned $2.50 for your SMART bank!</p>";
+      finalSummaryContent.innerHTML = summaryHtml;
+      
+      gameContainer.style.opacity = '0.3';
+      finalSummaryModal.classList.add('show');
       window.parent.postMessage("showNext", "*");
     } 
 
@@ -283,17 +281,22 @@
       message = document.getElementById('message');
       badgesEarned = document.getElementById('badges-earned');
       badgePopup = document.getElementById('badge-popup');
-      finalSummary = document.getElementById('final-summary');
       streakTracker = document.getElementById('streak-tracker');
       howToPlayBtn = document.getElementById('how-to-play-btn');
       instructionsModal = document.getElementById('instructions-modal');
       closeModalBtn = document.getElementById('close-modal-btn');
-      
+      promptOverlay = document.getElementById('prompt-overlay');
+      promptText = document.getElementById('prompt-text');
+      finalSummaryModal = document.getElementById('final-summary-modal');
+      finalSummaryContent = document.getElementById('final-summary-content');
+
       howToPlayBtn.onclick = function() { instructionsModal.classList.add('show'); pauseGameTimer(); }
       closeModalBtn.onclick = function() { instructionsModal.classList.remove('show'); resumeGameTimer(); }
       instructionsModal.onclick = function(event) { if (event.target === instructionsModal) { instructionsModal.classList.remove('show'); resumeGameTimer(); } }
       
-      isGameOver = false; currentLength = 3; consecutiveCorrect = 0; personalBest = 0; earnedBadges = {}; timeRemaining = GAME_DURATION; badgesEarned.innerHTML = ''; finalSummary.classList.add('hidden'); streakTracker.classList.remove('hidden'); infoBar.classList.remove('hidden');
+      isGameOver = false; currentLength = 3; consecutiveCorrect = 0; personalBest = 0; earnedBadges = {}; timeRemaining = GAME_DURATION; 
+      finalSummaryModal.classList.remove('show'); gameContainer.style.opacity = '1';
+      badgesEarned.innerHTML = '';
       updateStreakVisual(); updateTimer(); resumeGameTimer(); showDigits();
     }
   </script>
