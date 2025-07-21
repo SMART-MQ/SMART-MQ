@@ -123,6 +123,20 @@
     @keyframes fanfare-anim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
 
+    /* --- CHANGE: CSS for new pre-round overlay --- */
+    #pre-round-text {
+        color: white;
+        font-size: 4em;
+        font-weight: 700;
+        text-align: center;
+        text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+        animation: text-pop 0.5s ease-out forwards;
+    }
+    @keyframes text-pop {
+        from { transform: scale(0.7); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
   </style>
 </head>
 <body>
@@ -166,8 +180,8 @@
   
   <div id="round-fanfare" class="hidden"></div>
   <div id="finalSummary" class="hidden"></div>
-
   <button id="helpBtn" class="help-button hidden">?</button>
+
   <div id="help-overlay" class="overlay fadeable is-faded-out">
       <div class="overlay-content">
           <h2 class="welcome-title">How to Play</h2>
@@ -179,6 +193,11 @@
           </ul>
           <button id="closeHelpBtn">Close</button>
       </div>
+  </div>
+  
+  <!-- --- CHANGE: New pre-round overlay --- -->
+  <div id="pre-round-overlay" class="overlay fadeable is-faded-out">
+    <h2 id="pre-round-text"></h2>
   </div>
 
   <script>
@@ -209,7 +228,10 @@
         resultsOverlay: document.getElementById('results-overlay'), readyBtn: document.getElementById('readyBtn'),
         helpBtn: document.getElementById('helpBtn'),
         helpOverlay: document.getElementById('help-overlay'),
-        closeHelpBtn: document.getElementById('closeHelpBtn')
+        closeHelpBtn: document.getElementById('closeHelpBtn'),
+        // --- CHANGE: Added pre-round elements ---
+        preRoundOverlay: document.getElementById('pre-round-overlay'),
+        preRoundText: document.getElementById('pre-round-text'),
     };
 
     allElements.startBtn.addEventListener('click', startGame);
@@ -271,6 +293,61 @@
         setTimeout(() => allElements.roundFanfare.classList.add('hidden'), 1500);
     }
 
+    // --- CHANGE: New function for the pre-round sequence ---
+    function startPreRoundSequence() {
+        const textEl = allElements.preRoundText;
+
+        const updateText = (text) => {
+            textEl.textContent = text;
+            textEl.style.animation = 'none';
+            textEl.offsetHeight; // Trigger a reflow to restart animation
+            textEl.style.animation = '';
+        };
+
+        allElements.preRoundOverlay.classList.remove('is-faded-out');
+        
+        let delay = 100;
+        setTimeout(() => updateText("Get Ready..."), delay);
+        delay += 1500;
+
+        setTimeout(() => updateText("3"), delay);
+        delay += 1000;
+        
+        setTimeout(() => updateText("2"), delay);
+        delay += 1000;
+        
+        setTimeout(() => updateText("1"), delay);
+        delay += 1000;
+        
+        setTimeout(() => updateText("Memorise these items!"), delay);
+        delay += 1500;
+
+        // Hide the pre-round overlay
+        setTimeout(() => {
+            allElements.preRoundOverlay.classList.add('is-faded-out');
+        }, delay);
+        
+        // Show the game content after the overlay has faded
+        setTimeout(() => {
+            if (isGameOver) return;
+            buildScene();
+            allElements.viewingPhase.classList.remove('is-faded-out');
+            
+            allElements.readyBtn.disabled = true;
+            setTimeout(() => { allElements.readyBtn.disabled = false; }, 10000);
+
+            let timeLeft = VIEWING_TIME;
+            allElements.viewingCountdown.textContent = timeLeft;
+            viewTimer = setInterval(() => {
+                if(isGameOver || isPaused) { return; }
+                timeLeft--;
+                allElements.viewingCountdown.textContent = timeLeft;
+                if (timeLeft <= 0) { showAnsweringPhase(); }
+            }, 1000);
+        }, delay + 400); // Start after overlay fades out
+    }
+
+
     function nextRound() {
       if (isGameOver) return;
       round++;
@@ -281,25 +358,12 @@
       allElements.nextBtn.classList.add('hidden');
       allElements.answeringPhase.classList.add('is-faded-out');
       
-      triggerFanfare();
+      triggerFanfare(); // Takes 1.5s
       
+      // --- CHANGE: Call the new pre-round sequence instead of showing items directly
       setTimeout(() => {
-          if (isGameOver) return;
-          buildScene();
-          allElements.viewingPhase.classList.remove('is-faded-out');
-          
-          allElements.readyBtn.disabled = true;
-          setTimeout(() => { allElements.readyBtn.disabled = false; }, 10000);
-
-          let timeLeft = VIEWING_TIME;
-          allElements.viewingCountdown.textContent = timeLeft;
-          viewTimer = setInterval(() => {
-              if(isGameOver) { clearInterval(viewTimer); return; }
-              if(isPaused) return;
-              timeLeft--;
-              allElements.viewingCountdown.textContent = timeLeft;
-              if (timeLeft <= 0) { showAnsweringPhase(); }
-          }, 1000);
+        if(isGameOver) return;
+        startPreRoundSequence();
       }, 1500);
     }
     
@@ -426,7 +490,6 @@
         maxItemsMemorized = Math.max(...correctRounds.map(r => r.items));
       }
       
-      // CHANGE: Simplified the final score display as requested.
       allElements.finalSummary.innerHTML = `
         <h2>Good Job!</h2>
         <p id="best-score">Your best score:<br><strong>${maxItemsMemorized} items!</strong> ⭐</p>
