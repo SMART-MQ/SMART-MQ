@@ -8,24 +8,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
     <style>
-        /* --- PLAYROOM / CLUTTER CHAOS THEME --- */
+        /* CSS is unchanged */
         * { box-sizing: border-box; }
         body {
-            background-color: #E3F2FD; /* Light Sky Blue */
+            background-color: #E3F2FD;
             font-family: 'Fredoka One', cursive;
-            color: #37474F; /* Blue Grey */
+            color: #37474F;
             text-align: center;
             margin: 0;
             padding: 10px;
             -webkit-tap-highlight-color: transparent;
         }
         .hidden { display: none !important; }
-
         .container {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 10px; min-height: 95vh; max-width: 600px; margin: 0 auto;
         }
-
         h1 { font-size: 3rem; color: #D32F2F; text-shadow: 3px 3px 0px #FFF176; margin: 15px 0; }
         .welcome-title {
             font-size: 1.3em; color: #1565C0; background-color: #BBDEFB;
@@ -33,11 +31,9 @@
         }
         .instructions-list { list-style-type: '🧸'; padding-left: 25px; margin: 20px auto; text-align: left; max-width: 400px; }
         .instructions-list li { font-size: 1.2em; margin-bottom: 15px; padding-left: 10px; line-height: 1.4; transition: all 0.2s ease-in-out; }
-
         #game-area { width: 100%; }
         #game-info { font-size: 1.5rem; font-weight: 700; color: #455A64; margin-bottom: 10px; }
         #message { font-size: 1.2rem; font-weight: 700; color: #0D47A1; min-height: 40px; margin-bottom: 15px; }
-        
         .timer-bar-container {
             width: 100%; height: 25px; background-color: #B0BEC5; border-radius: 12px;
             border: 2px solid #546E7A; margin: 15px auto; overflow: hidden;
@@ -47,54 +43,42 @@
             height: 100%; width: 100%; background: linear-gradient(90deg, #69F0AE, #B9F6CA);
             border-radius: 8px; transition: width 0.5s linear;
         }
-
         .grid {
             display: grid; gap: 15px; justify-content: center;
             margin: 20px auto; user-select: none; max-width: max-content;
             padding: 15px; background-color: rgba(255,255,255,0.4); border-radius: 20px;
         }
         .cell {
-            cursor: pointer; position: relative; background-color: #ECEFF1; /* Light grey block */
+            cursor: pointer; position: relative; background-color: #ECEFF1;
             border: 3px solid #B0BEC5; border-radius: 12px; box-shadow: 0 5px 0 #78909C;
             display: flex; align-items: center; justify-content: center;
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
         }
-        .grid.guessing .cell:hover:not(.correct):not(.incorrect) {
-            transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 0 #78909C;
-            border-color: #FBC02D; /* Yellow accent */
-        }
-        .cell:active:not(.correct):not(.incorrect) {
-            transform: translateY(1px); box-shadow: 0 2px 0 #78909C;
-        }
-
+        .grid.guessing .cell:hover:not(.correct):not(.incorrect) { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 0 #78909C; border-color: #FBC02D; }
+        .cell:active:not(.correct):not(.incorrect) { transform: translateY(1px); box-shadow: 0 2px 0 #78909C; }
         .cell.correct {
             border-color: #66BB6A; background-color: #E8F5E9;
             transform: translateY(2px); box-shadow: 0 2px 0 #43A047; cursor: not-allowed;
         }
         .cell.incorrect { animation: shake 0.5s; border-color: #EF5350; }
-        .marker {
-            position: absolute; bottom: 5px; right: 5px; font-size: 2.4rem; animation: popIn 0.3s ease;
-        }
+        .marker { position: absolute; bottom: 5px; right: 5px; font-size: 2.4rem; animation: popIn 0.3s ease; }
         @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
-
         button {
             background-color: #FBC02D; border: none; color: #3E2723; padding: 15px 30px;
             margin: 10px; font-size: 1.5em; font-family: 'Fredoka One', cursive; font-weight: 700;
             border-radius: 12px; cursor: pointer; transition: all 0.2s ease;
             box-shadow: 0 5px 0 #F9A825; text-transform: uppercase;
         }
-        button:hover:not(:disabled) {
-            background-color: #FDD835; transform: translateY(-2px); box-shadow: 0 7px 0 #F9A825;
-        }
+        button:hover:not(:disabled) { background-color: #FDD835; transform: translateY(-2px); box-shadow: 0 7px 0 #F9A825; }
         .help-button {
             position: fixed; bottom: 15px; left: 15px; width: 50px; height: 50px;
             border-radius: 50%; font-size: 1.8em; z-index: 2000; padding: 0; line-height: 1;
         }
-
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 77, 128, 0.7); z-index: 1000; display: flex;
+            flex-direction: column;
             justify-content: center; align-items: center; padding: 15px;
             transition: opacity 0.3s ease;
         }
@@ -106,24 +90,24 @@
             font-size: 8rem; font-weight: bold; color: #D32F2F;
             background-color: rgba(227, 242, 253, 0.95);
         }
+        #countdownOverlay span {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 20px;
+        }
         #round-fanfare {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background-color: rgba(211, 47, 47, 0.9); color: white; padding: 20px 40px;
             border-radius: 20px; font-size: 3em; z-index: 9999;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3); pointer-events: none; opacity: 0;
         }
+        #round-fanfare.long-text { font-size: 2.2em; }
         .fanfare-animate { animation: fanfare-anim 1.5s ease-in-out; }
-        @keyframes fanfare-anim {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
-        }
-
+        @keyframes fanfare-anim { 0%, 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
         #finalSummary { text-align: center; }
         #finalSummary p { margin: 15px 0; font-size: 1.2em; line-height: 1.5; }
         #star-summary { font-size: 1.8em; color: #D32F2F; margin: 20px 0; font-weight: bold; }
         #final-prompt { color: #1565C0; font-weight: bold; }
-        
         @media (max-height: 700px) and (max-width: 400px) {
             h1 { font-size: 2.2rem; margin-top: 5px; margin-bottom: 5px; }
             .welcome-title { font-size: 1.1em; margin-bottom: 10px; }
@@ -159,7 +143,6 @@
     </div>
     
     <div id="finalSummary" class="container hidden">
-        <!-- CHANGE: Title updated -->
         <h1>Great Job!</h1>
         <div class="overlay-content">
             <p id="star-summary"></p>
@@ -246,16 +229,34 @@
         countdownOverlay.classList.remove('hidden');
         const steps = ["3", "2", "1", "GO!"];
         let i = 0;
-        countdownText.textContent = steps[i];
+        countdownText.innerHTML = steps[i];
         const interval = setInterval(() => {
             i++;
-            if (i < steps.length) { countdownText.textContent = steps[i]; } 
+            if (i < steps.length) { countdownText.innerHTML = steps[i]; } 
             else { clearInterval(interval); countdownOverlay.classList.add('hidden'); callback(); }
         }, 800);
     }
     
-    function triggerFanfare(text, callback) {
+    function showMemorizeCountdown(callback) {
+      countdownOverlay.classList.remove('hidden');
+      const steps = ["<span>Get ready to memorise...</span>", "3", "2", "1", "GO!"];
+      let i = 0;
+      countdownText.innerHTML = steps[i];
+      const interval = setInterval(() => {
+        i++;
+        if (i < steps.length) {
+          countdownText.innerHTML = steps[i];
+        } else {
+          clearInterval(interval);
+          countdownOverlay.classList.add('hidden');
+          callback();
+        }
+      }, i === 0 ? 1500 : 800);
+    }
+
+    function triggerFanfare(text, callback, isLong = false) {
         roundFanfare.textContent = text;
+        roundFanfare.classList.toggle('long-text', isLong);
         roundFanfare.classList.remove('fanfare-animate');
         void roundFanfare.offsetWidth;
         roundFanfare.classList.add('fanfare-animate');
@@ -264,7 +265,6 @@
 
     function startRound() {
         if (isPaused) return;
-        const round = rounds[currentRound];
         foundDifferences.clear();
         incorrectPressesThisRound = 0;
         gridElement.classList.add('hidden');
@@ -275,17 +275,14 @@
             if (isPaused) return;
             gameInfoElement.textContent = `Round ${currentRound + 1} of ${rounds.length}`; 
             
-            const diffText = round.differences === 1 ? 'There is 1 changed item.' : `There are ${round.differences} changed items.`;
-            messageElement.innerHTML = `Get ready to memorise...<br>${diffText}`;
-            
-            introTimeout = setTimeout(() => {
+            showMemorizeCountdown(() => {
                 if (isPaused) return;
-                if (emojiIndex + round.gridSize > objectEmojis.length) { emojiIndex = 0; }
-                originalGrid = objectEmojis.slice(emojiIndex, emojiIndex + round.gridSize);
-                emojiIndex += round.gridSize;
-                renderGrid(originalGrid, round.columns, round.cellSize, false);
-                startMemorizationPhase(round);
-            }, 2500);
+                if (emojiIndex + rounds[currentRound].gridSize > objectEmojis.length) { emojiIndex = 0; }
+                originalGrid = objectEmojis.slice(emojiIndex, emojiIndex + rounds[currentRound].gridSize);
+                emojiIndex += rounds[currentRound].gridSize;
+                renderGrid(originalGrid, rounds[currentRound].columns, rounds[currentRound].cellSize, false);
+                startMemorizationPhase(rounds[currentRound]);
+            });
         });
     }
 
@@ -310,17 +307,19 @@
     function startGuessingPhase() {
         isMemorizing = false;
         timerBarContainer.classList.add('hidden');
-        const result = modifyGrid(originalGrid, rounds[currentRound].differences);
-        modifiedGrid = result.newGrid;
-        changedIndices = result.changedIndices;
-        gridElement.style.opacity = '0';
-        messageElement.textContent = 'Now, find the changed items!';
-        setTimeout(() => {
+        gridElement.classList.add('hidden');
+
+        triggerFanfare("Now find the changed items!", () => {
             if (isPaused) return;
+            const result = modifyGrid(originalGrid, rounds[currentRound].differences);
+            modifiedGrid = result.newGrid;
+            changedIndices = result.changedIndices;
+            messageElement.textContent = 'Now, find the changed items!';
             renderGrid(modifiedGrid, rounds[currentRound].columns, rounds[currentRound].cellSize, true);
-            gridElement.style.transition = 'opacity 0.5s ease-in-out';
-            gridElement.style.opacity = '1';
-        }, 500);
+            gridElement.style.opacity = '0';
+            gridElement.classList.remove('hidden');
+            setTimeout(() => { gridElement.style.opacity = '1'; }, 100);
+        }, true);
     }
 
     function renderGrid(gridData, columns, cellSize, clickable) {
