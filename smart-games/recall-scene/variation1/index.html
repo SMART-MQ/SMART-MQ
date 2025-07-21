@@ -324,8 +324,13 @@
         setTimeout(() => {
             if (isGameOver) return;
             buildScene();
-            allElements.viewingPhase.classList.remove('is-faded-out');
             
+            // --- CHANGE: The more robust way to reveal the items ---
+            allElements.viewingPhase.classList.remove('hidden'); // Put it back in the document flow, but still transparent
+            setTimeout(() => {
+                allElements.viewingPhase.classList.remove('is-faded-out'); // Now, fade it in
+            }, 20); // A tiny delay ensures the browser renders the display change first
+
             allElements.readyBtn.disabled = true;
             setTimeout(() => { allElements.readyBtn.disabled = false; }, 10000);
 
@@ -350,8 +355,9 @@
       allElements.resultsOverlay.classList.add('is-faded-out');
       allElements.nextBtn.classList.add('hidden');
       allElements.answeringPhase.classList.add('is-faded-out');
-      // --- CHANGE: The simple fix to prevent the flash ---
-      allElements.viewingPhase.classList.add('is-faded-out'); 
+      
+      // --- CHANGE: Use the powerful .hidden class to guarantee it's not visible ---
+      allElements.viewingPhase.classList.add('hidden', 'is-faded-out'); 
       
       triggerFanfare();
       
